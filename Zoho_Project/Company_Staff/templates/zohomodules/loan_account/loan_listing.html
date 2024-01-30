@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<style>
+    body {
+        color: white;
+    }
+
+   
+   
+
+    .responsive-table {
+        width: 100%;
+        overflow-x: auto;
+        margin-top: 50px;
+    }
+
+    .responsive-table th, .responsive-table td {
+        padding: 8px;
+        text-align: left;
+    }
+    button {
+        margin-right: 40px;  
+    }
+
+</style>
+
+<div class="body-wrapper">
+    <div class="container-fluid">
+        <input type="text" id="search" name="search" placeholder="Search">
+
+        <i class="fas fa-filter"></i> 
+        <select id="filter" name="filter">
+            <option value="All">All</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+        </select>
+
+        <i class="fas fa-sort"></i>
+        <select id="sort" name="sort">
+            <option value="all">All</option>
+            <option value="Account Holder">Account Holder</option>
+            <option value="Loan Amount">Loan Amount</option>
+        </select>
+
+        <button onclick="">Export to Excel</button>
+        <a href="{% url 'add_loan' %}" class="btn btn-primary">Add loan</a>
+
+        <div class="responsive-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Serial Number</th>
+                        <th>Date</th>
+                        <th>Account Holder Name</th>
+                        <th>Account Number</th>
+                        <th>Loan Amount</th>
+                        <th>Balance</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+              
+                    <tr>
+                        <td>1</td>
+                        <td>2024-01-30</td>
+                        <td>abc</td>
+                        <td>123456789</td>
+                        <td>10,000.00</td>
+                        <td>5,000.00</td>
+                        <td>Active</td>
+                    </tr>
+                
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
