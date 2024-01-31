@@ -53,7 +53,7 @@
                                     <label for="">Account Number</label>
                                 </div>
                                 <div class="input-container col-6">
-                                    <input type="text" class="form-control text-dark bg-light" name="fname" id="fname" required>
+                                    <input type="text" class="form-control text-dark bg-light" name="account_number"  required>
                                 </div>
                             </div>
                             <div class="row pb-3">
@@ -61,7 +61,7 @@
                                     <label for="">Loan Amount</label>
                                 </div>
                                 <div class="input-container col-6">
-                                    <input type="text" class="form-control text-dark bg-light" name="lname" id="lname" required>
+                                    <input type="text" class="form-control text-dark bg-light" name="loan_amount"  required>
                                 </div>
                             </div>
                             <div class="row pb-3">
@@ -69,7 +69,7 @@
                                     <label for="">Lender Bank</label>
                                 </div>
                                 <div class="input-container col-6">
-                                    <input type="text" class="form-control text-dark bg-light" name="alias" id="alias">
+                                    <input type="text" class="form-control text-dark bg-light" name="lender_bank" >
                                 </div>
                             </div>
                             <div class="row pb-3">
@@ -77,7 +77,7 @@
                                     <label for="">Date</label>
                                 </div>
                                 <div class="input-container col-6">
-                                    <input type="date" class="form-control text-dark bg-light" name="joindate" id="joindate" required>
+                                    <input type="date" class="form-control text-dark bg-light" name="loan_date"  required>
                                 </div>
                             </div>
                             <div class="row pb-3">
@@ -85,7 +85,7 @@
                                     <label for="sdate">Loan Recieved</label>
                                 </div>
                                 <div class="input-container col-6">
-                                    <select class="form-control text-dark bg-light" name="salary" id="sdate" required>
+                                    <select class="form-control text-dark bg-light" name="payment_method"  required>
                                         <option value="" selected hidden>Select</option>
                                         <option value="Cash">Cash</option>
                                         <option value="UPI">UPI</option>
@@ -100,7 +100,7 @@
                                         <label for="">Terms</label>
                                     </div>
                                     <div class="input-container col-6">
-                                        <input type="text" class="form-control text-dark bg-light" name="fsalary" id="fsalary" value="0">
+                                        <input type="text" class="form-control text-dark bg-light" name="terms"  value="0">
                                     </div>
                                 </div>
                            
@@ -110,7 +110,12 @@
                                         <label for="">Processing Paid from</label>
                                     </div>
                                     <div class="input-container col-6">
-                                        <input type="text" class="form-control text-dark bg-light" name="amnthr" id="amnthr" value="0">
+                                        <select class="form-control text-dark bg-light" name="processing_method"  required>
+                                            <option value="" selected hidden>Select</option>
+                                            <option value="Cash">Cash</option>
+                                            <option value="UPI">UPI</option>
+                                            <option value="Cheque">Cheque</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="row pb-3">
@@ -118,7 +123,7 @@
                                         <label for="">Interest rate</label>
                                     </div>
                                     <div class="input-container col-6">
-                                        <input type="number" class="form-control text-dark bg-light" name="hours" id="hours" onkeyup="calculateAmount()" value="0">
+                                        <input type="number" class="form-control text-dark bg-light" name="interest"   value="0">
                                     </div>
                                 </div>
                                 <div class="row pb-3">
@@ -126,7 +131,15 @@
                                         <label for="">Processing fee</label>
                                     </div>
                                     <div class="input-container col-6">
-                                        <input type="number" class="form-control text-dark bg-light" name="vsalary" id="vsalary" value="0" readonly>
+                                        <input type="number" class="form-control text-dark bg-light" name="processing_fee"  value="0" >
+                                    </div>
+                                </div>
+                                <div class="row pb-3">
+                                    <div class="col-6">
+                                        <label for="">Description</label>
+                                    </div>
+                                    <div class="input-container col-6">
+                                        <input type="text" class="form-control text-dark bg-light" name="description">
                                     </div>
                                 </div>
                             </div>
@@ -145,19 +158,21 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
+                                        <form method="POST" action="{% url 'save_account_details' %}" enctype="multipart/form-data">
+                                            {% csrf_token %}
                                         <div class="row">
                                             <div class="col-6">
                                                 <h4 class="text-light">Bank Account Holder Form</h4>
                                                 <h6 class="text-light mt-3"> Name</h6>
-                                                <input type="text" class="form-control text-dark bg-light" name="account_holder_name" id="account_holder_name" required>
+                                                <input type="text" class="form-control text-dark bg-light" name="name" required>
                                                 <h6 class="text-light mt-3"> Alias</h6>
-                                                <input type="text" class="form-control text-dark bg-light" name="account_holder_name" id="account_holder_name" required>
+                                                <input type="text" class="form-control text-dark bg-light" name="alias"  required>
                                                 <h6 class="text-light mt-3"> Phone Number</h6>
-                                                <input type="number" class="form-control text-dark bg-light" name="account_holder_name" id="account_holder_name" required>
+                                                <input type="number" class="form-control text-dark bg-light" name="phone_number"  required>
                                                 <h6 class="text-light mt-3">Email</h6>
                                                 <input type="email" class="form-control text-dark bg-light" name="email" id="email" required>
                                                 <h6 class="text-light mt-3">Account Type</h6>
-                                                <select class="form-control text-dark bg-light" name="salary" id="sdate" required>
+                                                <select class="form-control text-dark bg-light" name="account_type"  required>
                                                     <option value="" selected hidden>Select</option>
                                                     <option value="savings">Savings</option>
                                                     <option value="current">Current</option>
@@ -167,22 +182,116 @@
                                             <div class="col-6">
                                                 <h4 class="text-light">Bank Account Form</h4>
                                                 <h6 class="text-light mt-3">Bank Name</h6>
-                                                <input type="text" class="form-control text-dark bg-light" name="bank_name" id="bank_name" required>
+                                                <input type="text" class="form-control text-dark bg-light" name="bankname"  required>
                                                 <h6 class="text-light mt-3">Account Number</h6>
-                                                <input type="number" class="form-control text-dark bg-light" name="account_number" id="account_number" required>
+                                                <input type="number" class="form-control text-dark bg-light" name="account_number"  required>
                                                 <h6 class="text-light mt-3">IFSC Code</h6>
-                                                <input type="number" class="form-control text-dark bg-light" name="account_number" id="account_number" required>
+                                                <input type="text" class="form-control text-dark bg-light" name="ifsc_code"  required>
                                                 <h6 class="text-light mt-3">Swift Code</h6>
-                                                <input type="number" class="form-control text-dark bg-light" name="account_number" id="account_number" required>
+                                                <input type="text" class="form-control text-dark bg-light" name="swift_code"  required>
                                                 <h6 class="text-light mt-3">Branch Name</h6>
-                                                <input type="text" class="form-control text-dark bg-light" name="account_number" id="account_number" required>
+                                                <input type="text" class="form-control text-dark bg-light" name="branch_name"  required>
                                             </div>
                                         </div>
                                        
                                     </div>
+
+                                    <div class="row mt-2 mx-2 mb-2 pb-4">
+                                        <div class="col-6">
+                                            <h4 class="text-light">Bank Configuration Form</h4>
+                                            <h6 class="text-light mt-3"> Select cheque book range</h6>
+                                            <select class="form-control text-dark bg-light" name="cheque_book_range"  required>
+                                                <option value="" selected hidden>Select</option>
+                                                <option value="Yes" >Yes</option>
+                                                <option value="No">No</option>
+                                                
+                                            </select>
+                                            <h6 class="text-light mt-3"> Enable cheque printing</h6>
+                                            <select class="form-control text-dark bg-light" name="enable_cheque_printing"  required>
+                                                <option value="" selected hidden>Select</option>
+                                                <option value="Yes">Yes</option>
+                                                <option value="No">No</option>
+                                                
+                                            </select>
+                                            <h6 class="text-light mt-3"> Set cheque printing configuration</h6>
+                                            <!-- <input type="number" class="form-control text-dark bg-light" name="cheque_printing_configuration"  required> -->
+                                            <select class="form-control text-dark bg-light" name="enable_cheque_printing"  required>
+                                                <option value="" selected hidden>Select</option>
+                                                <option value="Yes">Yes</option>
+                                                <option value="No">No</option>
+                                                </select>
+                                            
+                                        </div>
+                                        <div class="col-6">
+                                            <h4 class="text-light">Mailing Address Form</h4>
+                                            <h6 class="text-light mt-3">Mailing Name</h6>
+                                            <input type="text" class="form-control text-dark bg-light" name="mailing_name"  required>
+                                            <h6 class="text-light mt-3">Address</h6>
+                                            <input type="text" class="form-control text-dark bg-light" name="address"  required>
+                                            <h6 class="text-light mt-3">Country</h6>
+                                            <input type="text" class="form-control text-dark bg-light" name="country"  required>
+                                            <h6 class="text-light mt-3">State</h6>
+                                            <select t class="form-control text-dark bg-light"  name="state">
+                                                <option value="" hidden>Select State</option>
+                                                <option value="[AN]-Andaman And Nicobar Islands">[AN]-Andaman And Nicobar Islands</option> <option value="[AD]-Andhra Pradesh">[AD]-Andhra Pradesh</option>
+                                                <option value="[AR]-Arunachal Pradesh">[AR]-Arunachal Pradesh	</option> <option value="volvo">[AS]-Assam</option>
+                                                <option value="[BR]-Bihar">[BR]-Bihar</option> <option value="volvo">[CH]-	Chandhigarh</option><option value="[CG]-Chattisgarh">[CG]-Chattisgarh</option>
+                                                <option value="[DD]-Daman Diu">[DD]-Daman Diu</option><option value="volvo">[DL]-	Delhi</option><option value="[GA]-Goa">[GA]-Goa</option> <option value="[GJ]-Gujarat">[GJ]-Gujarat</option>
+                                                <option value="[HR]-Haryana">[HR]-Haryana</option> <option value="[HP]-Himachal Pradesh">[HP]-Himachal Pradesh</option>
+                                                <option value="[JK]-Jammu And Kashmir">[JK]-Jammu And Kashmir</option><option value="[JH]-Jharkand">[JH]-Jharkand</option>
+                                                <option value="[KA]-Karnataka">[KA]-Karnataka</option><option value="[KL]-Kerala">[KL]-Kerala</option>
+                                                <option value="[LA]-Ladakh">[LA]-Ladakh</option><option value="[LD]-Lakshadweep">[LD]-Lakshadweep</option>
+                                                <option value="[MP]-Madhyapradesh">[MP]-Madhyapradesh</option><option value="[MH]-Maharashtra">[MH]-Maharashtra</option>
+                                                <option value="[MN]-Manipur">[MN]-Manipur</option>  <option value="[ML]-Meghalaya">[ML]-Meghalaya</option>
+                                                <option value="[MZ]-Mizoram">[MZ]-Mizoram</option> <option value="[NL]-Nagaland">[NL]-Nagaland</option> <option value="[NL]-Nagaland">[NL]-Nagaland</option>
+                                                <option value="[OD]-Odisha">[OD]-Odisha</option><option value="[PY]-Puducherry">[PY]-Puducherry</option>
+                                                <option value="[PB]-Punjab">[PB]-Punjab.</option><option value="[RL]-Rajasthan">[RL]-Rajasthan</option>
+                                                <option value="[SK]-Sikkim">[SK]-Sikkim</option><option value="[TN]-Tamilnadu">[TN]-Tamilnadu</option>
+                                                <option value="[TS]-Telenghana">[TS]-Telenghana</option><option value="[TR]-Tripura">[TR]-Tripura</option><option value="[UP]-Uttar Pradesh">[UP]-Uttar Pradesh</option>
+                                                <option value="[UK]-Utharakhand">[UK]-Utharakhand</option><option value="[WB]-West Bengal">[WB]-West Bengal</option>
+                                                <option value="[OT]-Other Territory">[OT]-Other Territory</option>
+                                            </select>
+                                            <h6 class="text-light mt-3">Pin</h6>
+                                            <input type="number" class="form-control text-dark bg-light" name="pin"  required>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2 mx-2 mb-2 pb-5">
+                                        <div class="col-6">
+                                            <h4 class="text-light">Tax Registration Form</h4>
+                                            <h6 class="text-light mt-3"> PAN number</h6>
+                                            <input type="text" class="form-control text-dark bg-light" name="pan_number"  required>
+
+                                            <h6 class="text-light mt-3"> Registration type</h6>
+                                            <select class="form-control text-dark bg-light" name="registration_type"  required>
+                                                <option value="" selected hidden>Select</option>
+                                                <option value="Regular">Regular</option>
+                                                
+                                            </select>
+                                            <h6 class="text-light mt-3"> GST Number </h6>
+                                            <input type="text" class="form-control text-dark bg-light" name="gst_num"  required>
+                                            
+                                        </div>
+                                        <div class="col-6">
+                                            <h4 class="text-light">Opening Balance Form</h4>
+                                            <h6 class="text-light mt-3">Date</h6>
+                                            <input type="date" class="form-control text-dark bg-light" name="date"  required>
+                                            <h6 class="text-light mt-3">Amount</h6>
+                                            <input type="number" class="form-control text-dark bg-light" name="amount"  required>
+                                        
+                                        </div>
+                                        
+                                    </div>
+                                    <button type="button" class="btn btn-primary">Save changes</button>
+                                </form>
+                                    
+                                   
+                                </div>
+
+
+
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary">Save changes</button>
+                                        
                                     </div>
                                 </div>
                             </div>

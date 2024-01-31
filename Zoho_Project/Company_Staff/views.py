@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.conf import settings
 from datetime import date
 from datetime import datetime, timedelta
+from Company_Staff.models import BankAccount
 
 # Create your views here.
 
@@ -493,4 +494,77 @@ def loan_listing(request):
   return render(request,'zohomodules/loan_account/loan_listing.html')
 
 def add_loan(request):
-  return render(request,'zohomodules/loan_account/add_loan.html')
+  if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        if 'login_id' not in request.session:
+            return redirect('/')
+        log_details= LoginDetails.objects.get(id=log_id)
+        dash_details = CompanyDetails.objects.get(login_details=log_details,superadmin_approval=1,Distributor_approval=1)
+        allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+        context = {
+            'details': dash_details,
+            'allmodules': allmodules
+        }
+  return render(request,'zohomodules/loan_account/add_loan.html',context)
+
+def save_account_details(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        alias = request.POST.get('alias')
+        phone_number = request.POST.get('phone_number')
+        email = request.POST.get('email')
+        account_type = request.POST.get('account_type')
+        bankname = request.POST.get('bankname')
+        account_number = request.POST.get('account_number')
+        ifsc_code = request.POST.get('ifsc_code')
+        swift_code = request.POST.get('swift_code')
+        branch_name = request.POST.get('branch_name')
+        cheque_book_range = request.POST.get('cheque_book_range')
+        enable_cheque_printing = request.POST.get('enable_cheque_printing')
+        cheque_printing_configuration = request.POST.get('cheque_printing_configuration')
+        mailing_name = request.POST.get('mailing_name')
+        address = request.POST.get('address')
+        country = request.POST.get('country')
+        state = request.POST.get('state')
+        pin = request.POST.get('pin')
+        pan_number = request.POST.get('pan_number')
+        registration_type = request.POST.get('registration_type')
+        gst_num = request.POST.get('gst_num')
+        # alter_gst_details = request.POST.get('alter_gst_details')
+        date = request.POST.get('date')
+        amount_type = request.POST.get('amount_type')
+        amount = request.POST.get('amount')
+
+        
+        BankAccount.objects.create(
+            customer_name=name,
+            alias=alias,
+            phone_number=phone_number,
+            email=email,
+            account_type=account_type,
+            bankname=bankname,
+            account_number=account_number,
+            ifsc_code=ifsc_code,
+            swift_code=swift_code,
+            branch_name=branch_name,
+            cheque_book_range=cheque_book_range,
+            enable_cheque_printing=enable_cheque_printing,
+            cheque_printing_configuration=cheque_printing_configuration,
+            mailing_name=mailing_name,
+            address=address,
+            country=country,
+            state=state,
+            pin=pin,
+            pan_number=pan_number,
+            registration_type=registration_type,
+            gst_num=gst_num,
+            # alter_gst_details=alter_gst_details,
+            date=date,
+            amount_type=amount_type,
+            amount=amount
+            
+        )
+
+        return render(request,'zohomodules/loan_account/add_loan.html')
+    else:
+        return render(request,'zohomodules/loan_account/add_loan.html')

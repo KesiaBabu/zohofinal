@@ -37,6 +37,7 @@ urlpatterns = [
        ## kesia loan account ##
     path('zohomodules/loan_account/loan_listing',views.loan_listing,name='loan_listing'),
     path('zohomodules/loan_account/add_loan',views.add_loan,name='add_loan'),
+    path('save_account_details',views.save_account_details,name='save_account_details'),
   
     
 ]
