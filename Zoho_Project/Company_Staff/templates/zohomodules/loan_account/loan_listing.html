@@ -62,15 +62,18 @@
                 </thead>
                 <tbody>
               
+                    {% for loan in loan_details %}
                     <tr>
-                        <td>1</td>
-                        <td>2024-01-30</td>
-                        <td>abc</td>
-                        <td>123456789</td>
-                        <td>10,000.00</td>
-                        <td>5,000.00</td>
-                        <td>Active</td>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ loan.loan_date }}</td>
+                        <td><a href="{% url 'overview' account_id=loan.bank_holder.id %}"> {{ loan.bank_holder.customer_name }}</a></td>
+                        <td>{{ loan.bank_holder.account_number }}</td>
+                        <td>{{ loan.loan_amount }}</td>
+                        <td></td>
+                        <td></td>
                     </tr>
+        
+                    {% endfor %}
                 
                 </tbody>
             </table>

@@ -4,8 +4,11 @@ from Register_Login.views import logout
 from django.contrib import messages
 from django.conf import settings
 from datetime import date
+from django.http import HttpResponse
 from datetime import datetime, timedelta
 from Company_Staff.models import BankAccount
+from Company_Staff.models import loan_account
+from django.shortcuts import render, get_object_or_404
 
 # Create your views here.
 
@@ -491,21 +494,94 @@ def staff_password_change(request):
 #### Kesia  ####
 
 def loan_listing(request):
-  return render(request,'zohomodules/loan_account/loan_listing.html')
-
-def add_loan(request):
   if 'login_id' in request.session:
         log_id = request.session['login_id']
         if 'login_id' not in request.session:
             return redirect('/')
-        log_details= LoginDetails.objects.get(id=log_id)
-        dash_details = CompanyDetails.objects.get(login_details=log_details,superadmin_approval=1,Distributor_approval=1)
-        allmodules= ZohoModules.objects.get(company=dash_details,status='New')
-        context = {
-            'details': dash_details,
-            'allmodules': allmodules
-        }
-  return render(request,'zohomodules/loan_account/add_loan.html',context)
+        
+        log_details = LoginDetails.objects.get(id=log_id)
+        user_type = log_details.user_type
+
+        if user_type in ['Company', 'Staff']:
+            dash_details = CompanyDetails.objects.get(login_details=log_details, superadmin_approval=1, Distributor_approval=1)
+            allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+            context = {
+                    'details': dash_details,
+                    'allmodules': allmodules,
+                    'bank_holder': BankAccount.objects.all(),
+                    'loan_details': loan_account.objects.all(),
+                }
+  return render(request,'zohomodules/loan_account/loan_listing.html',context)
+
+def add_loan(request):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        if 'login_id' not in request.session:
+            return redirect('/')
+        
+        log_details = LoginDetails.objects.get(id=log_id)
+        user_type = log_details.user_type
+
+        if user_type in ['Company', 'Staff']:
+            dash_details = CompanyDetails.objects.get(login_details=log_details, superadmin_approval=1, Distributor_approval=1)
+            allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+            context = {
+                    'details': dash_details,
+                    'allmodules': allmodules,
+                    'bank_holder': BankAccount.objects.all(),
+                    'loan_details': loan_account.objects.all(),
+                }
+
+            if request.method == 'POST':
+                account_name = request.POST.get('account_name')
+                customer_name = BankAccount.objects.get(id=account_name)
+                # account_number = request.POST.get('account_number')
+                loan_amount = request.POST.get('loan_amount')
+                lender_bank = request.POST.get('lender_bank')
+                loan_date = request.POST.get('loan_date')
+                payment_method = request.POST.get('payment_method')
+                processing_method = request.POST.get('processing_method')
+                interest = request.POST.get('interest', 0)
+                processing_fee = request.POST.get('processing_fee', 0)
+                description = request.POST.get('description')
+                try:
+                    bank_account = BankAccount.objects.get(id=account_name)
+                    account_number = bank_account.account_number
+                except BankAccount.DoesNotExist:
+                    account_number = ""
+
+                loan = loan_account(
+                    bank_holder=customer_name,
+                    # account_number=account_number,
+                    loan_amount=loan_amount,
+                    lender_bank=lender_bank,
+                    loan_date=loan_date,
+                    payment_method=payment_method,
+                    processing_method=processing_method,
+                    interest=interest,
+                    processing_fee=processing_fee,
+                    description=description
+                )
+                loan.save()
+                context = {
+                    'details': dash_details,
+                    'allmodules': allmodules,
+                    'bank_holder': BankAccount.objects.all(),
+                    'loan_details': loan_account.objects.all(),
+                }
+
+                
+                
+                return redirect('loan_listing')
+            else:
+               
+                return render(request, 'zohomodules/loan_account/add_loan.html', context)
+        else:
+            
+            return HttpResponse("Unauthorized access")
+    else:
+        return redirect('/')
+    
 
 def save_account_details(request):
     if request.method == 'POST':
@@ -568,3 +644,21 @@ def save_account_details(request):
         return render(request,'zohomodules/loan_account/add_loan.html')
     else:
         return render(request,'zohomodules/loan_account/add_loan.html')
+    
+# def holder_dropdown(request):
+#     if 'login_id' in request.session:
+#         log_id = request.session['login_id']
+#         if 'login_id' not in request.session:
+#             return redirect('/')
+#     log_details = LoginDetails.objects.get(id=log_id)
+
+#     options = {}
+#     option_objects = BankAccount.objects.filter(user = user)
+#     for option in option_objects:
+        
+#         options[option.id] = [option.salutation, option.first_name, option.last_name, option.id]
+#     return JsonResponse(options)
+    
+def overview(request,account_id):
+    account = get_object_or_404(BankAccount, id=account_id)
+    return render(request,'zohomodules/loan_account/overview.html', {'account': account})
