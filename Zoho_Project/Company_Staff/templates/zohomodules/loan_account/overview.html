@@ -70,19 +70,29 @@
                     <div class="row">
                       <div class="table-responsive scrollable-table" >
                         <table class="table  text-white" id="myTable">
-                          <tbody>
+                          <thead>
+                            <th>Name </th>
+                            <th>Loan Amount</th>
                            
-                              <tr class="clickable" id="{{i.id}}">
+                            <th>Status</th>
+                              
+                          </thead>
+                          <tbody>
+                            <td>{{account.customer_name}}</td>
+                            <td>{{ loan_info.loan_amount }}</td>
+                            <td>{{account.customer_name}}</td>
+                           
+                              <!-- <tr class="clickable" id="{{account.id}}">
                                 <td class="justify-content-between align-items-center ">
-                                  <b style="font-size: large;">{{acc.customer_name}} </b><br><br>
-                                  <label>{{i.joindate}} </label>
+                                  <b style="font-size: large;">{{account.customer_name}} </b><br><br>
+                                  <label>Name </label>
                                 </td>
                                 <td>
-                                  <label class="text-end d-block">{{i.status}}</label>
+                                  <label class="text-end d-block">{{account.customer_name}}</label>
                                   <br>
-                                  <label class="text-end d-block">₹{{i.salary}}</label>
+                                  <label class="text-end d-block">Status</label>
                                 </td>
-                              </tr>
+                              </tr> -->
                           
                           </tbody>
                         </table>
@@ -93,13 +103,18 @@
                     <div  id="overviewdiv">
                       <div class="row ">
                         <div class="col-md-7" >
-                          <a class="text-white" style="font-size: 1.5rem;;"><h2 class="text-white">{{p.first_name}} {{p.last_name}}</h2></a>
+                          <a class="text-white" style="font-size: 1.5rem;;"><h2 class="text-white">{{account.customer_name}}</h2></a>
                         </div>
                       </div>
+                      
                       <div class="row">
                         <div class="col-md-2" >
-                          <a class="btn bg-warning text-light btn-sm" ><i class="fas fa-eye"></i> Overview</a>
+                          <a href="{% url 'overview' account.id %}" class="btn bg-warning text-light btn-sm" ><i class="fas fa-eye"></i> Overview</a>
                         </div>
+                      
+                        <div class="col-md-2" >
+                          <a href="{% url 'transaction' account.id %}"  class="btn bg-warning text-light btn-sm" ><i class="fas fa-eye"></i> Transaction</a>
+                       </div>
                         <div class="col-md-10 col-lg-10 col-sm-12" style="text-align: right; ">
                           <a href="#"  class=" text-dark" >
                             <button class="btn btn-outline-warning btn-sm"  title="Edit"><i class="fas fa-edit"></i></button>
@@ -145,19 +160,19 @@
                         <div class="row " id="div-to-pdf" style="background-color: #acaaaafd; margin-left:1px; margin-right: 1rem; ">
                           <br>
                           <div class="row">
-                            <div class="col-3 mt-3" >
+                            <!-- <div class="col-3 mt-3" >
                               <label style="font-size: medium;  "><b>Name : {{account.customer_name}}</b></label><br>
                               <label style="font-size: medium; "><b>Position : {{p.designation}}</b></label>
-                            </div>
+                            </div> -->
                             <div class="col-6 mt-3">
-                              <div class="row text-center">
-                                <h2  >Account Holder</h2>
+                              <div class="row ">
+                                <h2  tyle="text-align: center;">Account Holder</h2>
                               </div>
                             </div>
-                            <div class="col-3 mt-3" style="text-align: right;">
+                            <!-- <div class="col-3 mt-3" style="text-align: right;">
                               <label style="font-size: medium;" ><b>Emp No : {{p.emp_number}}</b></label><br>
                               <label style="font-size: medium;"><b>Join Date : {{p.joindate | date:'d-m-Y'}}</b></label>
-                            </div>
+                            </div> -->
                           </div>
                           <div class="row text-center">
                             <h2 >
@@ -168,7 +183,7 @@
                             <div class="row mt-1">
                               <div class="col-2"></div>
                               <div class="col-6" style="text-align: center; ">
-                                <a href=" " >
+                                <!-- <a href=" " >
                                   {% if p.image != '' %}
                                   <img class="img-fluid" style="border: 2px rgb(199, 119, 0) solid;" src="{{p.image.url}}" alt="profile pic"  name="img" >
                                   {% else %}
@@ -177,244 +192,136 @@
                                   <br><br>
                                   <p class="text-dark fs-5 b" >{{p.title}} &nbsp;{{p.first_name}} &nbsp;{{p.last_name}}
                                   </p>
-                                </a>
+                                </a> -->
                               </div>
                             </div><br>
                             <div class="row mt-1">
-                              <div class="col-5"><p for=""> Email : </p></div>
+                              <div class="col-5"><p for=""> Name : </p></div>
                               <div class="col-7">
-                                <p class="bold"  style="max-width: 15rem;word-wrap: break-word;">{{p.email}}</p>
+                                <p class="bold"  style="max-width: 15rem;word-wrap: break-word;">{{account.customer_name}}</p>
+                              </div>
+                            </div>
+                            <div class="row mt-1">
+                              <div class="col-5"><p for=""> Status : </p></div>
+                              <div class="col-7">
+                                <p class="bold"  style="max-width: 15rem;word-wrap: break-word;">{{account.customer_name}}</p>
+                              </div>
+                            </div>
+                            <div class="row mt-1">
+                              <div class="col-5"><p for=""> Phone No. : </p></div>
+                              <div class="col-7">
+                                <p class="bold"  style="max-width: 15rem;word-wrap: break-word;">{{account.phone_number}}</p>
                               </div>
                             </div>
                             <div class="row mt-2">
-                              <div class="col-5"><p  for="">Phone Number:</p></div>
+                              <div class="col-5"><p  for="">Email:</p></div>
                               <div class="col-7">
-                                <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{p.Phone}}</p>
+                                <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{account.email}}</p>
                               </div>
                             </div>
-                            {% if p.emergency_phone %}
+                            <!-- {% if p.emergency_phone %}
                               <div class="row mt-2">
                                 <div class="col-5"><p  for="">Emergency Number :</p></div>
                                 <div class="col-7">
                                   <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{p.emergency_phone}}</p>
                                 </div>
                               </div>
-                            {% endif %}
+                            {% endif %} -->
                             <div class="row mt-2">
-                              <div class="col-5"><p  for="">Location :</p></div>
+                              <div class="col-5"><p  for="">Account number :</p></div>
                               <div class="col-7">
-                                <p class="bold" style="max-width: 15rem;word-wrap: break-word;">{{p.location}}</p>
+                                <p class="bold" style="max-width: 15rem;word-wrap: break-word;">{{account.account_number}}</p>
                               </div>
                             </div>
-                            <div class="h3 mt-4 text-black">Personal info
+                            <!-- <div class="h3 mt-4 text-black">Personal info
                               <hr style="color: orange;">
-                            </div>
+                            </div> -->
                             <div class="row mt-2">
-                              <div class="col-5"><p  for="">Gender :</p></div>
+                              <div class="col-5"><p  for="">IFSC Code :</p></div>
                               <div class="col-7">
-                                <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{p.gender}}</p>
+                                <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{account.ifsc_code}}</p>
                               </div>
                             </div>
                             <div class="row mt-2">
-                              <div class="col-5"><p  for="">Age :</p></div>
+                              <div class="col-5"><p  for="">Swift Code :</p></div>
                               <div class="col-7">
-                                <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{p.age}}</p>
+                                <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{account.swift_code}}</p>
                               </div>
                             </div>
                             <div class="row mt-2">
-                              <div class="col-5"><p  for="">Blood Group :</p></div>
+                              <div class="col-5"><p  for="">Branch Name :</p></div>
                               <div class="col-7">
-                                <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{p.blood}}</p>
+                                <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{account.branch_name}}</p>
                               </div>
                             </div>
                             <div class="row mt-2">
-                              <div class="col-5"><p  for="">Date of Birth :</p></div>
+                              <div class="col-5"><p  for="">Pan Number :</p></div>
                               <div class="col-7">
-                                <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{p.dob}}</p>
+                                <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{account.pan_number}}</p>
                               </div>
                             </div>
                             <div class="row mt-1">
-                              <div class="col-5"><p  for="">Permanent Address:</p></div>
+                              <div class="col-5"><p  for="">GST Number:</p></div>
                               <div class="col-7">
-                                <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{p.permanent_address}}</p>
+                                <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{account.gst_num}}</p>
                               </div>
                             </div>
-                            <div class="row mt-1">
-                              <div class="col-5"><p  for="">Temporary Address:</p></div>
-                              <div class="col-7">
-                                <p class="bold " style="max-width: 15rem;word-wrap: break-word;">{{p.address}}</p>
-                              </div>
-                            </div>
-                            {% if p.parent %}
-                              <div class="row mt-1">
-                                <div class="col-5"><p for="">Parent Name :</p></div>
-                                <div class="col-7">
-                                  <p class="bold " style="max-width: 12rem;word-wrap: break-word;">{{p.parent}}</p>
-                                </div>
-                              </div>
-                            {% endif %}
-                            {% if p.spouse_name %}
-                              <div class="row">
-                                <div class="col-5"><p  for="">Spouse Name :</p></div>
-                                <div class="col-7">
-                                  <p class="bold " style="max-width: 12rem;word-wrap: break-word;">{{p.spouse_name}}</p>
-                                </div>
-                              </div>
-                            {% endif %}
+                            
                           </div>
                           <div class="p-info col-sm ">
                             <div class="card " style="background-color:#383838 ; color:white; padding-left: 1rem; padding-top: 1rem;">
                               <div class="h3 mt-4 " style="margin-right: 2vh; color:white">
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Salary Info
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Loan Account Info
                                 <hr style="color: orange;">
                               </div>
                                                         
                               <div class="row mt-2">
                                 <div class="col-1"></div>
-                                <div class="col-5"><p for="">Employee Salary :</p></div>
+                                <div class="col-5"><p for="">Lender Bank :</p></div>
                                 <div class="col-6">
-                                  <p class="bold">{{p.salary}}</p>
+                                  <div style="display: inline-block;">{{ loan_info.lender_bank }}</div>
                                 </div>
                               </div>
                                                         
                               <div class="row mt-2">
                                 <div class="col-1"></div>
-                                <div class="col-5"><p for="">Salary Date Range :</p></div>
+                                <div class="col-5"><p for=""> Date  :</p></div>
                                 <div class="col-6">
-                                  <p class="bold">{{p.salaryrange}}</p>
+                                  <p class="bold">{{ loan_info.loan_date }}</p>
                                 </div>
                               </div>
                                                     
                               <div class="row mt-2">
                                 <div class="col-1"></div>
-                                <div class="col-5"><p for="">Salary Type :</p></div>
+                                <div class="col-5"><p for="">Loan Amount :</p></div>
                                 <div class="col-6">
-                                  {% if p.salary_type == 'Variable' %}
-                                    <p class="bold">Time Based</p>
-                                  {% else %}
-                                    <p class="bold">{{p.salary_type}}</p>
-                                  {% endif %}
+                                  <p class="bold">{{ loan_info.loan_amount }}</p>
+                                 
                                 </div>
                               </div>
               
-                              {% if p.salary_type == 'Variable' %}
-                                <div class="row mt-2">
-                                  <div class="col-1"></div>
-                                  <div class="col-5"><p for="">Amount per Hour :</p></div>
-                                  <div class="col-6">
-                                    <p class="bold">{{p.amountperhr}}</p>
-                                  </div>
-                                </div>
+                             
                                                       
                                 <div class="row mt-2">
                                   <div class="col-1"></div>
-                                  <div class="col-5"><p for="">Total Work Hours :</p></div>
+                                  <div class="col-5"><p for="">Terms :</p></div>
                                   <div class="col-6">
-                                    <p class="bold">{{p.workhr}}</p>
+                                    <p class="bold"></p>
                                   </div>
                                 </div>
-                              {% endif %}
-                                {% if isTDS %}
+                              
                               <div class="row mt-2">
                                 <div class="col-1"></div>
-                                <div class="col-5"><p for="">TDS Applicable :</p></div>
+                                <div class="col-5"><p for="">Interest :</p></div>
                                 <div class="col-6">
-                                  <p class="bold">{{p.isTDS}}</p>
+                                  <p class="bold" >{{ loan_info.interest }}</p>
                                 </div>
                               </div>
               
-                                <div class="row mt-2">
-                                  <div class="col-1"></div>
-                                  <div class="col-5"><p for="">TDS Amount :</p></div>
-                                  <div class="col-6">
-                                    <p class="bold">{{p.TDS}}</p>
-                                  </div>
-                                </div>
-                              {% endif %}
-                              {% if p.acc_no %} 
-                              <div class="h3 mt-4 text-light " style="margin-right: 2vh;">
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Bank Details
-                                <hr style="color: orange;">
-                              </div>
-                              {% if p.acc_no %}   <div class="row mt-2">
-                                <div class="col-1"></div>
-                                <div class="col-5"><p for="">ACC Number :</p></div>
-                                <div class="col-6">
-                                     <p class="bold">{{p.acc_no}}</p>
-                                </div>
-                              </div>
-                              {% endif %}
-                              {% if p.IFSC %}<div class="row mt-2">
-                                <div class="col-1"></div>
-                                <div class="col-5"><p for="">IFSC:</p></div>
-                                <div class="col-6">
-                                  <p class="bold">{{p.IFSC}}</p>
-                                </div>
-                              </div>{% endif %}
-
-                              {% if p.bank_name %}<div class="row mt-2">
-                                <div class="col-1"></div>
-                                <div class="col-5"><p for="">BANK :</p></div>
-                                <div class="col-6">
-                                   <p class="bold">{{p.bank_name}}</p>
-                                </div>
-                              </div>
-                              {% endif %}
-                              {% if p.branch %} <div class="row mt-2">
-                                <div class="col-1"></div>
-                                <div class="col-5"><p for="">Branch :</p></div>
-                                <div class="col-6">
-                                  <p class="bold">{{p.branch}}</p>
-                                </div>
-                              </div>
-                              {% endif %}
-                              {% endif %}
+                                
+                              
               
-                              <div class="h3 mt-4 text-light " style="margin-right: 2vh;">
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Statutary Info
-                                <hr style="color: orange;">
-                              </div>
-                                                        
-                              {% if p.Income_tax_no %}  <div class="row mt-2">
-                                <div class="col-1"></div>
-                                <div class="col-5"><p for="">Income Tax Number :</p></div>
-                                <div class="col-6">
-                                  <p class="bold">{{p.Income_tax_no}}</p>
-                                </div>
-                              </div> {% endif %}
-                                                    
-                              <div class="row mt-2">
-                                <div class="col-1"></div>
-                                <div class="col-5"><p for="">Aadhar Number :</p></div>
-                                <div class="col-6">
-                                  <p class="bold">{{p.Aadhar}}</p>
-                                </div>
-                              </div> 
-                                                    
-                              {% if p.UAN %} <div class="row mt-2">
-                                <div class="col-1"></div>
-                                <div class="col-5"><p for="">Universal Account No :</p></div>
-                                <div class="col-6">
-                                  <p class="bold">{{p.UAN}}</p>
-                                </div>
-                              </div> {% endif %}
-                                                        
-                              {% if p.PRAN %} <div class="row mt-2">
-                                <div class="col-1"></div>
-                                <div class="col-5"><p for="">PR Account No :</p></div>
-                                <div class="col-6">
-                                  <p class="bold">{{p.PRAN}}</p>
-                                </div>
-                              </div>
-                              {% endif %}          
-                              {% if p.PFN %}  <div class="row mt-2">
-                                <div class="col-1"></div>
-                                <div class="col-5"><p for="">PF Account No:</p></div>
-                                <div class="col-6">
-                                  <p class="bold">{{p.PFN}}</p>
-                                </div>
-                              </div>
-                              {% endif %}
+                              
                             </div><br>
                           </div>
                         </div>       
@@ -953,13 +860,6 @@ var element = document.getElementById('div-to-pdf')
   }
 </script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-<!-- <script>
-    {% for msg in messages %}
-    swal({
-    title: "{{msg}}",
-    text: "{{msg.tags}}",
-    icon: "{{msg.tags}}",
-  });
-    {% endfor %} -->
-   </script>
+
+   
 {% endblock %}

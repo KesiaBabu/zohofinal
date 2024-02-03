@@ -661,4 +661,10 @@ def save_account_details(request):
     
 def overview(request,account_id):
     account = get_object_or_404(BankAccount, id=account_id)
-    return render(request,'zohomodules/loan_account/overview.html', {'account': account})
+    loan_info = loan_account.objects.filter(bank_holder=account).first()
+    return render(request,'zohomodules/loan_account/overview.html', {'account': account,'loan_info': loan_info})
+
+def transaction(request,account_id):
+    account = get_object_or_404(BankAccount, id=account_id)
+    loan_info = loan_account.objects.filter(bank_holder=account).first()
+    return render(request,'zohomodules/loan_account/transaction.html', {'account': account,'loan_info': loan_info})

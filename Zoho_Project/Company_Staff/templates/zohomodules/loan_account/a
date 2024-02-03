@@ -290,3 +290,98 @@
         </div>
     </div>
 </div>
+
+
+
+
+
+
+
+
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<style>
+    body {
+        color: white;
+    }
+
+   
+   
+
+    .responsive-table {
+        width: 100%;
+        overflow-x: auto;
+        margin-top: 50px;
+    }
+
+    .responsive-table th, .responsive-table td {
+        padding: 8px;
+        text-align: left;
+    }
+    button {
+        margin-right: 40px;  
+    }
+
+</style>
+
+<div class="body-wrapper">
+    <div class="container-fluid">
+        <input type="text" id="search" name="search" placeholder="Search">
+
+        <i class="fas fa-filter"></i> 
+        <select id="filter" name="filter">
+            <option value="All">All</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+        </select>
+
+        <i class="fas fa-sort"></i>
+        <select id="sort" name="sort">
+            <option value="all">All</option>
+            <option value="Account Holder">Account Holder</option>
+            <option value="Loan Amount">Loan Amount</option>
+        </select>
+
+        <button onclick="">Export to Excel</button>
+        <a href="{% url 'add_loan' %}" class="btn btn-primary">Add loan</a>
+
+        <div class="responsive-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Serial Number</th>
+                        <th>Date</th>
+                        <th>Account Holder Name</th>
+                        <th>Account Number</th>
+                        <th>Loan Amount</th>
+                        <th>Balance</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+              
+                    {% for loan in loan_details %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ loan.loan_date }}</td>
+                        <td><a href="{% url 'overview' account_id=loan.bank_holder.id %}"> {{ loan.bank_holder.customer_name }}</a></td>
+                        <td>{{ loan.bank_holder.account_number }}</td>
+                        <td>{{ loan.loan_amount }}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+        
+                    {% endfor %}
+                
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+
