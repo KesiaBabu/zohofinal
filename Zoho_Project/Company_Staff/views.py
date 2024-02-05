@@ -503,8 +503,15 @@ def loan_listing(request):
         user_type = log_details.user_type
 
         if user_type in ['Company', 'Staff']:
-            dash_details = CompanyDetails.objects.get(login_details=log_details, superadmin_approval=1, Distributor_approval=1)
-            allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+            if user_type == 'Company':
+                # Fetch company details
+                dash_details = CompanyDetails.objects.get(login_details=log_details, superadmin_approval=1, Distributor_approval=1)
+                allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+            else:
+                # Fetch staff details
+                dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
+                allmodules = None
+            
             context = {
                     'details': dash_details,
                     'allmodules': allmodules,
@@ -523,8 +530,14 @@ def add_loan(request):
         user_type = log_details.user_type
 
         if user_type in ['Company', 'Staff']:
-            dash_details = CompanyDetails.objects.get(login_details=log_details, superadmin_approval=1, Distributor_approval=1)
-            allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+            if user_type == 'Company':
+                # Fetch company details
+                dash_details = CompanyDetails.objects.get(login_details=log_details, superadmin_approval=1, Distributor_approval=1)
+                allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+            else:
+                # Fetch staff details
+                dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
+                allmodules = None
             context = {
                     'details': dash_details,
                     'allmodules': allmodules,
@@ -660,11 +673,67 @@ def save_account_details(request):
 #     return JsonResponse(options)
     
 def overview(request,account_id):
-    account = get_object_or_404(BankAccount, id=account_id)
-    loan_info = loan_account.objects.filter(bank_holder=account).first()
-    return render(request,'zohomodules/loan_account/overview.html', {'account': account,'loan_info': loan_info})
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        if 'login_id' not in request.session:
+            return redirect('/')
+        
+        log_details = LoginDetails.objects.get(id=log_id)
+        user_type = log_details.user_type
+
+        if user_type in ['Company', 'Staff']:
+            if user_type == 'Company':
+                # Fetch company details
+                dash_details = CompanyDetails.objects.get(login_details=log_details, superadmin_approval=1, Distributor_approval=1)
+                allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+            else:
+                # Fetch staff details
+                dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
+                allmodules = None
+            account = get_object_or_404(BankAccount, id=account_id)
+            loan_info = loan_account.objects.filter(bank_holder=account).first()
+            context = {
+                    'details': dash_details,
+                    'allmodules': allmodules,
+                    'account':account,
+                    'loan_info':loan_info
+                     }
+            
+    
+            return render(request,'zohomodules/loan_account/overview.html',context)
 
 def transaction(request,account_id):
-    account = get_object_or_404(BankAccount, id=account_id)
-    loan_info = loan_account.objects.filter(bank_holder=account).first()
-    return render(request,'zohomodules/loan_account/transaction.html', {'account': account,'loan_info': loan_info})
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        if 'login_id' not in request.session:
+            return redirect('/')
+        
+        log_details = LoginDetails.objects.get(id=log_id)
+        user_type = log_details.user_type
+
+        if user_type in ['Company', 'Staff']:
+            if user_type == 'Company':
+                # Fetch company details
+                dash_details = CompanyDetails.objects.get(login_details=log_details, superadmin_approval=1, Distributor_approval=1)
+                allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+            else:
+                # Fetch staff details
+                dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
+                allmodules = None
+            account = get_object_or_404(BankAccount, id=account_id)
+            loan_info = loan_account.objects.filter(bank_holder=account).first()
+
+            context = {
+                    'details': dash_details,
+                    'allmodules': allmodules,
+                    'account':account,
+                    'loan_info':loan_info
+                     }
+    
+            return render(request,'zohomodules/loan_account/transaction.html', context)
+
+def repayment_due(request):
+    return render(request,'zohomodules/loan_account/repayment_due.html')
+
+def new_loan(request):
+    return render(request,'zohomodules/loan_account/new_loan.html')

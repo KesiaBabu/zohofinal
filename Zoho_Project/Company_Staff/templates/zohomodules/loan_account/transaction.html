@@ -35,14 +35,23 @@
                       </div>
                     </div>
                   <div class="col-sm-10 col-lg-5 ml-5 flex-column" id="marginid">
+
                     <div class="flex-column justify-content-center " >
+                      <a class="btn text-center  pt-2 btn-outline-warning" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button" >
+                        <i class="fa fa-filter mt-1">Make Payment</i>
+                      </a>
+                      <div class="dropdown-menu m-1">
+                        <a class="dropdown-item" href="{% url 'repayment_due' %}">Repayment Due</a>
+                        <a class="dropdown-item" href="{% url 'new_loan' %}">Issue New Loan</a>
+                        
+                      </div>
                       <a onclick="ExportToExcel()" class="btn text-center pt-2 btn-outline-warning " >
                         <i class='fas fa-file-export' style='font-size:20px'></i> <span style="margin-top: 3px;">Export</span>
                       </a>
                       <a data-toggle="modal" data-target="#importmodal" class="btn text-center pt-2 btn-outline-warning" onclick="sampleexcel()">
                         <i class="fas fa-file-import" style='font-size:20px'></i> <span style="margin-top: 3px;">Import</span>
                       </a>
-                      <a class="btn text-center  pt-2 btn-outline-warning" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button" >
+                      <!-- <a class="btn text-center  pt-2 btn-outline-warning" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button" >
                         <i class="fa fa-filter mt-1"></i>
                       </a>
                       <div class="dropdown-menu m-1">
@@ -52,7 +61,7 @@
                       </div>
                       <a  class="btn btn-outline-warning text-right px-3 py-2 flex-sm-row" role="button"  href="#">
                         <i class="fa fa-plus fs-4" ><span>New</span></i>
-                      </a>
+                      </a> -->
                     </div>
                   </div>
       </div>

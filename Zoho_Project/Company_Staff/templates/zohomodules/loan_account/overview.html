@@ -31,6 +31,7 @@
             <li class="breadcrumb-item" aria-current="page">Over view</li>
           </ol>
       </nav>
+      
       <div class="row mt-5">
           <div class="col-sm-12 col-lg-12 flex-column">
               <div class="card mb-3 bg-black shadow p-3 mb-5 rounded" style="max-width: 1200px;">
@@ -38,33 +39,34 @@
                   <div class="col-sm flex-column">
                     <div class="row">
                       <div class="row">
-                        <a class="text-white" style="font-size: 1.5rem;">Loan Account</a>
+                        <a class="text-white" style="font-size: 2rem;">Loan Account</a>
                       </div>
                       <div class="row">
-                        <div class="col-sm-3 col-lg-7">
+                        <!-- <div class="col-sm-3 col-lg-7">
                           <input type="text" id="search" class="form-control bg-light text-dark " placeholder="Search.." autocomplete="off">
-                        </div>
-                        <div class="col-sm-4 col-lg-5 " style="text-align: right; float: right;" >
+                        </div> -->
+                        <!-- <div class="col-sm-4 col-lg-5 " style="text-align: right; float: right;" >
                           <a class="btn text-center  btn-outline-warning btn-sm" id="sortbutton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button" >
                             <i  class="fas fa-sort "></i>
-                          </a>
-                          <div class="dropdown-menu m-1">
+                          </a> -->
+                          <!-- <div class="dropdown-menu m-1">
                             <a class="dropdown-item" href="">All</a>
                             <a class="dropdown-item" onclick="sortTable()">Employee Name</a>
                             <a class="dropdown-item" onclick="sortTablebal()">Employee Salary</a>
-                          </div>
-                          <a class="btn text-center btn-outline-warning btn-sm" id="filterbutton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button" >
+                          </div> -->
+                          <!-- <a class="btn text-center btn-outline-warning btn-sm" id="filterbutton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button" >
                             <i  class="fas fa-filter "></i>
-                          </a>
-                          <div class="dropdown-menu m-1">
+                          </a> -->
+                          <!-- <div class="dropdown-menu m-1">
                             <a class="dropdown-item" onclick="applyFilter('All')">All</a>
                             <a class="dropdown-item" onclick="applyFilter('Active')">Active</a>
                             <a class="dropdown-item" onclick="applyFilter('Inactive')">Inactive</a>
-                          </div>
-                          <a class="btn btn btn-outline-warning btn-sm " style="text-align: right;" href="#"><i class="fa fa-plus "></i></a>
-                        </div>
+                          </div> -->
+                          <!-- <a class="btn btn btn-outline-warning btn-sm " style="text-align: right;" href="#"><i class="fa fa-plus "></i></a>
+                        </div> -->
                       </div> 
                       </div>
+                      <br><br><br><br>
                       
                   
                     <div class="row">
@@ -141,7 +143,7 @@
                           <a href="#" class="  text-dark" >
                             <button class="btn btn-outline-warning btn-sm"  title="Delete"><i class="fas fa-trash-alt"></i></button>
                           </a>
-                          <a class="btn btn-outline-warning btn-sm" href="#" id="sts">{{p.status}}</a>
+                          <!-- <a class="btn btn-outline-warning btn-sm" href="#" id="sts">{{p.status}}</a> -->
                           <a class="btn btn-outline-warning btn-sm" href="" data-toggle="modal" data-target="#commentModal2" data-toggle="tooltip" title="history">
                             <i class="fa-solid fa-clock-rotate-left"></i>
                           </a>
@@ -276,7 +278,7 @@
                               </div>
                                                         
                               <div class="row mt-2">
-                                <div class="col-1"></div>
+                                
                                 <div class="col-5"><p for="">Lender Bank :</p></div>
                                 <div class="col-6">
                                   <div style="display: inline-block;">{{ loan_info.lender_bank }}</div>
@@ -284,16 +286,16 @@
                               </div>
                                                         
                               <div class="row mt-2">
-                                <div class="col-1"></div>
+                                
                                 <div class="col-5"><p for=""> Date  :</p></div>
                                 <div class="col-6">
-                                  <p class="bold">{{ loan_info.loan_date }}</p>
+                                  <p class="bold" >{{ loan_info.loan_date }}</p>
                                 </div>
                               </div>
-                                                    
+                                                     
                               <div class="row mt-2">
-                                <div class="col-1"></div>
-                                <div class="col-5"><p for="">Loan Amount :</p></div>
+                             
+                                <div class="col-5"><p for="">Loan Amount:</p></div>
                                 <div class="col-6">
                                   <p class="bold">{{ loan_info.loan_amount }}</p>
                                  
@@ -303,7 +305,7 @@
                              
                                                       
                                 <div class="row mt-2">
-                                  <div class="col-1"></div>
+                                 
                                   <div class="col-5"><p for="">Terms :</p></div>
                                   <div class="col-6">
                                     <p class="bold"></p>
@@ -311,7 +313,7 @@
                                 </div>
                               
                               <div class="row mt-2">
-                                <div class="col-1"></div>
+                                
                                 <div class="col-5"><p for="">Interest :</p></div>
                                 <div class="col-6">
                                   <p class="bold" >{{ loan_info.interest }}</p>
