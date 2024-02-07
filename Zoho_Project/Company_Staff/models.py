@@ -2,6 +2,7 @@ from django.db import models
 from Register_Login.models import LoginDetails
 from Register_Login.models import CompanyDetails
 from datetime import datetime
+from datetime import date
 
 # Create your models here.
 
@@ -77,5 +78,27 @@ class loan_account(models.Model):
     processing_fee=models.IntegerField()
     interest=models.IntegerField()
     description=models.CharField(max_length=255)
+
+
+
+class repayment_due(models.Model):
+    login_details = models.ForeignKey(LoginDetails, on_delete=models.CASCADE,null=True,blank=True)
+    company=models.ForeignKey(CompanyDetails,on_delete=models.CASCADE,null=True,blank=True)
+    bank_holder=models.ForeignKey(BankAccount, on_delete=models.CASCADE,null=True,blank=True)
+    loan = models.ForeignKey(loan_account, on_delete=models.CASCADE,null=True,blank=True)
+    principal_amount=models.IntegerField(null=True,blank=True)
+    interest_amount=models.IntegerField(null=True,blank=True)
+    paid_from=models.CharField(max_length=255)
+    date=models.DateField(default=date.today)
+    total_amount=models.IntegerField(null=True,blank=True)
+
+class newloan(models.Model):
+    login_details = models.ForeignKey(LoginDetails, on_delete=models.CASCADE,null=True,blank=True)
+    company=models.ForeignKey(CompanyDetails,on_delete=models.CASCADE,null=True,blank=True)
+    bank_holder=models.ForeignKey(BankAccount, on_delete=models.CASCADE,null=True,blank=True)
+    new_amount=models.IntegerField(null=True,blank=True)
+    paid_from=models.CharField(max_length=255)
+    date=models.DateField(default=date.today)
+
 
     

@@ -32,7 +32,7 @@
                     </h5>
                     {% endfor %}
                 </div>
-                <form method="POST" action="{% url 'add_loan' %}" enctype="multipart/form-data" >
+                <form method="POST" action="{% url 'new_loan' account.id %}" enctype="multipart/form-data" >
                     {% csrf_token %}
                     <div class="row">
                         <div class="data  col-lg-8 col-md-6 col-sm-16">
@@ -41,7 +41,7 @@
                                     <label for="account_name">Balance Amount</label>
                                 </div>
                                 <div class="col-6 d-flex">
-                                    <input type="text" class="form-control text-dark bg-light" name="account_number"  >
+                                    <input type="text" class="form-control text-dark bg-light" id="balance_amount"  name="balance_amount" value="{{ balance_amount }}" readonly >
                                        
                                         
                                 
@@ -53,7 +53,7 @@
                                     <label for="">New Loan</label>
                                 </div>
                                 <div class="input-container col-6">
-                                    <input type="text" class="form-control text-dark bg-light" name="account_number"  >
+                                    <input type="text" class="form-control text-dark bg-light" id="new_loan" name="new_loan" onchange="updateTotalAmount()" >
                                 </div>
                             </div>
                             <div class="row pb-3">
@@ -61,7 +61,7 @@
                                     <label for="">Paid From</label>
                                 </div>
                                 <div class="input-container col-6">
-                                    <select class="form-control text-dark bg-light" name="payment_method"  >
+                                    <select class="form-control text-dark bg-light" id="paid_from" name="paid_from"  >
                                         <option value="" selected hidden>Select</option>
                                         <option value="Cash">Cash</option>
                                         <option value="UPI">UPI</option>
@@ -75,7 +75,7 @@
                                     <label for="">Date</label>
                                 </div>
                                 <div class="input-container col-6">
-                                    <input type="date" class="form-control text-dark bg-light" name="loan_date"  >
+                                    <input type="date" class="form-control text-dark bg-light" id="loan_date" name="loan_date" value="{{ today_date|date:'Y-m-d' }}" >
                                 </div>
                             </div>
                             
@@ -86,14 +86,9 @@
                                         <label for="">Total Amount</label>
                                     </div>
                                     <div class="input-container col-6">
-                                        <input type="text" class="form-control text-dark bg-light" name="terms"  value="0">
+                                        <input type="text" class="form-control text-dark bg-light" id="total_amount" name="total_amount"  value="0" readonly>
                                     </div>
                                 </div>
-                           
-                            
-                               
-                                
-                                
                                 
                             </div>
                             <button type="submit"  class="btn btn-outline-warning custom-btn" > Save</button>
@@ -101,6 +96,17 @@
                     </div>
         
                         </section>
+                        <script>
+                            function updateTotalAmount() {
+                                var newLoan = parseFloat(document.getElementById("new_loan").value);
+                                var balanceAmount = parseFloat(document.getElementById("balance_amount").value);
+                                var totalAmount = newLoan + balanceAmount;
+                                document.getElementById("total_amount").value = totalAmount.toFixed(2);
+                            }
+                        
+                            // Trigger the function on input event
+                            document.getElementById("new_loan").addEventListener("input", updateTotalAmount);
+                        </script>
 
                         
                         
