@@ -8,8 +8,7 @@ from django.http import HttpResponse
 from datetime import datetime, timedelta
 from Company_Staff.models import BankAccount
 from Company_Staff.models import loan_account
-from Company_Staff.models import repayment_due
-from Company_Staff.models import newloan
+from Company_Staff.models import LoanRepayemnt
 from django.shortcuts import render, get_object_or_404
 from datetime import date as dt
 from django.db.models import Sum
@@ -724,25 +723,23 @@ def transaction(request,account_id):
                 
                 dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
                 allmodules = None
-            account = get_object_or_404(BankAccount, id=account_id)
-            # bank_account = BankAccount.objects.get(pk=bank_account_id)
-            repayment_details = repayment_due.objects.filter(bank_holder=account)
-            loan_info = loan_account.objects.filter(bank_holder=account).first()
-            new_loan = newloan.objects.filter(bank_holder=account)
-
+            loan = get_object_or_404(loan_account, id=account_id)
+            repayment_details = LoanRepayemnt.objects.filter(loan=loan)
+            loan_info = loan_account.objects.get(id=account_id)
             total_emi_paid = repayment_details.aggregate(total_emi_paid=Sum('total_amount'))['total_emi_paid'] or 0
-            current_balance = account.amount - total_emi_paid
+            current_balance = loan_info.loan_amount- total_emi_paid
+            total_amount= loan_info.loan_amount + loan_info.interest
 
             context = {
                     'details': dash_details,
                     'allmodules': allmodules,
-                    'account':account,
                     'loan_info':loan_info,
                     'repayment_details': repayment_details,
+                    'account_id': account_id,
                     'current_balance': current_balance,
-                    'new_loan':new_loan
+                    'total_amount':total_amount
+                    
                      }
-    
             return render(request,'zohomodules/loan_account/transaction.html', context)
 
 def repayment_due_form(request, account_id):
@@ -765,29 +762,36 @@ def repayment_due_form(request, account_id):
             if request.method == 'POST':
                 principal_amount = request.POST.get('principal_amount')
                 interest_amount = request.POST.get('interest_amount')
-                paid_from = request.POST.get('paid_from')
+                payment_method=request.POST.get('paid_from'),
+                upi_id=request.POST.get('upi_id'),
+                cheque=request.POST.get('cheque'),
                 date = request.POST.get('date')
                 total_amount = int(principal_amount) + int(interest_amount)
                 
-           
-                repayment=repayment_due(
-                    login_details_id=login_details.id, 
-                    bank_holder_id=account_id,
+                # Create a new repayment object
+                repayment = LoanRepayemnt(
+                    login_details=login_details,
                     principal_amount=principal_amount,
                     interest_amount=interest_amount,
-                    paid_from=paid_from,
-                    date=date,
+                    payment_method=payment_method,
+                    upi_id=upi_id,
+                    cheque=cheque,
+                    payment_date=date,
                     total_amount=total_amount,
-                    ) 
+                )
+                # Set the loan account for the repayment
+                loan = loan_account.objects.get(pk=account_id)
+                repayment.loan = loan
                 repayment.save()
-                return redirect('transaction',account_id=account_id)
+                
+                return redirect('transaction', account_id=account_id)
             else:
                 today_date = dt.today()
-                bank_account = BankAccount.objects.get(id=account_id)
-                return render(request, 'zohomodules/loan_account/repayment_due_form.html', { 'details': dash_details, 'allmodules': allmodules,  'loan_details': loan_account.objects.all(),'bank_account':bank_account,'today_date': today_date})
+                
+                return render(request, 'zohomodules/loan_account/repayment_due_form.html', { 'details': dash_details, 'allmodules': allmodules,  'today_date': today_date,'account_id': account_id,})
     return redirect('/')
 
-def new_loan(request, account_id):
+def new_loan(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         if 'login_id' not in request.session:
@@ -804,34 +808,10 @@ def new_loan(request, account_id):
                 dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
                 allmodules = None
 
-            account = BankAccount.objects.get(id=account_id)
-            balance_amount = account.amount - account.repayment_due_set.aggregate(total_repayment=Sum('total_amount'))['total_repayment']
-            today_date = dt.today()
-            if request.method == 'POST':
-                new_amount = request.POST.get('new_loan')
-                paid_from = request.POST.get('paid_from')
-                loan_date = request.POST.get('loan_date')
-
-                total_amount = int(balance_amount) + int(new_amount)
-
-                new_loan = newloan(
-                    login_details_id=login_details.id, 
-                    bank_holder_id=account_id,
-                    new_amount=new_amount,
-                    paid_from=paid_from,
-                    date=loan_date
-                )
-                new_loan.save()
-            
-                
-
-            context = {
+            context={
+                'allmodules':allmodules,
                 'details': dash_details,
-                'allmodules': allmodules,
-                'balance_amount': balance_amount,
-                'account': account,
-                'today_date': today_date
             }
+    return render(request, 'zohomodules/loan_account/new_loan.html',context)
 
-            return render(request, 'zohomodules/loan_account/new_loan.html', context)
-    return redirect('/')
+

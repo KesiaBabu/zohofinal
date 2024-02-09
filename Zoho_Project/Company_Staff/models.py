@@ -81,24 +81,19 @@ class loan_account(models.Model):
 
 
 
-class repayment_due(models.Model):
+class LoanRepayemnt(models.Model):
     login_details = models.ForeignKey(LoginDetails, on_delete=models.CASCADE,null=True,blank=True)
     company=models.ForeignKey(CompanyDetails,on_delete=models.CASCADE,null=True,blank=True)
-    bank_holder=models.ForeignKey(BankAccount, on_delete=models.CASCADE,null=True,blank=True)
-    loan = models.ForeignKey(loan_account, on_delete=models.CASCADE,null=True,blank=True)
+    loan=models.ForeignKey(loan_account, on_delete=models.CASCADE,null=True,blank=True)
     principal_amount=models.IntegerField(null=True,blank=True)
     interest_amount=models.IntegerField(null=True,blank=True)
-    paid_from=models.CharField(max_length=255)
-    date=models.DateField(default=date.today)
+    payment_method=models.CharField(max_length=255)
+    upi_id=models.CharField(max_length=255)
+    cheque=models.CharField(max_length=255)
+    payment_date=models.DateField(default=date.today)
     total_amount=models.IntegerField(null=True,blank=True)
 
-class newloan(models.Model):
-    login_details = models.ForeignKey(LoginDetails, on_delete=models.CASCADE,null=True,blank=True)
-    company=models.ForeignKey(CompanyDetails,on_delete=models.CASCADE,null=True,blank=True)
-    bank_holder=models.ForeignKey(BankAccount, on_delete=models.CASCADE,null=True,blank=True)
-    new_amount=models.IntegerField(null=True,blank=True)
-    paid_from=models.CharField(max_length=255)
-    date=models.DateField(default=date.today)
+
 
 
     

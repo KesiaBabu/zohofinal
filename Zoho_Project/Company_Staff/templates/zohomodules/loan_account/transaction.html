@@ -41,8 +41,8 @@
                         <i class="fa fa-filter mt-1">Make Payment</i>
                       </a>
                       <div class="dropdown-menu m-1">
-                        <a class="dropdown-item" href="{% url 'repayment_due_form' account.id %}">Repayment Due</a>
-                        <a class="dropdown-item" href="{% url 'new_loan' account.id %}">Issue New Loan</a>
+                        <a class="dropdown-item" href="{% url 'repayment_due_form' account_id=account_id %}">Repayment Due</a>
+                        <a class="dropdown-item" href="{% url 'new_loan'  %}">Issue New Loan</a>
                         
                       </div>
                       <a onclick="ExportToExcel()" class="btn text-center pt-2 btn-outline-warning " >
@@ -68,9 +68,9 @@
         <br>
         <div class="row">
             <div class="col-10 mt-7" >
-              <h4 style=" color: white;  "><b>Name : {{account.customer_name}}</b></h4>
+              <h4 style=" color: white;  "><b>Name : {{loan_info.bank_holder.customer_name}}</b></h4>
               <h4  style="color: white; text-align: right;" ><b>Balance : {{ current_balance }}</b></h4>
-              <h4 style="color: white; "><b>Account Number : {{account.account_number}}</b></h4>
+              <h4 style="color: white; "><b>Account Number : {{loan_info.bank_holder.account_number}}</b></h4>
               
          
                 <div class="col-3 mt-1" style="text-align: right;">
@@ -109,18 +109,18 @@
                 
                   <tr id="over" class='clickable-row' data-href="#">
                     <td style="text-align: center;">{{forloop.counter}}</td>
-                    <td style="text-align: center;">{{ account.date }}</td>
+                    <td style="text-align: center;">{{ loan_info.loan_date }}</td>
                     <td style="text-align: center;">Opening Balance</td>
-                    <td style="text-align: center;">{{ account.amount }}</td>
-                    <td style="text-align: center;">0</td>  
-                    <td style="text-align: center;">{{ account.amount }}</td> 
+                    <td style="text-align: center;">{{ loan_info.loan_amount }}</td>
+                    <td style="text-align: center;">{{ loan_info.interest }}</td>  
+                    <td style="text-align: center;">{{ total_amount  }}</td> 
                     <td style="text-align: center;"></td>            
                     
                   </tr>
                   {% for repayment in repayment_details %}
                   <tr id="over" class='clickable-row' data-href="#">
                     <td style="text-align: center;">{{forloop.counter}}</td>
-                    <td style="text-align: center;">{{ repayment.date }}</td>
+                    <td style="text-align: center;">{{ repayment.payment_date }}</td>
                     <td style="text-align: center;">EMI Paid</td>
                     <td style="text-align: center;">{{ repayment.principal_amount }}</td>
                     <td style="text-align: center;">{{ repayment.interest_amount }}</td>  
@@ -129,23 +129,13 @@
                   </tr>
                   {% endfor %}
 
-                  {% for repayment in repayment_details %}
-                  <tr id="over" class='clickable-row' data-href="#">
-                    <td style="text-align: center;">{{forloop.counter}}</td>
-                    <td style="text-align: center;">{{ repayment.date }}</td>
-                    <td style="text-align: center;">EMI Paid</td>
-                    <td style="text-align: center;">{{ repayment.principal_amount }}</td>
-                    <td style="text-align: center;">{{ repayment.interest_amount }}</td>  
-                    <td style="text-align: center;">{{ repayment.total_amount }}</td> 
-                    <td style="text-align: center;"></td>             
-                  </tr>
-                  {% endfor %}
+                  
                   {% for a in new_loan %}
                   <tr id="new-loan-row">
                       <td style="text-align: center;">{{ forloop.counter }}</td>
                       <td style="text-align: center;">{{ a.date }}</td>
                       <td style="text-align: center;">Additional Loan</td>
-                      <td style="text-align: center;">{{ a.amount }}</td>
+                      <td style="text-align: center;">{{ a.new_amount }}</td>
                       <td style="text-align: center;">{{ a.interest }}</td>
                       <td style="text-align: center;">{{ a.total_amount }}</td>
                       <td style="text-align: center;"></td>
