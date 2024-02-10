@@ -767,8 +767,8 @@ def repayment_due_form(request, account_id):
                 cheque=request.POST.get('cheque'),
                 date = request.POST.get('date')
                 total_amount = int(principal_amount) + int(interest_amount)
+                type = 'EMI paid'
                 
-                # Create a new repayment object
                 repayment = LoanRepayemnt(
                     login_details=login_details,
                     principal_amount=principal_amount,
@@ -778,8 +778,9 @@ def repayment_due_form(request, account_id):
                     cheque=cheque,
                     payment_date=date,
                     total_amount=total_amount,
+                    type = type
                 )
-                # Set the loan account for the repayment
+                
                 loan = loan_account.objects.get(pk=account_id)
                 repayment.loan = loan
                 repayment.save()

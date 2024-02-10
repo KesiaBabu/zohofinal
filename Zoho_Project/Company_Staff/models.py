@@ -92,6 +92,7 @@ class LoanRepayemnt(models.Model):
     cheque=models.CharField(max_length=255)
     payment_date=models.DateField(default=date.today)
     total_amount=models.IntegerField(null=True,blank=True)
+    type=models.CharField(max_length=255,null=True)
 
 
 
