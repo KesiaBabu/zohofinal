@@ -83,7 +83,8 @@
                     <td style="text-align: center; "><a href="{% url 'overview' account_id=loan.bank_holder.id %}" style="color: inherit; text-decoration: none;"> {{ loan.bank_holder.customer_name }}</a></td>
                     <td style="text-align: center;">{{ loan.bank_holder.account_number }}</td>
                     <td style="text-align: center;">{{ loan.loan_amount }}</td>
-                    <td style="text-align: center;">{{i.designation}}</td>
+                    <td style="text-align: center;">{{ loan.balance}}</td>
+                    
                     
                   </tr>
                 {% endfor %}

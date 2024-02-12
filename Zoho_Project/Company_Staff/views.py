@@ -515,12 +515,21 @@ def loan_listing(request):
                 dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
                 allmodules = None
             
+            
+            loan_details = loan_account.objects.all()
+
+            # Calculate balance for each loan account
+            for loan in loan_details:
+                total_emis_paid = LoanRepayemnt.objects.filter(loan=loan, type='EMI paid').aggregate(total=Sum('total_amount'))['total'] or 0
+                total_additional_loan = LoanRepayemnt.objects.filter(loan=loan, type='Additional Loan').aggregate(total=Sum('total_amount'))['total'] or 0
+                loan.balance = loan.loan_amount - total_emis_paid + total_additional_loan
+            
             context = {
-                    'details': dash_details,
-                    'allmodules': allmodules,
-                    'bank_holder': BankAccount.objects.all(),
-                    'loan_details': loan_account.objects.all(),
-                }
+                'details': dash_details,
+                'allmodules': allmodules,
+                'loan_details': loan_details,
+                
+            }
   return render(request,'zohomodules/loan_account/loan_listing.html',context)
 
 def add_loan(request):
@@ -686,22 +695,46 @@ def overview(request,account_id):
 
         if user_type in ['Company', 'Staff']:
             if user_type == 'Company':
-                # Fetch company details
+                
                 dash_details = CompanyDetails.objects.get(login_details=log_details, superadmin_approval=1, Distributor_approval=1)
                 allmodules = ZohoModules.objects.get(company=dash_details, status='New')
             else:
-                # Fetch staff details
+               
                 dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
                 allmodules = None
             account = get_object_or_404(BankAccount, id=account_id)
             loan_info = loan_account.objects.filter(bank_holder=account).first()
+            repayment_details = LoanRepayemnt.objects.filter(loan=loan_info)
+            current_balance = loan_info.loan_amount  
+            balances = []  # List to store balances
+            
+            # Iterate through repayment details to calculate balances
+            for repayment in repayment_details:
+                if repayment.type == 'EMI paid':
+                    current_balance -= repayment.total_amount
+                elif repayment.type == 'Additional Loan':
+                    current_balance += repayment.total_amount
+                
+                # Append the current balance to the balances list
+                balances.append(current_balance)
+            
+            # Calculate overall balance
+            overall_balance = current_balance
+            
+            # Combine repayment details and balances
+            repayment_details_with_balances = zip(repayment_details, balances)
+            total_amount= loan_info.loan_amount + loan_info.interest
+    
             context = {
                     'details': dash_details,
                     'allmodules': allmodules,
                     'account':account,
-                    'loan_info':loan_info
-                     }
-            
+                    'loan_info':loan_info,
+                    'repayment_details': repayment_details,
+                    'repayment_details_with_balances': repayment_details_with_balances,
+                    'overall_balance': overall_balance, 
+                    'total_amount':total_amount
+                     }          
     
             return render(request,'zohomodules/loan_account/overview.html',context)
 
@@ -762,11 +795,11 @@ def repayment_due_form(request, account_id):
             if request.method == 'POST':
                 principal_amount = request.POST.get('principal_amount')
                 interest_amount = request.POST.get('interest_amount')
-                payment_method=request.POST.get('paid_from'),
+                payment_method=request.POST.get('payment_method'),
                 upi_id=request.POST.get('upi_id'),
                 cheque=request.POST.get('cheque'),
                 date = request.POST.get('date')
-                total_amount = int(principal_amount) + int(interest_amount)
+                total_amount = float(principal_amount) + float(interest_amount)
                 type = 'EMI paid'
                 
                 repayment = LoanRepayemnt(
@@ -785,14 +818,14 @@ def repayment_due_form(request, account_id):
                 repayment.loan = loan
                 repayment.save()
                 
-                return redirect('transaction', account_id=account_id)
+                return redirect('overview', account_id=account_id)
             else:
                 today_date = dt.today()
                 
-                return render(request, 'zohomodules/loan_account/repayment_due_form.html', { 'details': dash_details, 'allmodules': allmodules,  'today_date': today_date,'account_id': account_id,})
+                return render(request, 'zohomodules/loan_account/overview.html', { 'details': dash_details, 'allmodules': allmodules,  'today_date': today_date,'account_id': account_id,})
     return redirect('/')
 
-def new_loan(request):
+def new_loan(request,account_id):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         if 'login_id' not in request.session:
@@ -808,11 +841,42 @@ def new_loan(request):
             else:
                 dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
                 allmodules = None
+            if request.method == 'POST':
+                principal_amount = request.POST.get('principal_amount')
+                interest_amount = request.POST.get('interest_amount')
+                payment_method=request.POST.get('payment_method'),
+                upi_id=request.POST.get('upi_id'),
+                cheque=request.POST.get('cheque'),
+                date = request.POST.get('date')
+                total_amount = float(principal_amount) + float(interest_amount)
+                type = 'Additional Loan'
+                
+                repayment = LoanRepayemnt(
+                    login_details=login_details,
+                    principal_amount=principal_amount,
+                    interest_amount=interest_amount,
+                    payment_method=payment_method,
+                    upi_id=upi_id,
+                    cheque=cheque,
+                    payment_date=date,
+                    total_amount=total_amount,
+                    type = type
+                )
+                
+                loan = loan_account.objects.get(pk=account_id)
+                repayment.loan = loan
+                repayment.save()
+                
+                return redirect('overview', account_id=account_id)
+            else:
+                today_date = dt.today()
 
             context={
                 'allmodules':allmodules,
                 'details': dash_details,
             }
-    return render(request, 'zohomodules/loan_account/new_loan.html',context)
+            return render(request, 'zohomodules/loan_account/overview.html', { 'details': dash_details, 'allmodules': allmodules,  'today_date': today_date,'account_id': account_id,})
+    return redirect('/')
+    
 
 

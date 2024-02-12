@@ -68,6 +68,7 @@ class loan_account(models.Model):
     logindetails = models.ForeignKey(LoginDetails, on_delete=models.CASCADE,null=True,blank=True)
     company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE,null=True,blank=True)
     loan_amount=models.IntegerField()
+    balance=models.IntegerField(default=0,null=True)
     lender_bank=models.CharField(max_length=255)
     loan_date = models.DateField()
     payment_method=models.CharField(max_length=255)

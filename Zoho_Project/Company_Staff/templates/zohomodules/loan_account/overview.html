@@ -446,7 +446,7 @@
                   </div>
     
                   <!-- Bank to Cash -->
-                  <div class="modal fade" id="repayment">
+                  <div class="modal fade" id="emi_repayment">
                     <div class="modal-dialog modal-lg">
                       <div class="modal-content" style="background:black; border: 1px solid #ffae1f;">
                         <div class="modal-body">
@@ -460,31 +460,31 @@
                               </button>
                             </div>
                           </div><br>
-                          <form action="#" method="post" class="needs-validation" novalidate autocomplete="off">
+                          <form action="{% url 'repayment_due_form' account.id %}" method="post" class="needs-validation" novalidate autocomplete="off">
                             {%csrf_token%}
                             <div class="row">
                               <div class="col-md-6">
                                 <label for="dest" style="color: white;">Principal Amount</label>
-                                <input type="text" class="form-control text-white bg-black mt-1" id="dest" maxlength="10" name="dest"  >
+                                <input type="text" class="form-control text-white bg-black mt-1" id="principal_amount" maxlength="10" name="principal_amount"  >
                               </div>
                               <div class="col-md-6">
                                 <label for="date" style="color: white;">Date</label>
-                                <input type="date" class="form-control text-white bg-black mt-1" id="date" value="{{today_date}}"name="date">
+                                <input type="date" class="form-control text-white bg-black mt-1" id="date" value="{{ today_date|date:'Y-m-d' }}"name="date">
                               </div>
                             </div>
         
                             <div class="row mt-3">
                               <div class="col-md-6">
                                 <label for="amount" style="color: white;">Interest Amount</label>
-                                <input type="number" class="form-control text-white bg-black mt-1" id="amount" maxlength="10" name="amount">
+                                <input type="number" class="form-control text-white bg-black mt-1" id="interest_amount" name="interest_amount">
                               </div>
                               <div class="col-md-6">
                                 <label for="amount" style="color: white;">Total Amount</label>
-                                <input type="number" class="form-control text-white bg-black mt-1" id="amount" maxlength="10" name="amount">
+                                <input type="number" class="form-control text-white bg-black mt-1" id="total_amount"  name="total_amount">
                               </div>
                               <div class="col-md-6">
                                 <label for="origin" style="color: white;">Paid From</label>
-                                <select class="form-control text-white bg-black form-select mt-1" id="origin" name="origin" >
+                                <select class="form-control text-white bg-black form-select mt-1" id="payment_method" name="payment_method" >
                                   <option value="" hidden>-- Select --</option>
                                   
                                   <option value="Cash">Cash</option>
@@ -498,7 +498,7 @@
         
                             
 
-                            <input type="hidden" id="repayment" name="type">
+                            <input type="hidden" id="selectedType" name="type">
 
                             <div class="row mt-3">
                               <div class="col-md-4"></div>
@@ -517,7 +517,7 @@
                   </div>
     
                   <!-- Cash to Bank -->
-                  <div class="modal fade" id="cash_to_bank">
+                  <div class="modal fade" id="additional_loan">
                     <div class="modal-dialog modal-lg">
                       <div class="modal-content" style="background:black; border: 1px solid #ffae1f;">
                         <div class="modal-body">
@@ -531,16 +531,16 @@
                               </button>
                             </div>
                           </div><br>
-                          <form action="#" method="post" class="needs-validation" novalidate autocomplete="off">
+                          <form action="{% url 'new_loan' account.id %}" method="post" class="needs-validation" novalidate autocomplete="off">
                             {%csrf_token%}
                             <div class="row">
                               <div class="col-md-6">
                                 <label for="origin" style="color: white;">Balance Loan</label>
-                                <input type="text" class="form-control text-white bg-black mt-1" id="origin" maxlength="10" name="origin"  readonly>
+                                <input type="text" class="form-control text-white bg-black mt-1" id="balance" name="balance"  readonly>
                               </div>
                               <div class="col-md-6">
                                 <label for="origin" style="color: white;">New Loan</label>
-                                <input type="text" class="form-control text-white bg-black mt-1" id="origin" maxlength="10" name="origin" >
+                                <input type="text" class="form-control text-white bg-black mt-1" id="principal_amount" name="principal_amount" >
                               </div>
                               <!-- <div class="col-md-6">
                                 <label for="dest" style="color: white;">To</label>
@@ -555,9 +555,10 @@
         
                             <div class="row mt-3">
                               <div class="col-md-6">
-                                <label for="amount" style="color: white;">Total Loan</label>
-                                <input type="number" class="form-control text-white bg-black mt-1" id="amount" maxlength="10" name="amount">
+                                <label for="origin" style="color: white;">Interest Amount</label>
+                                <input type="text" class="form-control text-white bg-black mt-1" id="interest_amount" name="interest_amount" >
                               </div>
+                              
                               <div class="col-md-6">
                                 <label for="date" style="color: white;">Date</label>
                                 <input type="date" class="form-control text-white bg-black mt-1" id="date" value="{{tod}}" name="date">
@@ -566,8 +567,12 @@
         
                             <div class="row mt-3">
                               <div class="col-md-6">
+                                <label for="amount" style="color: white;">Total Loan</label>
+                                <input type="number" class="form-control text-white bg-black mt-1" id="toal_amount"  name="total_amount">
+                              </div>
+                              <div class="col-md-6">
                                 <label for="dest" style="color: white;">Payment Method</label>
-                                <select class="form-control text-white bg-black form-select mt-1" id="dest" name="dest">
+                                <select class="form-control text-white bg-black form-select mt-1" id="payment_method" name="payment_method">
                                   <option value="" hidden>-- Select --</option>
                                   
                                   <option value="Cash">Cash</option>
@@ -1002,7 +1007,7 @@
                                 <textarea name="adjdescription" class="form-control text-white bg-black mt-1" id="adjdescription" placeholder="Max. 500 characters"></textarea>
                               </div>
                             </div>
-                            <input type="hidden" id="selectedTypeA" name="adjtype">
+                            <input type="hidden" id="eselectedTypeA" name="adjtype">
                           </form>
                           <div class="row mt-3">
                             <div class="col-md-4"></div>
@@ -1077,7 +1082,7 @@
                             <span class="bnk-colon text-black">:</span>
                         </div>
                         <div class="col-md-5 text-right">
-                            <span class="bank-value text-black">{{ bnk.bnk_bal_type }}</span>
+                            <span class="bank-value text-black">{{ overall_balance }}</span>
                         </div>
                       </div>
                       <div class="bank-row d-md-flex mt-5">
@@ -1224,12 +1229,12 @@
   
                     <div class="col-md-6">
                       <div style="float: right; padding-right: 5%;">
-                        <h4 class="text-white">Balance: &nbsp;&nbsp;&nbsp;&#8377;{{bnk.bnk_bal}}</h4>
+                        <h4 class="text-white">Balance: &nbsp;&nbsp;&nbsp;&#8377;{{overall_balance}}</h4>
                         <div class="form-group">
                           <select class="form-control form-select bg-black text-white" id="selectOption">
                             <option value="" class="hidden-option">Make Payment</option>
-                            <option value="Bank To Cash Transfer">Repayment Due</option>
-                            <option value="Cash To Bank Transfer">Issue New Loan</option>
+                            <option value="Repayment Due">Repayment Due</option>
+                            <option value="Issue New Loan">Issue New Loan</option>
                             <!-- <option value="Bank To Bank Transfer">Bank To Bank Transfer</option>
                             <option value="Adjust Bank Balance">Adjust Bank Balance</option> -->
                           </select>
@@ -1255,14 +1260,14 @@
                       <tbody>
                         
                         <tr class="text-white text-center">
-                          <td>{{ forloop.counter }}</td>
+                          <td>1</td>
                           <td>{{ loan_info.loan_date}}</td>
                           <td>{{ loan_info.bank_holder.customer_name}}</td>
-                          <td>{{ t.trans_adj_type }}</td>
+                          <td>Opening Balance</td>
                           <td>{{ loan_info.loan_amount }}</td>
                           <td>{{ loan_info.interest }}</td>
-                          <td>{{ loan_info.total_amount }}</td>
-                          {% if t.trans_type == 'Opening Balance' %}
+                          <td>{{ total_amount }}</td>
+                          
                           <td>
                             <a class="btn medium_btn" data-toggle="dropdown">
                               <i class="fas fa-ellipsis-v text-warning"></i>
@@ -1276,7 +1281,20 @@
                               </a>
                             </div>
                           </td>
-                          {% else %}
+                         
+                          
+                          
+                        </tr>
+                        {% for a in repayment_details %}
+                        <tr class="text-white text-center">
+                          {% with adjusted_counter=forloop.counter0|add:2 %}
+                          <td>{{ adjusted_counter }}</td>
+                          <td>{{ a.payment_date }}</td>
+                          <td>{{ a.loan.bank_holder.customer_name}}</td>
+                          <td>{{ a.type}}</td>
+                          <td>{{ a.principal_amount }}</td>
+                          <td>{{ a.interest_amount }}</td>
+                          <td>{{ a.total_amount }}</td>
                           <td>
                             <a class="btn medium_btn" data-toggle="dropdown">
                               <i class="fas fa-ellipsis-v text-warning"></i>
@@ -1293,9 +1311,9 @@
                               </a>
                             </div>
                           </td>
-                          {% endif %}
                         </tr>
-                       
+                        {% endwith %}
+                        {% endfor %}
                       </tbody>
                     </table> 
                   </div>
@@ -1307,7 +1325,7 @@
                       <div id="ember2512" class="tooltip-container ember-view ribbon text-ellipsis">
                         <section>
                           <div class="text-center">
-                            <h2 class="text-white bg-warning p-3">BANK STATEMENT</h2>
+                            <h2 class="text-white bg-warning p-3">LOAN STATEMENT</h2>
                           </div>
                         </section>
                         <br>
@@ -1317,9 +1335,9 @@
                               <div class="col-7">
                                 <p><b class="text-black">COMPANY</b>,</p>
                                 <div style="margin-left: 20%;">
-                                  <h3>{{ bnk.company.company_name }}</h3>
+                                  <h3>{{ loan_info.company.company_name }}</h3>
                                   <p class="text-black"> 
-                                    {{ bnk.company.contact }} <br>
+                                    {{ loan_info.company.contact }} <br>
                                     {{ bnk.company.address }} <br>
                                     {{ bnk.company.city }} <br>
                                     {{ bnk.company.state|slice:'5:' }},
@@ -1329,11 +1347,11 @@
                                 </div>
                               </div>
                               <div class="col-5">
-                                <p><b class="text-black">BANK</b>,</p>
+                                <p><b class="text-black">LOAN</b>,</p>
                                 <div style="margin-left: 20%;">
-                                  <h3>{{ bnk.bnk_name }}</h3>
+                                  <h3>{{ loan_info.bank_holder.customer_name }}</h3>
                                   <p class="text-black"> 
-                                    {{ bnk.bnk_acno }} <br>
+                                    {{ loan_info.bank_holder.account_number}} <br>
                                     {{ bnk.bnk_ifsc }} <br>
                                     {{ bnk.bnk_branch }}
                                   </p>
@@ -1342,7 +1360,7 @@
                             </div>
 
                             <div class="row">
-                              <h2 class="text-black">Bank Balance : {{ bnk.bnk_bal }}</h2>
+                              <h2 class="text-black">Balance : {{ overall_balance }}</h2>
                             </div>
                           </div>
                         </section>
@@ -1356,20 +1374,43 @@
                                 <th>NAME</th>
                                 <th>TYPE</th>
                                 <th>AMOUNT</th>
+                                <th>INTEREST</th>
+                                <th>TOTAL AMOUNT</th>
                                 <th>BALANCE</th>
                               </tr>
                             </thead>
                             <tbody>
-                              {% for t in trans %}
+                              
                               <tr class="text-black text-center">
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ t.trans_adj_date|date:'d-m-Y' }}</td>
-                                <td>{{ t.trans_type }}</td>
-                                <td>{{ t.trans_adj_type }}</td>
-                                <td>{{ t.trans_amount }}</td>
-                                <td>{{ t.trans_adj_amount }}</td>
+                                
+                                  <td>1</td>
+                                  <td>{{ loan_info.loan_date}}</td>
+                                  <td>{{ loan_info.bank_holder.customer_name}}</td>
+                                  <td>Opening Balance</td>
+                                  <td>{{ loan_info.loan_amount }}</td>
+                                  <td>{{ loan_info.interest }}</td>
+                                  <td>{{ total_amount }}</td>
+                                  <td>{{ loan_info.loan_amount }}</td>
                               </tr>
-                              {%endfor%}
+                              {% for a ,balance in repayment_details_with_balances %}
+                              <tr class="text-black text-center">
+                                {% with adjusted_counter=forloop.counter0|add:2 %}
+                                <td>{{ adjusted_counter }}</td>
+                                <td>{{ a.payment_date }}</td>
+                                <td>{{ a.loan.bank_holder.customer_name}}</td>
+                                <td>{{ a.type}}</td>
+                                <td>{{ a.principal_amount }}</td>
+                                <td>{{ a.interest_amount }}</td>
+                                <td>{{ a.total_amount }}</td>
+                                <td>{{ balance }}</td>
+                               
+                                
+                                
+   
+                                </tr>
+                                {% endwith %}
+                                {% endfor %}
+                             
                             </tbody>
                           </table><br><br>
                         </section>
@@ -1387,7 +1428,24 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      var principalInput = document.getElementById('principal_amount');
+      var interestInput = document.getElementById('interest_amount');
+      var totalAmountInput = document.getElementById('total_amount');
 
+      function calculateTotal() {
+          var principal = parseFloat(principalInput.value) || 0;
+          var interest = parseFloat(interestInput.value) || 0;
+          var total = principal + interest;
+          totalAmountInput.value = total.toFixed();
+      }
+
+      principalInput.addEventListener('input', calculateTotal);
+      interestInput.addEventListener('input', calculateTotal);
+      calculateTotal(); 
+  });
+</script>
 <script>
   $(document).ready(function() {
     show_div = '{{show_div}}'
@@ -1524,9 +1582,9 @@
         xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
       },
       success: function (response) {
-        if(response.ttype == 'repayment'){
+        if(response.ttype == 'Bank to Cash'){
           $('#edit_bank_to_cash').modal('show');
-          document.getElementById('eselectedType').value = 'Repayment Due';
+          document.getElementById('eselectedType').value = 'Bank To Cash Transfer';
           $('#btcid').val(response.trans_id)
           $('#btcorigin').val(response.origin)
           $('#btcamount').val(response.trans_amount)
@@ -1574,7 +1632,7 @@
 
 <script>
   $("#btcpaysave").click(function () {
-    $('#repayment').modal('hide');
+    $('#edit_bank_to_cash').modal('hide');
     $.ajax({
       type: "POST", 
       url: "#",
@@ -1584,7 +1642,7 @@
         amount : document.getElementById('btcamount').value,
         edit_date : document.getElementById('btcdate').value,
         desc : document.getElementById('btcdescription').value,
-        type : 'Repayment Due'
+        type : 'Bank To Cash Transfer'
       },
       beforeSend: function (xhr, settings) {
         xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
@@ -1665,8 +1723,8 @@
 </script>
 
 <script>
-  document.querySelector('#edit_repayment .close').addEventListener('click', function() {
-    $('#edit_repayment').modal('hide');
+  document.querySelector('#edit_bank_to_cash .close').addEventListener('click', function() {
+    $('#edit_bank_to_cash').modal('hide');
     window.location.href = '?Transaction=True';
   });
 
@@ -1691,15 +1749,15 @@
   document.getElementById('selectOption').addEventListener('change', function() {
     var selectedValue = this.value;
     if (selectedValue === 'Repayment Due') {
-      $('#repayment').modal('show');
-      document.getElementById('repayment').value = selectedValue;
+      $('#emi_repayment').modal('show');
+      document.getElementById('selectedType').value = selectedValue;
     } else {
-      $('#repayment').modal('hide');
+      $('#emi_repayment').modal('hide');
     }
   });
 
-  document.querySelector('#repayment .close').addEventListener('click', function() {
-    $('#repayment').modal('hide');
+  document.querySelector('#emi_repayment .close').addEventListener('click', function() {
+    $('#emi_repayment').modal('hide');
     window.location.href = '?Transaction=True';
   });
 </script>
@@ -1708,15 +1766,15 @@
 <script>
   document.getElementById('selectOption').addEventListener('change', function() {
     var selectedValue = this.value;
-    if (selectedValue === 'Cash To Bank Transfer') {
-      $('#cash_to_bank').modal('show');
+    if (selectedValue === 'Issue New Loan') {
+      $('#additional_loan').modal('show');
       document.getElementById('selectedTypeC').value = selectedValue;
     } else {
-      $('#cash_to_bank').modal('hide');
+      $('#additional_loan').modal('hide');
     }
   });
-  document.querySelector('#cash_to_bank .close').addEventListener('click', function() {
-    $('#cash_to_bank').modal('hide');
+  document.querySelector('#additional_loan .close').addEventListener('click', function() {
+    $('#additional_loan').modal('hide');
     window.location.href = '?Transaction=True';
   });
 </script>
