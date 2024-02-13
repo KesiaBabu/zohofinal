@@ -737,6 +737,25 @@ def overview(request,account_id):
                      }          
     
             return render(request,'zohomodules/loan_account/overview.html',context)
+        
+from django.http import JsonResponse
+
+def update_status(request):
+    if request.method == 'POST':
+        loan_id = request.POST.get('loan_id')
+        new_status = request.POST.get('new_status')
+        if loan_id and new_status in ['Active', 'Inactive']:
+            try:
+                loanaccount = loan_account.objects.get(pk=loan_id)
+                loanaccount.status = new_status
+                loanaccount.save()
+                return JsonResponse({'status': new_status})
+            except loan_account.DoesNotExist:
+                return JsonResponse({'error': 'Loan account does not exist'}, status=404)
+        else:
+            return JsonResponse({'error': 'Invalid parameters'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 def transaction(request,account_id):
     if 'login_id' in request.session:

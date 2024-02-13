@@ -63,10 +63,18 @@ class BankAccountHistory(models.Model):
     date = models.DateField()
     action = models.CharField(max_length=10)
 
+class Loan_Term(models.Model):
+    duration= models.IntegerField(null=True,blank=True)
+    term = models.CharField(max_length=255,null=True,blank=True)
+    days = models.IntegerField(null=True,blank=True)
+    company = models.ForeignKey(CompanyDetails,on_delete=models.CASCADE,null=True,blank=True)
+
 class loan_account(models.Model):
     bank_holder=models.ForeignKey(BankAccount,on_delete=models.CASCADE,null=True)
     logindetails = models.ForeignKey(LoginDetails, on_delete=models.CASCADE,null=True,blank=True)
     company = models.ForeignKey(CompanyDetails, on_delete=models.CASCADE,null=True,blank=True)
+    loan_term = models.ForeignKey(Loan_Term, on_delete=models.CASCADE,null=True,blank=True)
+    account_number = models.CharField(max_length=15, unique=True,null=True)
     loan_amount=models.IntegerField()
     balance=models.IntegerField(default=0,null=True)
     lender_bank=models.CharField(max_length=255)
@@ -76,9 +84,14 @@ class loan_account(models.Model):
     cheque=models.CharField(max_length=255)
     loan_rec_bank_acc=models.CharField(max_length=255)
     processing_method=models.CharField(max_length=255)
+    processing_upi=models.CharField(max_length=255,null=True)
+    processing_cheque=models.CharField(max_length=255,null=True)
+    processing_acc=models.CharField(max_length=255,null=True)
     processing_fee=models.IntegerField()
+    term=models.CharField(max_length=15,null=True)
     interest=models.IntegerField()
     description=models.CharField(max_length=255)
+    status= models.TextField(default='Active')
 
 
 
