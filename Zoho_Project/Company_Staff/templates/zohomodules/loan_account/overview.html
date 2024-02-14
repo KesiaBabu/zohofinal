@@ -334,8 +334,11 @@
                     </div>
                     <div class="col-md-6">
                       <div class="d-sm-flex" style="float: right;">
-                        <a class="btn btn-outline-warning small_btn mt-2" title="EDIT" id="edit_btn" href="#">
+                        <a class="btn btn-outline-warning small_btn mt-2" title="EDIT" id="edit_btn" href="{% url 'edit_loanaccount' account.id %}">
                           <i class="fa fa-pencil"></i>
+                        </a>
+                        <a class="btn btn-outline-warning small_btn mt-2" href="" data-toggle="modal" data-target="#commentModal2" data-toggle="tooltip" title="history">
+                          <i class="fa-solid fa-clock-rotate-left"></i>
                         </a>
                         <a class="btn btn-outline-warning small_btn mt-2 mx-2" href="#" title="DELETE" id="delete_btn">
                           <i class="fa fa-trash"></i>
@@ -1318,6 +1321,11 @@
                     </table> 
                   </div>
                 </div>
+                <form method="POST" id="dateRangeForm">
+                  {% csrf_token %}
+                  <input type="date" name="start_date" id="startDate">
+                  <input type="date" name="end_date" id="endDate">
+              </form>
 
                 <div class="print-only tabcontent" id="Statement">
                   <div class="page" size="A4">
@@ -1426,8 +1434,66 @@
     </div>
   </div>
 </div>
+<div class="modal fade" id="commentModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"  aria-hidden="true" style="margin-top: 8vh;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="background-color: #3b3b3b;">
+      <div class="modal-header">
+        <h3 class="modal-title text-light" id="exampleModalLabel">HISTORY</h3>
+        <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <div class="container " >
+        <table class="table text-light  " style="margin:3px; background-color: #000000;">
+          <thead>
+            <tr>
+              <th>
+                sl
+              </th>
+              <th>
+                Date
+              </th>
+              <th>
+                Action
+              </th>
+              <th>
+                By
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in history %}
+            <tr class="table-row">
+              <td>{{forloop.counter}}</td>
+              <td>{{i.date}}</td>
+              <td>{{i.action}}</td>
+              <td>{{i.login_details.first_name}} {{i.login_details.Last_name}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+  document.getElementById("startDate").addEventListener("change", function() {
+      document.getElementById("dateRangeForm").submit();
+  });
+  
+  document.getElementById("endDate").addEventListener("change", function() {
+      document.getElementById("dateRangeForm").submit();
+  });
+</script>
 <script>
   $(document).ready(function() {
       $('#status_btn').click(function(e) {

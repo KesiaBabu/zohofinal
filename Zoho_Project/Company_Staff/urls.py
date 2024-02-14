@@ -43,6 +43,10 @@ urlpatterns = [
     path('zohomodules/loan_account/repayment_due_form/<int:account_id>',views.repayment_due_form,name='repayment_due_form'),
     path('zohomodules/loan_account/new_loan/<int:account_id>',views.new_loan,name='new_loan'),
     path('zohomodules/loan_account/update_status',views.update_status,name='update_status'),
+    path('zohomodules/loan_account/edit_loanaccount/<int:account_id>',views.edit_loanaccount, name='edit_loanaccount'),
+    path('zohomodules/loan_account/edit_loan/<int:account_id>',views.edit_loan, name='edit_loan'),
+
+
   
     
 ]

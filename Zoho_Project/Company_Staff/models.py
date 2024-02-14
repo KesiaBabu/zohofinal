@@ -108,6 +108,20 @@ class LoanRepayemnt(models.Model):
     total_amount=models.IntegerField(null=True,blank=True)
     type=models.CharField(max_length=255,null=True)
 
+class LoanAccountHistory(models.Model):
+    login_details = models.ForeignKey(LoginDetails, on_delete=models.CASCADE,null=True,blank=True)
+    company=models.ForeignKey(CompanyDetails,on_delete=models.CASCADE,null=True,blank=True)
+    loan=models.ForeignKey(loan_account,on_delete=models.CASCADE,null=True,blank=True)
+    date=models.DateField(default=date.today)
+    action=models.CharField(max_length=255)
+
+class LoanRepaymentHistory(models.Model):
+    login_details = models.ForeignKey(LoginDetails, on_delete=models.CASCADE,null=True,blank=True)
+    company=models.ForeignKey(CompanyDetails,on_delete=models.CASCADE,null=True,blank=True)
+    repayment=models.ForeignKey(LoanRepayemnt,on_delete=models.CASCADE,null=True,blank=True)
+    date=models.DateField(default=date.today)
+    action=models.CharField(max_length=255)
+
 
 
 

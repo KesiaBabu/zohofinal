@@ -9,9 +9,11 @@ from datetime import datetime, timedelta
 from Company_Staff.models import BankAccount
 from Company_Staff.models import loan_account
 from Company_Staff.models import LoanRepayemnt
+from Company_Staff.models import LoanAccountHistory
 from django.shortcuts import render, get_object_or_404
 from datetime import date as dt
 from django.db.models import Sum
+from django.utils.timezone import now
 
 # Create your views here.
 
@@ -588,6 +590,14 @@ def add_loan(request):
                     description=description
                 )
                 loan.save()
+                history=LoanAccountHistory.objects.create(
+                    login_details=log_details,
+                    company=dash_details,
+                    loan=loan,
+                    date=now().date(),
+                    action='Created'
+                )
+                history.save()
                 context = {
                     'details': dash_details,
                     'allmodules': allmodules,
@@ -724,7 +734,19 @@ def overview(request,account_id):
             # Combine repayment details and balances
             repayment_details_with_balances = zip(repayment_details, balances)
             total_amount= loan_info.loan_amount + loan_info.interest
-    
+
+            history=LoanAccountHistory.objects.filter(loan=loan_info)
+
+            start_date_str = request.POST.get('start_date')
+            end_date_str = request.POST.get('end_date')
+        
+            if start_date_str and end_date_str:
+                start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+                end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+          
+                repayment_details_with_balances = [(repayment, balance) for repayment, balance in repayment_details_with_balances if start_date <= repayment.payment_date <= end_date]
+        
+       
             context = {
                     'details': dash_details,
                     'allmodules': allmodules,
@@ -733,7 +755,8 @@ def overview(request,account_id):
                     'repayment_details': repayment_details,
                     'repayment_details_with_balances': repayment_details_with_balances,
                     'overall_balance': overall_balance, 
-                    'total_amount':total_amount
+                    'total_amount':total_amount,
+                    'history':history
                      }          
     
             return render(request,'zohomodules/loan_account/overview.html',context)
@@ -896,6 +919,81 @@ def new_loan(request,account_id):
             }
             return render(request, 'zohomodules/loan_account/overview.html', { 'details': dash_details, 'allmodules': allmodules,  'today_date': today_date,'account_id': account_id,})
     return redirect('/')
-    
+
+def edit_loanaccount(request, account_id):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        if 'login_id' not in request.session:
+            return redirect('/')
+        
+        login_details = LoginDetails.objects.get(id=log_id)
+        user_type = login_details.user_type
+
+        if user_type in ['Company', 'Staff']:
+            if user_type == 'Company':
+                dash_details = CompanyDetails.objects.get(login_details=login_details, superadmin_approval=1, Distributor_approval=1)
+                allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+            else:
+                dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
+                allmodules = None
+            bank_holder=BankAccount.objects.all()
+
+            loan = loan_account.objects.get(pk=account_id)
 
 
+            return render(request, 'zohomodules/loan_account/edit_loan.html', {'account': loan, 'details':dash_details,'bank_holder':bank_holder, 'user_type': user_type, 'allmodules': allmodules})
+
+    return redirect('/')
+
+def edit_loan(request, account_id):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        if 'login_id' not in request.session:
+            return redirect('/')
+        
+        login_details = LoginDetails.objects.get(id=log_id)
+        user_type = login_details.user_type
+
+        if user_type in ['Company', 'Staff']:
+            if user_type == 'Company':
+                dash_details = CompanyDetails.objects.get(login_details=login_details, superadmin_approval=1, Distributor_approval=1)
+                allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+            else:
+                dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
+                allmodules = None
+
+            loan = loan_account.objects.get(pk=account_id)
+
+            if request.method == 'POST':
+                
+                loan.bank_holder.customer_name = request.POST.get('account_name')
+                loan.account_number = request.POST.get('account_number')
+                loan.loan_amount = request.POST.get('loan_amount')
+                loan.lender_bank = request.POST.get('lender_bank')
+                loan.loan_date = request.POST.get('loan_date')
+                loan.payment_method = request.POST.get('payment_method')
+                loan.term = request.POST.get('terms')
+                loan.processing_method = request.POST.get('processing_method')
+                loan.interest = request.POST.get('interest')
+                loan.processing_fee = request.POST.get('processing_fee')
+                loan.description = request.POST.get('description')
+                
+                loan.save()
+
+                history=LoanAccountHistory.objects.create(
+                    login_details=login_details,
+                    company=dash_details,
+                    loan=loan,
+                    date=now().date(),
+                    action='Edited'
+                )
+                history.save()
+                
+               
+                return redirect('overview', account_id=account_id)  
+
+            return render(request, 'zohomodules/loan_account/edit_loanaccount.html', {'loan': loan, 'details': dash_details, 'user_type': user_type, 'allmodules': allmodules,'history':history})
+
+    return redirect('/')
+
+            
