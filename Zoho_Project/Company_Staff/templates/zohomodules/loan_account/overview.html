@@ -260,7 +260,7 @@
                   <i class="fa fa-sort mt-1" style="font-size: small;"></i>
                   </a>
                   <div class="dropdown-menu ">
-                      <a class="dropdown-item text-black" href="#" >All</a>
+                      <a class="dropdown-item text-black" href="{% url 'overview' account.id %}" >All</a>
                       <a class="dropdown-item text-black" onclick="sorttable(0)">Account Holder</a>
                       <a class="dropdown-item text-black" onclick="sorttable(1)">Balance</a>
                   </div>
@@ -269,11 +269,11 @@
                     <i class="fa fa-filter" style="font-size: small;"></i>
                   </a>
                   <div class="dropdown-menu">
-                    <a class="dropdown-item text-black" href="#">All</a>
+                    <a class="dropdown-item text-black" href="{% url 'overview' account.id %}">All</a>
                     <a class="dropdown-item text-black" onclick="filtertable('Active')">Active</a>
                     <a class="dropdown-item text-black" onclick="filtertable('Inactive')">Inactive</a>
                   </div>
-                  <a class="btn btn-outline-warning small_btn mt-4" role="button" href="#">
+                  <a class="btn btn-outline-warning small_btn mt-4" role="button" href="{% url 'add_loan' %}">
                     <i class="fa fa-plus"></i>
                   </a>
                 </div>
@@ -283,18 +283,22 @@
                     <div class="table-responsive">
                       <table class="table text-white" id="sidetable">
                         <tbody>
-                          
-                          <tr class='clickable-row' data-href="#" style="cursor: pointer;">
+                          {% for b in loan_side %}
+                          <tr class='clickable-row' data-href="{% url 'overview' b.id %}" style="cursor: pointer;">
+                            
                             <td>
-                              <span class="name"><b>{{ loan_info.bank_holder.customer_name }}</b></span><br><br>
-                              {{ loan_info.bank_holder.account_number }}
+                              
+                              <span class="name"><b>{{ b.bank_holder.customer_name }}</b></span><br><br>
+                              {{ b.bank_holder.account_number }}
                             </td>
                             <td>
-                              <span style="float: right;" class="bal">&#8377;{{ overall_balance }}</span><br><br>
-                              <span style="float: right;" class="stat">{{loan_info.status}}</span>
+                              <span style="float: right;" class="bal">&#8377;{{ b.balance }}</span><br><br>
+                              <span style="float: right;" class="stat">{{b.status}}</span>
                             </td>
+                            
+
                           </tr>
-                         
+                          {% endfor %}
                         </tbody>
                       </table>
                     </div>
@@ -1346,11 +1350,11 @@
                                   <h3>{{ loan_info.company.company_name }}</h3>
                                   <p class="text-black"> 
                                     {{ loan_info.company.contact }} <br>
-                                    {{ bnk.company.address }} <br>
-                                    {{ bnk.company.city }} <br>
-                                    {{ bnk.company.state|slice:'5:' }},
-                                    {{ bnk.company.country }} <br>
-                                    {{ bnk.company.pincode }}
+                                    {{ loan_info.company.address }} <br>
+                                    {{ loan_info.company.city }} <br>
+                                    {{ loan_info.company.state|slice:'5:' }},
+                                    {{ loan_info.company.country }} <br>
+                                    {{ loan_info.company.pincode }}
                                   </p>
                                 </div>
                               </div>

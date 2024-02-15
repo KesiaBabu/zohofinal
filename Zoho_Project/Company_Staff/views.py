@@ -693,7 +693,45 @@ def save_account_details(request):
         
 #         options[option.id] = [option.salutation, option.first_name, option.last_name, option.id]
 #     return JsonResponse(options)
-    
+# def employeeloan_create(request):
+#     if 'login_id' in request.session:
+#         log_id = request.session['login_id']
+#         if 'login_id' not in request.session:
+#             return redirect('/')
+#     log_details= LoginDetails.objects.get(id=log_id)
+  
+#     if log_details.user_type == "Company":
+#         dash_details = CompanyDetails.objects.get(login_details=log_details,superadmin_approval=1,Distributor_approval=1)
+#         allmodules= ZohoModules.objects.get(company=dash_details,status='New')
+#         pay = payroll_employee.objects.filter(company=dash_details,status='active')
+#         loan_term =Loan_Term.objects.filter(company=dash_details)
+#         toda = date.today()
+#         tod = toda.strftime("%Y-%m-%d") 
+        
+       
+
+
+#     if log_details.user_type == "Staff":
+#         dash_details = StaffDetails.objects.get(login_details=log_details)
+#         allmodules= ZohoModules.objects.get(company=dash_details.company,status='New')
+#         pay = payroll_employee.objects.filter(company=dash_details.company,status='active')
+#         loan_term =Loan_Term.objects.filter(company=dash_details.company)
+#         toda = date.today()
+#         tod = toda.strftime("%Y-%m-%d") 
+#     content = {
+#             'details': dash_details,
+#             'allmodules': allmodules,
+#             'log_id':log_details,
+#             'pay':pay,
+#             'loan_term':loan_term,
+#             'tod':tod
+
+           
+            
+#     }
+#     return render(request,'zohomodules/employe_loan/employee_loan_create.html',content)   
+
+
 def overview(request,account_id):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
@@ -712,26 +750,26 @@ def overview(request,account_id):
                
                 dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
                 allmodules = None
+
             account = get_object_or_404(BankAccount, id=account_id)
             loan_info = loan_account.objects.filter(bank_holder=account).first()
             repayment_details = LoanRepayemnt.objects.filter(loan=loan_info)
             current_balance = loan_info.loan_amount  
-            balances = []  # List to store balances
+            balances = [] 
+            loan_side = loan_account.objects.all() 
+            for loan in loan_side:
+                total_emis_paid = LoanRepayemnt.objects.filter(loan=loan, type='EMI paid').aggregate(total=Sum('total_amount'))['total'] or 0
+                total_additional_loan = LoanRepayemnt.objects.filter(loan=loan, type='Additional Loan').aggregate(total=Sum('total_amount'))['total'] or 0
+                loan.balance = loan.loan_amount - total_emis_paid + total_additional_loan     
             
-            # Iterate through repayment details to calculate balances
             for repayment in repayment_details:
                 if repayment.type == 'EMI paid':
                     current_balance -= repayment.total_amount
                 elif repayment.type == 'Additional Loan':
-                    current_balance += repayment.total_amount
-                
-                # Append the current balance to the balances list
+                    current_balance += repayment.total_amount     
                 balances.append(current_balance)
-            
-            # Calculate overall balance
+
             overall_balance = current_balance
-            
-            # Combine repayment details and balances
             repayment_details_with_balances = zip(repayment_details, balances)
             total_amount= loan_info.loan_amount + loan_info.interest
 
@@ -750,13 +788,15 @@ def overview(request,account_id):
             context = {
                     'details': dash_details,
                     'allmodules': allmodules,
+                    'log_id':log_details,
                     'account':account,
                     'loan_info':loan_info,
                     'repayment_details': repayment_details,
                     'repayment_details_with_balances': repayment_details_with_balances,
                     'overall_balance': overall_balance, 
                     'total_amount':total_amount,
-                    'history':history
+                    'history':history,
+                    'loan_side':loan_side
                      }          
     
             return render(request,'zohomodules/loan_account/overview.html',context)
