@@ -754,13 +754,27 @@ def overview(request,account_id):
             account = get_object_or_404(BankAccount, id=account_id)
             loan_info = loan_account.objects.filter(bank_holder=account).first()
             repayment_details = LoanRepayemnt.objects.filter(loan=loan_info)
+           
+
+
             current_balance = loan_info.loan_amount  
             balances = [] 
             loan_side = loan_account.objects.all() 
             for loan in loan_side:
                 total_emis_paid = LoanRepayemnt.objects.filter(loan=loan, type='EMI paid').aggregate(total=Sum('total_amount'))['total'] or 0
                 total_additional_loan = LoanRepayemnt.objects.filter(loan=loan, type='Additional Loan').aggregate(total=Sum('total_amount'))['total'] or 0
-                loan.balance = loan.loan_amount - total_emis_paid + total_additional_loan     
+                loan.balance = loan.loan_amount - total_emis_paid + total_additional_loan 
+
+            start_date = request.GET.get('start_date')
+            end_date = request.GET.get('end_date')
+
+            # Filter repayment details by date range if start_date and end_date are provided
+            if start_date and end_date:
+                start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+                end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+                repayment_details = repayment_details.filter(payment_date__range=(start_date, end_date))  
+                 
+            
             
             for repayment in repayment_details:
                 if repayment.type == 'EMI paid':
@@ -775,14 +789,9 @@ def overview(request,account_id):
 
             history=LoanAccountHistory.objects.filter(loan=loan_info)
 
-            start_date_str = request.POST.get('start_date')
-            end_date_str = request.POST.get('end_date')
-        
-            if start_date_str and end_date_str:
-                start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-                end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
-          
-                repayment_details_with_balances = [(repayment, balance) for repayment, balance in repayment_details_with_balances if start_date <= repayment.payment_date <= end_date]
+            
+
+            
         
        
             context = {
@@ -1036,4 +1045,52 @@ def edit_loan(request, account_id):
 
     return redirect('/')
 
+def edit_repayment(request, account_id):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        if 'login_id' not in request.session:
+            return redirect('/')
+        
+        login_details = LoginDetails.objects.get(id=log_id)
+        user_type = login_details.user_type
+
+        if user_type in ['Company', 'Staff']:
+            if user_type == 'Company':
+                dash_details = CompanyDetails.objects.get(login_details=login_details, superadmin_approval=1, Distributor_approval=1)
+                allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+            else:
+                dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
+                allmodules = None
+            repayment = get_object_or_404(LoanRepayemnt, id=account_id)
+    
+            if request.method == 'POST':
+                principal_amount = request.POST.get('principal_amount')
+                interest_amount = request.POST.get('interest_amount')
+                payment_method = request.POST.get('payment_method')
+                upi_id = request.POST.get('upi_id')
+                cheque = request.POST.get('cheque')
+                payment_date = request.POST.get('date')
+                total_amount = request.POST.get('total_amount')
+                repayment_type = request.POST.get('type')
+        
+                repayment.principal_amount = principal_amount
+                repayment.interest_amount = interest_amount
+                repayment.payment_method = payment_method
+                repayment.upi_id = upi_id
+                repayment.cheque = cheque
+                repayment.payment_date = payment_date
+                repayment.total_amount = total_amount
+                repayment.type = repayment_type
+        
+                repayment.save()
+                return redirect('overview')
+            else:
+                return render(request, 'zohomodules/loan_account/overview.html', {'repayment': repayment,'details': dash_details,  'allmodules': allmodules})
+
+
             
+                
+    
+
+        
+        

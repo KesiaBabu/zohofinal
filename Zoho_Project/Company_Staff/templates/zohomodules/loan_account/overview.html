@@ -338,19 +338,28 @@
                     </div>
                     <div class="col-md-6">
                       <div class="d-sm-flex" style="float: right;">
-                        <a class="btn btn-outline-warning small_btn mt-2" title="EDIT" id="edit_btn" href="{% url 'edit_loanaccount' account.id %}">
+                        <a onclick="ExportToExcel()" class="btn btn-outline-warning small_btn mt-2 mx-2" title="EXPORT" >
+                          <i class='fas fa-file-export' ></i> 
+                        </a>
+                        <a class="btn btn-outline-warning small_btn mt-2 " title="EDIT" id="edit_btn" href="{% url 'edit_loanaccount' account.id %}">
                           <i class="fa fa-pencil"></i>
                         </a>
                         <a class="btn btn-outline-warning small_btn mt-2" href="" data-toggle="modal" data-target="#commentModal2" data-toggle="tooltip" title="history">
                           <i class="fa-solid fa-clock-rotate-left"></i>
                         </a>
-                        <a class="btn btn-outline-warning small_btn mt-2 mx-2" href="#" title="DELETE" id="delete_btn">
+                        <a class="btn btn-outline-warning small_btn mt-2 " href="#" title="DELETE" id="delete_btn">
                           <i class="fa fa-trash"></i>
                         </a>
-                        <a class="btn btn-outline-warning small_btn mt-2 mx-2 d-none" title="SHARE" id="share_btn" data-toggle="modal" data-target="#snd_mail">
+                        <a class="btn btn-outline-warning small_btn mt-2  d-none" title="SHARE" id="share_btn"data-toggle="dropdown" >
                           <i class="fas fa-share"></i>
                         </a>
-                        <a class="btn btn-outline-warning small_btn mt-2" data-toggle="dropdown">
+                        
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                          <a class="dropdown-item text-black" href="#" data-toggle="modal" title="upload" data-target="#commentModal4" data-toggle="tooltip" title="comment">Mail</a>
+                          <a class="dropdown-item text-black" href="#" onclick="shareViaWhatsApp()">whatsapp</a>
+                        </div>
+                        
+                        <!-- <a class="btn btn-outline-warning small_btn mt-2" >
                           <i class="fas fa-paperclip"></i>
                         </a>
                         <div class="dropdown-menu">
@@ -358,7 +367,7 @@
                           {% if bnk.document != "" %} 
                           <a class="dropdown-item text-black" download href="{{bnk.document.url}}">Download Document</a>
                           {% endif %}
-                        </div>
+                        </div> -->
                         <a class="btn btn-outline-warning small_btn mt-2 mx-2 d-none" onclick="export_as_pdf()" title="PDF" id="pdf_btn"> 
                           <i class="fa fa-file-pdf"></i>
                         </a>
@@ -752,13 +761,13 @@
                   </div>  
     
                   <!-- Bank to Cash Edit -->
-                  <div class="modal fade" id="edit_bank_to_cash">
+                  <div class="modal fade" id="edit_emi">
                     <div class="modal-dialog modal-lg">
                       <div class="modal-content" style="background:black; border: 1px solid #ffae1f;">
                         <div class="modal-body">
                           <div class="row">
                             <div class="col-md-10 p-4">
-                              <h2 class="text-uppercase" style="color: white; font-weight: bolder;">Edit Bank To Cash Transfer</h2>
+                              <h2 class="text-uppercase" style="color: white; font-weight: bolder;">Edit Repayment Due</h2>
                             </div>
                             <div class="col-md-2 p-4">
                               <button type="button" class="btn close" data-dismiss="modal" aria-label="Close" style="float: right;">
@@ -768,52 +777,55 @@
                           </div><br>
                           <form method="post" class="needs-validation" novalidate autocomplete="off">
                             {%csrf_token%}
-                            <input type="text" id="btcid" hidden>
                             <div class="row">
-                                <div class="col-md-6">
-                                    <label for="btcorigin" style="color: white;">From</label>
-                                    <select class="form-control text-white bg-black form-select mt-1" id="btcorigin" name="btcorigin" >
-                                      <option value="" hidden>-- Select a Bank --</option>
-                                      {% for b in bnk_list %}
-                                      <option value="{{b.id }}">{{ b.bnk_name }} ({{ b.bnk_acno }})</option>
-                                      {% endfor %}
-                                    </select>
-                                  </div>
-                                <div class="col-md-6">
-                                    <label for="btcdest" style="color: white;">To</label>
-                                    <input type="text" class="form-control text-white bg-black mt-1" id="btcdest" maxlength="10" name="ebtcest" value="Cash" readonly>
+                              <div class="col-md-6">
+                                <label for="dest" style="color: white;">Principal Amount</label>
+                                <input type="text" class="form-control text-white bg-black mt-1" id="principal_amount" maxlength="10" name="principal_amount"  >
+                              </div>
+                              <div class="col-md-6">
+                                <label for="date" style="color: white;">Date</label>
+                                <input type="date" class="form-control text-white bg-black mt-1" id="date" value="{{ today_date|date:'Y-m-d' }}"name="date">
+                              </div>
+                            </div>
+        
+                            <div class="row mt-3">
+                              <div class="col-md-6">
+                                <label for="amount" style="color: white;">Interest Amount</label>
+                                <input type="number" class="form-control text-white bg-black mt-1" id="interest_amount" name="interest_amount">
+                              </div>
+                              <div class="col-md-6">
+                                <label for="amount" style="color: white;">Total Amount</label>
+                                <input type="number" class="form-control text-white bg-black mt-1" id="total_amount"  name="total_amount">
+                              </div>
+                              <div class="col-md-6">
+                                <label for="origin" style="color: white;">Paid From</label>
+                                <select class="form-control text-white bg-black form-select mt-1" id="payment_method" name="payment_method" >
+                                  <option value="" hidden>-- Select --</option>
+                                  
+                                  <option value="Cash">Cash</option>
+                                  <option value="UPI">UPI</option>
+                                  <option value="Cheque">Cheque</option>
+                                 
+                                </select>
+                              </div>
+                              
+                            </div>
+        
+                            
+
+                            <input type="hidden" id="selectedType" name="type">
+
+                            <div class="row mt-3">
+                              <div class="col-md-4"></div>
+                              <div class="col-md-4">
+                                <div class="d-flex">
+                                  <button class="btn save_btn btn-outline-warning mt-2 my-4 mx-2 w-50" type="submit" data-dismiss="modal" id="paySave">Save</button> 
+                                  <input class="btn save_btn btn-outline-warning mt-2 my-4 mx-2 w-50" type="reset" value="Reset">
                                 </div>
-                            </div>
-        
-                            <div class="row mt-3">
-                              <div class="col-md-6">
-                                <label for="btcamount" style="color: white;">Amount</label>
-                                <input class="form-control text-white bg-black mt-1" id="btcamount" name="btcamount">
                               </div>
-                              <div class="col-md-6">
-                                <label for="btcdate" style="color: white;">Date</label>
-                                <input type="date" class="form-control text-white bg-black mt-1" id="btcdate" name="edate">
-                              </div>
+                              <div class="col-md-4"></div>
                             </div>
-        
-                            <div class="row mt-3">
-                              <div class="col-md-12">
-                                <label for="btcdescription" style="color: white;">Description:</label>
-                                <textarea name="btcdescription" class="form-control text-white bg-black mt-1" id="btcdescription" placeholder="Max. 500 characters"></textarea>
-                              </div>
-                            </div>
-                            <input type="hidden" id="eselectedType" name="ctbtype">
                           </form>
-                          <div class="row mt-3">
-                            <div class="col-md-4"></div>
-                            <div class="col-md-4">
-                              <div class="d-flex">
-                                <button class="btn save_btn btn-outline-warning mt-2 my-4 mx-2 w-50" type="submit" data-dismiss="modal" id="btcpaysave">Save</button> 
-                                <input class="btn save_btn btn-outline-warning mt-2 my-4 mx-2 w-50" type="reset" value="Reset">
-                              </div>
-                            </div>
-                            <div class="col-md-4"></div>
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -1307,8 +1319,8 @@
                               <i class="fas fa-ellipsis-v text-warning"></i>
                             </a>
                             <div class="dropdown-menu">
-                              <a class="dropdown-item btn text-black" onclick="edit_trans_details('{{t.id}}')">
-                                &nbsp; <i class="fa fa-pencil"></i> &nbsp;&nbsp; <span style="font-size: medium;">Edit</span>
+                              <a class="dropdown-item btn text-black" onclick="edit_trans_details('{{ account.id }}')">
+                                  &nbsp; <i class="fa fa-pencil"></i> &nbsp;&nbsp; <span style="font-size: medium;">Edit</span>
                               </a>
                               <a class="dropdown-item btn text-black" href="#">
                                 &nbsp; <i class="fas fa-trash-alt"></i> &nbsp;&nbsp; <span style="font-size: medium;">Delete</span>
@@ -1325,10 +1337,12 @@
                     </table> 
                   </div>
                 </div>
-                <form method="POST" id="dateRangeForm">
-                  {% csrf_token %}
-                  <input type="date" name="start_date" id="startDate">
-                  <input type="date" name="end_date" id="endDate">
+                <form method="get">
+                  <label for="start_date">Start Date:</label>
+                  <input type="date" id="start_date" name="start_date">
+                  <label for="end_date">End Date:</label>
+                  <input type="date" id="end_date" name="end_date">
+                  <button type="submit">Filter</button>
               </form>
 
                 <div class="print-only tabcontent" id="Statement">
@@ -1487,17 +1501,53 @@
   </div>
 </div>
 </div>
+<div class="modal fade" id="commentModal4" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"  aria-hidden="true" style="margin-top: 8vh;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="background-color: #3b3b3b;">
+      <div class="modal-header">
+        <h3 class="modal-title text-light" id="exampleModalLabel">Share details</h3>
+        <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+        </button>
+      </div>
+      <form action="#" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body">
+          <input type="email" name="email" required style="color:white;" class="form-control">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-outline-warning">Share</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
 <script>
-  document.getElementById("startDate").addEventListener("change", function() {
-      document.getElementById("dateRangeForm").submit();
-  });
-  
-  document.getElementById("endDate").addEventListener("change", function() {
-      document.getElementById("dateRangeForm").submit();
-  });
+  function ExportToExcel() {
+    console.log("transactiontable");
+    $('in1').prop
+    const table = document.getElementById('transactiontable'); 
+    const wb = XLSX.utils.table_to_book(table);
+
+    XLSX.writeFile(wb, 'Transaction.xlsx');
+}
 </script>
+<script>
+  function shareViaWhatsApp() {
+    // Replace 'Hello, this is a shared message!' with your desired message
+    var message = encodeURIComponent(window.location.href);
+
+    // Create the WhatsApp share link
+    var whatsappLink = 'https://wa.me/?text=' + message;
+
+    // Open the link in a new tab/window
+    window.open(whatsappLink, '_blank');
+  }
+</script> 
 <script>
   $(document).ready(function() {
       $('#status_btn').click(function(e) {
@@ -1677,20 +1727,20 @@
       type: "POST", 
       url: "#",
       data: {
-        'id':id
+        'account_id': id
       },
       beforeSend: function (xhr, settings) {
         xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
       },
       success: function (response) {
-        if(response.ttype == 'Bank to Cash'){
-          $('#edit_bank_to_cash').modal('show');
-          document.getElementById('eselectedType').value = 'Bank To Cash Transfer';
-          $('#btcid').val(response.trans_id)
-          $('#btcorigin').val(response.origin)
-          $('#btcamount').val(response.trans_amount)
-          $('#btcdate').val(response.trans_adj_date)
-          $('#btcdescription').val(response.trans_desc)
+        if(response.ttype == 'Repayment Due'){
+          $('#edit_emi').modal('show');
+          document.getElementById('eselectedType').value = 'Repayment Due';
+          $('#principal_amount').val(response.trans_id)
+          $('#date').val(response.origin)
+          $('#interest_amount').val(response.trans_amount)
+          $('#total_amount').val(response.trans_adj_date)
+          $('#payment_method').val(response.trans_desc)
 
         }else if(response.ttype == 'Cash to Bank'){
           $('#edit_cash_to_bank').modal('show');
@@ -1733,17 +1783,17 @@
 
 <script>
   $("#btcpaysave").click(function () {
-    $('#edit_bank_to_cash').modal('hide');
+    $('#edit_emi').modal('hide');
     $.ajax({
       type: "POST", 
       url: "#",
       data: {
-        id : document.getElementById('btcid').value,
-        origin : document.getElementById('btcorigin').value,
-        amount : document.getElementById('btcamount').value,
-        edit_date : document.getElementById('btcdate').value,
-        desc : document.getElementById('btcdescription').value,
-        type : 'Bank To Cash Transfer'
+        principal_amount : document.getElementById('principal_amount').value,
+        date : document.getElementById('date').value,
+        interest_amount : document.getElementById('interest_amount').value,
+        total_amount : document.getElementById('total_amount').value,
+        payment_method : document.getElementById('payment_method').value,
+        type : 'Repayment Due'
       },
       beforeSend: function (xhr, settings) {
         xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
@@ -1824,8 +1874,8 @@
 </script>
 
 <script>
-  document.querySelector('#edit_bank_to_cash .close').addEventListener('click', function() {
-    $('#edit_bank_to_cash').modal('hide');
+  document.querySelector('#edit_emi .close').addEventListener('click', function() {
+    $('#edit_emi').modal('hide');
     window.location.href = '?Transaction=True';
   });
 
@@ -2058,4 +2108,4 @@
     html2pdf().from(content).save('{{bnk.bnk_name }}.pdf');
   }
 </script>
-{%endblock%}
+{% endblock %}
