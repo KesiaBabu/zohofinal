@@ -374,7 +374,7 @@
                         <a class="btn btn-outline-warning small_btn mt-2 d-none" onclick="window.print()" title="PRINT" id="print_btn">
                           <i class="fa fa-print"></i> 
                         </a>
-                        <a class="btn btn-outline-warning small_btn mt-2 mx-2" href="{% url 'update_status' %}" title="STATUS" id="status_btn">{{loan_info.status}}</a>
+                        <a class="btn btn-outline-warning small_btn mt-2 mx-2" href="{% url 'update_status' account.id %}" title="STATUS" >{{loan_info.status}}</a>
                       </div>
                     </div>
                   </div><br>
@@ -1552,28 +1552,26 @@
   $(document).ready(function() {
       $('#status_btn').click(function(e) {
           e.preventDefault();
-          var loanAccountId = '{{ loan_info.id }}'; // Assuming id is the primary key of the loan account
-          
-          // Toggle the button text
+          var loanAccountId = '{{ account.id }}'; 
           var currentStatus = $(this).text().trim();
           var newStatus = (currentStatus === 'Active') ? 'Inactive' : 'Active';
-          $(this).text(newStatus);
+          var $button = $(this); // Store reference to the button element
+
+        // Update button text immediately
+          $button.text(newStatus);
   
-          // Send AJAX request to update status
           $.ajax({
               type: 'POST',
-              url: '{% url "update_status" %}',
+              url: '{% url "update_status" account.id  %}',
               data: {
-                  'loan_account_id': loanAccountId,
+                'account_id': loanAccountId,
                   'csrfmiddlewaretoken': '{{ csrf_token }}'
               },
               success: function(response) {
-                  // Do nothing on success, as button text already updated
+                $('#status_btn').text(response.new_status);
               },
               error: function(xhr, status, error) {
-                  console.error(xhr.responseText);
-                  // Revert button text if error occurs
-                  $(this).text(currentStatus);
+                $('#status_btn').text(currentStatus);
               }
           });
       });
