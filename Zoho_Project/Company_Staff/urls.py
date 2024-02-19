@@ -46,6 +46,7 @@ urlpatterns = [
     path('zohomodules/loan_account/edit_loanaccount/<int:account_id>',views.edit_loanaccount, name='edit_loanaccount'),
     path('zohomodules/loan_account/edit_loan/<int:account_id>',views.edit_loan, name='edit_loan'),
     path('zohomodules/loan_account/edit_repayment/<int:account_id>',views.edit_repayment, name='edit_repayment'),
+    path('zohomodules/loan_account/share_email/<int:account_id>',views.share_email,name='share_email'),
 
 
   

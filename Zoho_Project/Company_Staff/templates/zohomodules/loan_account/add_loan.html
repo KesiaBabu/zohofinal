@@ -89,12 +89,28 @@
                                     <label for="sdate">Loan Recieved</label>
                                 </div>
                                 <div class="input-container col-6">
-                                    <select class="form-control text-dark bg-light" name="payment_method"  >
+                                    <select class="form-control text-dark bg-light" name="payment_method"   id="payment_method">
                                         <option value="" selected hidden>Select</option>
                                         <option value="Cash">Cash</option>
                                         <option value="UPI">UPI</option>
                                         <option value="Cheque">Cheque</option>
                                     </select>
+                                </div>
+                            </div>
+                            <div class="row pb-3" id="cheque_details" style="display: none;">
+                                <div class="col-6">
+                                    <label for="cheque_number">Cheque Number</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="cheque_number" id="cheque_number">
+                                </div>
+                            </div>
+                            <div class="row pb-3" id="upi_details" style="display: none;">
+                                <div class="col-6">
+                                    <label for="upi_id">UPI ID</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="upi_id" id="upi_id">
                                 </div>
                             </div>
                             
@@ -114,7 +130,7 @@
                                         <label for="">Processing Paid from</label>
                                     </div>
                                     <div class="input-container col-6">
-                                        <select class="form-control text-dark bg-light" name="processing_method"  >
+                                        <select class="form-control text-dark bg-light" name="processing_method"  id="processing_method">
                                             <option value="" selected hidden>Select</option>
                                             <option value="Cash">Cash</option>
                                             <option value="UPI">UPI</option>
@@ -122,6 +138,23 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="row pb-3" id="cheque" style="display: none;">
+                                    <div class="col-6">
+                                        <label for="cheque_number">Cheque Number</label>
+                                    </div>
+                                    <div class="input-container col-6">
+                                        <input type="text" class="form-control text-dark bg-light" name="cheque_number" id="cheque">
+                                    </div>
+                                </div>
+                                <div class="row pb-3" id="upi" style="display: none;">
+                                    <div class="col-6">
+                                        <label for="upi_id">UPI ID</label>
+                                    </div>
+                                    <div class="input-container col-6">
+                                        <input type="text" class="form-control text-dark bg-light" name="upi_id" id="upi">
+                                    </div>
+                                </div>
+                                
                                 <div class="row pb-3">
                                     <div class="col-6">
                                         <label for="">Interest rate</label>
@@ -152,6 +185,51 @@
                     </div>
         
                         </section>
+                        <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5+KEk3Iv57OpFwtrc8DbEEn1N5VDDlP5sl8xvZao" crossorigin="anonymous"></script>
+                        <script>
+                            $(document).ready(function() {
+                                $('#payment_method').change(function() {
+                                    console.log('Dropdown changed'); // Check if the event listener is triggered
+                                    var selectedOption = $(this).val();
+                                    console.log('Selected option:', selectedOption); // Check the value of selectedOption
+                                    if (selectedOption === 'Cheque') {
+                                        console.log('Cheque selected'); // Check if this block is executed
+                                        $('#cheque_details').show();
+                                        $('#upi_details').hide();
+                                    } else if (selectedOption === 'UPI') {
+                                        console.log('UPI selected'); // Check if this block is executed
+                                        $('#cheque_details').hide();
+                                        $('#upi_details').show();
+                                    } else {
+                                        console.log('Other option selected'); // Check if this block is executed
+                                        $('#cheque_details').hide();
+                                        $('#upi_details').hide();
+                                    }
+                                });
+                            });
+                        </script>
+                        <script>
+                            $(document).ready(function() {
+                                $('#processing_method').change(function() {
+                                    console.log('Dropdown changed'); // Check if the event listener is triggered
+                                    var selectedOption = $(this).val();
+                                    console.log('Selected option:', selectedOption); // Check the value of selectedOption
+                                    if (selectedOption === 'Cheque') {
+                                        console.log('Cheque selected'); // Check if this block is executed
+                                        $('#cheque').show();
+                                        $('#upi').hide();
+                                    } else if (selectedOption === 'UPI') {
+                                        console.log('UPI selected'); // Check if this block is executed
+                                        $('#cheque').hide();
+                                        $('#upi').show();
+                                    } else {
+                                        console.log('Other option selected'); // Check if this block is executed
+                                        $('#cheque').hide();
+                                        $('#upi').hide();
+                                    }
+                                });
+                            });
+                        </script>
 
                         <div class="modal fade" id="accountModal" tabindex="-1" role="dialog" aria-labelledby="accountModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-xl" role="document">
@@ -294,6 +372,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <script>
                             $(document).on("click","submitFormBtn",function() {
                                 $.ajax({

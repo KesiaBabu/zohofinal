@@ -14,6 +14,11 @@ from django.shortcuts import render, get_object_or_404
 from datetime import date as dt
 from django.db.models import Sum
 from django.utils.timezone import now
+from django.template.loader import get_template
+from django.core.mail import EmailMessage
+from io import BytesIO
+from xhtml2pdf import pisa
+
 
 # Create your views here.
 
@@ -750,12 +755,12 @@ def overview(request,account_id):
                
                 dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
                 allmodules = None
-
+            
+            today=date.today()
+            today_date = today.strftime("%Y-%m-%d")
             account = get_object_or_404(BankAccount, id=account_id)
             loan_info = loan_account.objects.filter(bank_holder=account).first()
             repayment_details = LoanRepayemnt.objects.filter(loan=loan_info)
-           
-
 
             current_balance = loan_info.loan_amount  
             balances = [] 
@@ -765,17 +770,6 @@ def overview(request,account_id):
                 total_additional_loan = LoanRepayemnt.objects.filter(loan=loan, type='Additional Loan').aggregate(total=Sum('total_amount'))['total'] or 0
                 loan.balance = loan.loan_amount - total_emis_paid + total_additional_loan 
 
-            start_date = request.GET.get('start_date')
-            end_date = request.GET.get('end_date')
-
-            # Filter repayment details by date range if start_date and end_date are provided
-            if start_date and end_date:
-                start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
-                end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
-                repayment_details = repayment_details.filter(payment_date__range=(start_date, end_date))  
-                 
-            
-            
             for repayment in repayment_details:
                 if repayment.type == 'EMI paid':
                     current_balance -= repayment.total_amount
@@ -789,11 +783,6 @@ def overview(request,account_id):
 
             history=LoanAccountHistory.objects.filter(loan=loan_info)
 
-            
-
-            
-        
-       
             context = {
                     'details': dash_details,
                     'allmodules': allmodules,
@@ -805,7 +794,8 @@ def overview(request,account_id):
                     'overall_balance': overall_balance, 
                     'total_amount':total_amount,
                     'history':history,
-                    'loan_side':loan_side
+                    'loan_side':loan_side,
+                    'today_date':today_date
                      }          
     
             return render(request,'zohomodules/loan_account/overview.html',context)
@@ -927,6 +917,8 @@ def new_loan(request,account_id):
             else:
                 dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
                 allmodules = None
+
+            today_date = dt.today()
             if request.method == 'POST':
                 principal_amount = request.POST.get('principal_amount')
                 interest_amount = request.POST.get('interest_amount')
@@ -934,7 +926,7 @@ def new_loan(request,account_id):
                 upi_id=request.POST.get('upi_id'),
                 cheque=request.POST.get('cheque'),
                 date = request.POST.get('date')
-                total_amount = float(principal_amount) + float(interest_amount)
+                total_amount = request.POST.get('total_amount')
                 type = 'Additional Loan'
                 
                 repayment = LoanRepayemnt(
@@ -953,15 +945,16 @@ def new_loan(request,account_id):
                 repayment.loan = loan
                 repayment.save()
                 
-                return redirect('overview', account_id=account_id)
-            else:
-                today_date = dt.today()
+                return redirect('overview', account_id=account_id)    
 
             context={
                 'allmodules':allmodules,
                 'details': dash_details,
+                'today_date': today_date,
+                'account_id': account_id,
+                
             }
-            return render(request, 'zohomodules/loan_account/overview.html', { 'details': dash_details, 'allmodules': allmodules,  'today_date': today_date,'account_id': account_id,})
+            return render(request, 'zohomodules/loan_account/overview.html',context)
     return redirect('/')
 
 def edit_loanaccount(request, account_id):
@@ -1081,6 +1074,57 @@ def edit_repayment(request, account_id):
                 return redirect('overview')
             else:
                 return render(request, 'zohomodules/loan_account/overview.html', {'repayment': repayment,'details': dash_details,  'allmodules': allmodules})
+            
+            
+from django.template.loader import render_to_string
+
+def share_email(request, account_id):
+    try:
+        if request.method == 'POST':
+            emails_string = request.POST['email']
+            emails_list = [email.strip() for email in emails_string.split(',')]
+            loan_info = loan_account.objects.get(pk=account_id)
+
+            repayment_details = LoanRepayemnt.objects.filter(loan=loan_info)
+            current_balance = loan_info.loan_amount  
+            balances = [] 
+            for repayment in repayment_details:
+                if repayment.type == 'EMI paid':
+                    current_balance -= repayment.total_amount
+                elif repayment.type == 'Additional Loan':
+                    current_balance += repayment.total_amount     
+                balances.append(current_balance)
+            overall_balance = current_balance
+            total_amount= loan_info.loan_amount + loan_info.interest
+
+            context = {
+                'loan_info': loan_info,
+                'repayment_details': repayment_details,
+                'repayment_details_with_balances': zip(repayment_details, balances),
+                'overall_balance': overall_balance, 
+                'total_amount': total_amount,
+            }
+
+            html_content = render_to_string('zohomodules/loan_account/mailoverview.html', context)
+
+            result = BytesIO()
+            pdf = pisa.pisaDocument(BytesIO(html_content.encode("UTF-8")), result)
+            pdf = result.getvalue()
+
+            filename = f'{loan_info.bank_holder.customer_name}-statement - {loan_info.id}.pdf'
+            subject = f"{loan_info.bank_holder.customer_name} - {loan_info.id}- statement"
+            email = EmailMessage(subject, f"Hi,\nPlease find the attached statement - File-{loan_info.bank_holder.customer_name}  .\n--\nRegards,\n", to=emails_list)
+            email.attach(filename, pdf, "application/pdf")
+            email.from_email = settings.EMAIL_HOST_USER  
+            email.send(fail_silently=False)
+
+            messages.success(request, 'Statement has been shared via email successfully..!')
+            return redirect('overview', account_id)
+    except Exception as e:
+        print(e)
+        messages.error(request, f'{e}')
+        return redirect('overview', account_id)
+
 
 
             

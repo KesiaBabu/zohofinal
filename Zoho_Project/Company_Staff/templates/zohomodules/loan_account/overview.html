@@ -335,7 +335,10 @@
                         <span class="fa fa-file-word" style="font-weight: bold;  font-size: small;" id="statement_icon"></span> 
                         <span style="font-size: small;">Statement</span>
                       </a>
-                    </div>
+                      </div>
+                      <!-- <div class="d-sm-flex" style="width: 30%;">
+                        <input class="form-control text-black bg-light mt-4" type="text" id="search_tra" placeholder="Search..." style="margin-right: 10%;">
+                          </div> -->
                     <div class="col-md-6">
                       <div class="d-sm-flex" style="float: right;">
                         <a onclick="ExportToExcel()" class="btn btn-outline-warning small_btn mt-2 mx-2" title="EXPORT" >
@@ -355,7 +358,7 @@
                         </a>
                         
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                          <a class="dropdown-item text-black" href="#" data-toggle="modal" title="upload" data-target="#commentModal4" data-toggle="tooltip" title="comment">Mail</a>
+                          <a class="dropdown-item text-black" href="{% url 'share_email' account.id %}" data-toggle="modal" title="upload" data-target="#commentModal4" data-toggle="tooltip" title="comment">Mail</a>
                           <a class="dropdown-item text-black" href="#" onclick="shareViaWhatsApp()">whatsapp</a>
                         </div>
                         
@@ -485,7 +488,7 @@
                               </div>
                               <div class="col-md-6">
                                 <label for="date" style="color: white;">Date</label>
-                                <input type="date" class="form-control text-white bg-black mt-1" id="date" value="{{ today_date|date:'Y-m-d' }}"name="date">
+                                <input type="date" class="form-control text-white bg-black mt-1" id="date" value="{{ today_date }}"name="date">
                               </div>
                             </div>
         
@@ -509,6 +512,14 @@
                                  
                                 </select>
                               </div>
+                              <div class="col-md-6" id="cheque_details" style="display: none;">
+                                <label for="cheque_number" style="color: white;">Cheque Number</label>
+                                <input type="text" class="form-control text-white bg-black mt-1" id="cheque_number" name="cheque_number">
+                            </div>
+                            <div class="col-md-6" id="upi_details" style="display: none;">
+                                <label for="upi_id" style="color: white;">UPI ID</label>
+                                <input type="text" class="form-control text-white bg-black mt-1" id="upi_id" name="upi_id">
+                            </div>
                               
                             </div>
         
@@ -552,43 +563,35 @@
                             <div class="row">
                               <div class="col-md-6">
                                 <label for="origin" style="color: white;">Balance Loan</label>
-                                <input type="text" class="form-control text-white bg-black mt-1" id="balance" name="balance"  readonly>
+                                <input type="text" class="form-control text-white bg-black mt-1" id="balance" name="balance" value="{{ overall_balance }}" readonly>
                               </div>
                               <div class="col-md-6">
                                 <label for="origin" style="color: white;">New Loan</label>
-                                <input type="text" class="form-control text-white bg-black mt-1" id="principal_amount" name="principal_amount" >
+                                <input type="number" class="form-control text-white bg-black mt-1" id="principalamount" name="principal_amount" >
                               </div>
-                              <!-- <div class="col-md-6">
-                                <label for="dest" style="color: white;">To</label>
-                                <select class="form-control text-white bg-black form-select mt-1" id="dest" name="dest">
-                                  <option value="" hidden>-- Select a Bank --</option>
-                                  {% for b in bnk_list %}
-                                  <option value="{{b.id }}">{{ b.bnk_name }} ({{ b.bnk_acno }})</option>
-                                  {% endfor %}
-                                </select>
-                              </div> -->
+                              
                             </div>
         
                             <div class="row mt-3">
                               <div class="col-md-6">
                                 <label for="origin" style="color: white;">Interest Amount</label>
-                                <input type="text" class="form-control text-white bg-black mt-1" id="interest_amount" name="interest_amount" >
+                                <input type="number" class="form-control text-white bg-black mt-1" id="interestamount" name="interest_amount" >
                               </div>
                               
                               <div class="col-md-6">
                                 <label for="date" style="color: white;">Date</label>
-                                <input type="date" class="form-control text-white bg-black mt-1" id="date" value="{{tod}}" name="date">
+                                <input type="date" class="form-control text-white bg-black mt-1" id="date" value="{{ today_date }}" name="date">
                               </div>
                             </div>
         
                             <div class="row mt-3">
                               <div class="col-md-6">
                                 <label for="amount" style="color: white;">Total Loan</label>
-                                <input type="number" class="form-control text-white bg-black mt-1" id="toal_amount"  name="total_amount">
+                                <input type="number" class="form-control text-white bg-black mt-1" id="totalamount"  name="total_amount">
                               </div>
                               <div class="col-md-6">
                                 <label for="dest" style="color: white;">Payment Method</label>
-                                <select class="form-control text-white bg-black form-select mt-1" id="payment_method" name="payment_method">
+                                <select class="form-control text-white bg-black form-select mt-1" id="paymentmethod" name="payment_method">
                                   <option value="" hidden>-- Select --</option>
                                   
                                   <option value="Cash">Cash</option>
@@ -598,6 +601,20 @@
                                 </select>
                               </div>
                             </div>
+                            <div class="row mt-3" id="chequedetails" style="display: none;">
+                              <div class="col-md-6">
+                                  <label for="cheque_number" style="color: white;">Cheque Number</label>
+                                  <input type="text" class="form-control text-white bg-black mt-1" id="cheque_number" name="cheque_number">
+                              </div>
+                          </div>
+      
+                          <!-- Text box for UPI -->
+                          <div class="row mt-3" id="upidetails" style="display: none;">
+                              <div class="col-md-6">
+                                  <label for="upi_id" style="color: white;">UPI ID</label>
+                                  <input type="text" class="form-control text-white bg-black mt-1" id="upi_id" name="upi_id">
+                              </div>
+                          </div>
   
                             <input type="hidden" id="selectedTypeC" name="type">
   
@@ -1337,12 +1354,12 @@
                     </table> 
                   </div>
                 </div>
-                <form method="get">
-                  <label for="start_date">Start Date:</label>
-                  <input type="date" id="start_date" name="start_date">
-                  <label for="end_date">End Date:</label>
-                  <input type="date" id="end_date" name="end_date">
-                  <button type="submit">Filter</button>
+                <form id="date-filter-form">
+                  <label for="start-date">Start Date:</label>
+                  <input type="date" id="start-date" name="start-date">
+                  <label for="end-date">End Date:</label>
+                  <input type="date" id="end-date" name="end-date">
+                  <button type="button" id="filter-button">Filter</button>
               </form>
 
                 <div class="print-only tabcontent" id="Statement">
@@ -1510,7 +1527,7 @@
           <span aria-hidden="true" style="font-size: x-large;">&times;</span>
         </button>
       </div>
-      <form action="#" method="POST" enctype="multipart/form-data">
+      <form action="{% url 'share_email' account.id %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="modal-body">
           <input type="email" name="email" required style="color:white;" class="form-control">
@@ -1526,6 +1543,95 @@
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script>
+  $(document).ready(function() {
+      $('#paymentmethod').change(function() {
+          var selectedOption = $(this).val();
+          if (selectedOption === 'Cheque') {
+              $('#chequedetails').show();
+              $('#upidetails').hide();
+          } else if (selectedOption === 'UPI') {
+              $('#chequedetails').hide();
+              $('#upidetails').show();
+          } else {
+              $('#chequedetails').hide();
+              $('#upidetails').hide();
+          }
+      });
+  });
+</script>
+
+<script>
+  $(document).ready(function() {
+      $('#payment_method').change(function() {
+          var selectedOption = $(this).val();
+          if (selectedOption === 'Cheque') {
+              $('#cheque_details').show();
+              $('#upi_details').hide();
+          } else if (selectedOption === 'UPI') {
+              $('#cheque_details').hide();
+              $('#upi_details').show();
+          } else {
+              $('#cheque_details').hide();
+              $('#upi_details').hide();
+          }
+      });
+  });
+</script>
+
+  <script>
+            $(document).ready(function() {
+                var table = $('#statementtable')[0]; 
+                var fromDate;
+                $('#start-date').on('change', function () {
+                    fromDate = new Date($(this).val());
+                    $('#end-date').prop('min', function () {
+                        return fromDate.toISOString().split('T')[0];
+                    });
+                    filterTransactions();
+                });
+          
+                var toDate;
+                $('#end-date').on('change', function () {
+                    toDate = new Date($(this).val());
+                    $('#start-date').prop('max', function () {
+                        return toDate.toISOString().split('T')[0];
+                    });
+                    filterTransactions();
+                });
+          
+                function filterTransactions() {
+                    var startDate = fromDate;
+                    var endDate = toDate;
+                    var rows = table.rows;
+          
+                    for (var i = 1; i < rows.length; i++) { // Start from index 1 to skip the header row
+                        var row = rows[i];
+                        var dateCell = row.cells[1]; // Assuming date is in the second column
+                        var rowDate = new Date(dateCell.textContent);
+          
+                        if (rowDate >= startDate && rowDate <= endDate) {
+                            $(row).show();
+                           
+                        } else {
+                            $(row).hide();
+                        }
+                      
+                    }
+          
+                    var options = { year: 'numeric', month: 'long', day: 'numeric' };
+          
+                    if (fromDate) {
+                        $('#d1').text(fromDate.toLocaleDateString(undefined, options));
+                    }
+          
+                    if (toDate) {
+                        $('#d2').text(" To " + toDate.toLocaleDateString(undefined, options));
+                    }
+                }
+            });
+          </script>
 <script>
   function ExportToExcel() {
     console.log("transactiontable");
@@ -1576,6 +1682,24 @@
           });
       });
   });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var principalInput = document.getElementById('principalamount');
+        var interestInput = document.getElementById('interestamount');
+        var totalAmountInput = document.getElementById('totalamount');
+  
+        function calculateTotal() {
+            var principal = parseFloat(principalInput.value) || 0;
+            var interest = parseFloat(interestInput.value) || 0;
+            var total = principal + interest;
+            totalAmountInput.value = total.toFixed();
+        }
+  
+        principalInput.addEventListener('input', calculateTotal);
+        interestInput.addEventListener('input', calculateTotal);
+        calculateTotal(); 
+    });
   </script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -1634,6 +1758,19 @@
   $(document).ready(function() {
     var $rows = $('#sidetable tbody tr');
     $('#search').keyup(function() {
+      var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+      $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+      }).hide();
+    });
+  });
+  $('.dropdown-toggle').dropdown();
+</script>
+<script>
+  $(document).ready(function() {
+    var $rows = $('#transactiontable tbody tr');
+    $('#search_tra').keyup(function() {
       var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
       $rows.show().filter(function() {
         var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
