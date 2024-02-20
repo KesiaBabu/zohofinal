@@ -378,9 +378,25 @@
                           <i class="fa fa-print"></i> 
                         </a>
                         <a class="btn btn-outline-warning small_btn mt-2 mx-2" href="{% url 'update_status' account.id %}" title="STATUS" >{{loan_info.status}}</a>
+                        
                       </div>
                     </div>
-                  </div><br>
+                  </div>
+                  
+                  <div class="row mt-3">
+                    <div class="col-md-12 d-flex justify-content-end d-none" id="date-filter" >
+                        <form id="date-filter-form" class="d-flex">
+                            <div class="d-flex">
+                                <label class="text-white mr-2">From:</label>
+                                <input type="date" class="form-control form-control-sm text-white bg-black mr-2" id="start-date" name="start-date">
+                            </div>
+                            <div class="d-flex ">
+                                <label class="text-white mr-2">To:</label>
+                                <input type="date" class="form-control form-control-sm text-white bg-black mr-2" id="end-date" name="end-date">
+                            </div>
+                        </form>
+                    </div>
+                </div><br>
 
                   <!-- Send Mail  -->
                   <div class="modal fade" id="snd_mail">
@@ -1354,13 +1370,7 @@
                     </table> 
                   </div>
                 </div>
-                <form id="date-filter-form">
-                  <label for="start-date">Start Date:</label>
-                  <input type="date" id="start-date" name="start-date">
-                  <label for="end-date">End Date:</label>
-                  <input type="date" id="end-date" name="end-date">
-                  <button type="button" id="filter-button">Filter</button>
-              </form>
+                
 
                 <div class="print-only tabcontent" id="Statement">
                   <div class="page" size="A4">
@@ -2169,6 +2179,9 @@
       document.getElementById('delete_btn').classList.add('d-block');
       document.getElementById('share_btn').classList.remove('d-block');
       document.getElementById('share_btn').classList.add('d-none');
+      document.getElementById('date-filter').classList.remove('d-none');
+      document.getElementById('date-filter').classList.add('d-none');
+      
       document.getElementById('over').style.display = 'block'
       document.getElementById('tran').style.display = 'none'
       document.getElementById('state').style.display = 'none'
@@ -2199,6 +2212,9 @@
       document.getElementById('delete_btn').classList.add('d-block');
       document.getElementById('share_btn').classList.remove('d-block');
       document.getElementById('share_btn').classList.add('d-none');
+      document.getElementById('date-filter').classList.remove('d-none');
+      // document.getElementById('date-filter').classList.add('d-none');
+      
       document.getElementById('over').style.display = 'none'
       document.getElementById('tran').style.display = 'block'
       document.getElementById('state').style.display = 'none'
@@ -2228,6 +2244,8 @@
       document.getElementById('delete_btn').classList.add('d-none');
       document.getElementById('share_btn').classList.remove('d-none');
       document.getElementById('share_btn').classList.add('d-block');
+      document.getElementById('date-filter').classList.remove('d-none');
+      // document.getElementById('date-filter').classList.add('d-none');
       document.getElementById('over').style.display = 'none'
       document.getElementById('tran').style.display = 'none'
       document.getElementById('state').style.display = 'block'

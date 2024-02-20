@@ -189,19 +189,19 @@
                         <script>
                             $(document).ready(function() {
                                 $('#payment_method').change(function() {
-                                    console.log('Dropdown changed'); // Check if the event listener is triggered
+                                    console.log('Dropdown changed');
                                     var selectedOption = $(this).val();
-                                    console.log('Selected option:', selectedOption); // Check the value of selectedOption
+                                    console.log('Selected option:', selectedOption); 
                                     if (selectedOption === 'Cheque') {
-                                        console.log('Cheque selected'); // Check if this block is executed
+                                        console.log('Cheque selected'); 
                                         $('#cheque_details').show();
                                         $('#upi_details').hide();
                                     } else if (selectedOption === 'UPI') {
-                                        console.log('UPI selected'); // Check if this block is executed
+                                        console.log('UPI selected'); 
                                         $('#cheque_details').hide();
                                         $('#upi_details').show();
                                     } else {
-                                        console.log('Other option selected'); // Check if this block is executed
+                                        console.log('Other option selected'); 
                                         $('#cheque_details').hide();
                                         $('#upi_details').hide();
                                     }
@@ -211,19 +211,19 @@
                         <script>
                             $(document).ready(function() {
                                 $('#processing_method').change(function() {
-                                    console.log('Dropdown changed'); // Check if the event listener is triggered
+                                    console.log('Dropdown changed'); 
                                     var selectedOption = $(this).val();
-                                    console.log('Selected option:', selectedOption); // Check the value of selectedOption
+                                    console.log('Selected option:', selectedOption); 
                                     if (selectedOption === 'Cheque') {
-                                        console.log('Cheque selected'); // Check if this block is executed
+                                        console.log('Cheque selected'); 
                                         $('#cheque').show();
                                         $('#upi').hide();
                                     } else if (selectedOption === 'UPI') {
-                                        console.log('UPI selected'); // Check if this block is executed
+                                        console.log('UPI selected');
                                         $('#cheque').hide();
                                         $('#upi').show();
                                     } else {
-                                        console.log('Other option selected'); // Check if this block is executed
+                                        console.log('Other option selected'); 
                                         $('#cheque').hide();
                                         $('#upi').hide();
                                     }
@@ -373,20 +373,19 @@
                             </div>
                         </div>
                         
-                        <script>
-                            $(document).on("click","submitFormBtn",function() {
-                                $.ajax({
-                                        url: "{% url 'save_account_details' %}",
-                                        type: "POST",
-                                        data: $("#accountForm").serialize(),
-                                        success: function(response) {
-                                        document.getElementById("accountForm").reset();
-                                        reloadVendor();
-                                        },
-                                });
-                            });
+<script>
+$(document).on("click","submitFormBtn",function() {
+$.ajax({
+url: "{% url 'save_account_details' %}",
+type: "POST",
+data: $("#accountForm").serialize(),
+success: function(response) {
+document.getElementById("accountForm").reset();
+reloadVendor();
+},
+});
+});                        
 function reloadholder() {
-
 $.ajax({
   url: "",
   type: "GET",
@@ -407,16 +406,12 @@ $.ajax({
   }
 });
 }
-
 </script>
 
 <script>
     $(document).ready(function(){
-        
         $('select[name="account_name"]').change(function(){
-            var selectedAccountId = $(this).val();
-
-           
+            var selectedAccountId = $(this).val();           
             $.ajax({
                 url: '{% url "add_loan" %}', 
                 type: 'POST',
