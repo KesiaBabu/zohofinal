@@ -1579,3 +1579,77 @@ console.log('date1',startDate)
         });
     });
   </script>
+
+<div class="card radius-15" id="form1" style="display: none; background-color: #000000;">
+    <div class="card-body">
+
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-sm-4">
+                <label style="text-align:left ">Report period</label><br>
+                <form id="form_post" class="needs-validation" novalidate>
+                    <select class="form-control bg-light" id="filterstyle" onclick="filterDate(this)" list="hosting-plan"
+                        type="text">
+                        <option hidden>Select Report Period</option>
+                        <option><span class="bx bx-right-arrow-alt"></span>Custom</option>
+                    </select>
+            </div>
+
+            <div class="col-sm-4" id="frdate" style="display: none;">
+                <label for="from">From</label>
+                <input type="date" class="form-control" id="fdate" name="fdate"
+                    style="background-color:white;color: black;">
+            </div>
+            <div class="col-sm-4" id="todate" style="display: none;">
+                <label for="from">To</label>
+                <input type="date" class="form-control" id="ldate" name="ldate"
+                    style="background-color: white;color: black;">
+            </div>
+
+            <div class="col-md-3"></div>
+        </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    function filterDate(element) {
+        if (element.value == 'Custom') {
+            document.getElementById('frdate').style.display = 'block';
+            document.getElementById('todate').style.display = 'block';
+        } else {
+            document.getElementById('frdate').style.display = 'none';
+            document.getElementById('todate').style.display = 'none';
+        }
+      }
+    
+  </script>
+  
+  <script>
+    function filterTableByDate() {
+      const fromDate = new Date(document.getElementById('fdate').value);
+      const toDate = new Date(document.getElementById('ldate').value);
+      const tableRows = document.querySelectorAll('#logic tbody tr');
+  
+      tableRows.forEach(row => {
+          const dateCell = new Date(row.cells[1].innerText);
+  
+          // Extract date portions for comparison
+          const cellDate = new Date(dateCell.getFullYear(), dateCell.getMonth(), dateCell.getDate());
+          const fromDateTime = new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
+          const toDateTime = new Date(toDate.getFullYear(), toDate.getMonth(), toDate.getDate());
+  
+          if ((!fromDate || cellDate >= fromDateTime) && (!toDate || cellDate <= toDateTime)) {
+              row.style.display = '';
+          } else {
+              row.style.display = 'none';
+          }
+      });
+  }
+  
+  // Listen for changes in date inputs
+  document.getElementById('fdate').addEventListener('change', filterTableByDate);
+  document.getElementById('ldate').addEventListener('change', filterTableByDate);
+  
+  </script>

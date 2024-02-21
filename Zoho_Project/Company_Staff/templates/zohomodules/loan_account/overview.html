@@ -1589,6 +1589,46 @@
       });
   });
 </script>
+<!-- <script>
+  function filterDate(element) {
+      if (element.value == 'Custom') {
+          document.getElementById('frdate').style.display = 'block';
+          document.getElementById('todate').style.display = 'block';
+      } else {
+          document.getElementById('frdate').style.display = 'none';
+          document.getElementById('todate').style.display = 'none';
+      }
+    }
+  
+</script>
+
+<script>
+  function filterTableByDate() {
+    const fromDate = new Date(document.getElementById('first-date').value);
+    const toDate = new Date(document.getElementById('last-date').value);
+    const tableRows = document.querySelectorAll('#statementtable tbody tr');
+
+    tableRows.forEach(row => {
+        const dateCell = new Date(row.cells[1].innerText);
+
+        // Extract date portions for comparison
+        const cellDate = new Date(dateCell.getFullYear(), dateCell.getMonth(), dateCell.getDate());
+        const fromDateTime = new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
+        const toDateTime = new Date(toDate.getFullYear(), toDate.getMonth(), toDate.getDate());
+
+        if ((!fromDate || cellDate >= fromDateTime) && (!toDate || cellDate <= toDateTime)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Listen for changes in date inputs
+document.getElementById('first-date').addEventListener('change', filterTableByDate);
+document.getElementById('last-date').addEventListener('change', filterTableByDate);
+
+</script> -->
 
   <script>
             $(document).ready(function() {
@@ -1616,19 +1656,33 @@
                     var endDate = toDate;
                     var rows = table.rows;
           
-                    for (var i = 1; i < rows.length; i++) { // Start from index 1 to skip the header row
-                        var row = rows[i];
-                        var dateCell = row.cells[1]; // Assuming date is in the second column
-                        var rowDate = new Date(dateCell.textContent);
+                    // for (var i = 1; i < rows.length; i++) { // Start from index 1 to skip the header row
+                    //     var row = rows[i];
+                    //     var dateCell = row.cells[1]; // Assuming date is in the second column
+                    //     var rowDate = new Date(dateCell.textContent);
           
-                        if (rowDate >= startDate && rowDate <= endDate) {
-                            $(row).show();
+                    //     if ((rowDate >= startDate) && (rowDate <= endDate)) {
+                    //         $(row).show();
                            
-                        } else {
-                            $(row).hide();
-                        }
+                    //     } else {
+                    //         $(row).hide();
+                    //     }
                       
-                    }
+                    // }
+                    tableRows.forEach(row => {
+                  const dateCell = new Date(row.cells[1].innerText);
+
+        // Extract date portions for comparison
+                  const cellDate = new Date(dateCell.getFullYear(), dateCell.getMonth(), dateCell.getDate());
+                  const fromDateTime = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+                  const toDateTime = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+
+                if ((!startDate || cellDate >= fromDateTime) && (!endDate || cellDate <= toDateTime)) {
+                 row.style.display = '';
+                } else {
+                 row.style.display = 'none';
+              }
+              });
           
                     var options = { year: 'numeric', month: 'long', day: 'numeric' };
           

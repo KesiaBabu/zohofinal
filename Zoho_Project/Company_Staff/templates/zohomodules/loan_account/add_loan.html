@@ -242,7 +242,7 @@
                                     </div>
                                     <div class="modal-body">
                                     <!-- <form method="POST" action="{% url 'save_account_details' %}" > -->
-                                        <form method="POST" id="accountForm" >
+                                        <form method="POST" id="accountForm" class="needs-validation" novalidate autocomplete="off" >
                                     {% csrf_token %}                                           
                                         <div class="row">
                                             <div class="col-6">
@@ -364,21 +364,76 @@
                                         </div>
                                       </div>
                                 </div>
-                                    <div class="modal-footer">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                      <div class="d-flex">
+                                        <button class="btn btn-outline-warning"
+                                        type="submit" data-dismiss="modal" id="submitFormBtn">Submit
+                                        </button> 
+                  
+                                        <button type="button" class="btn btn-outline-warning" 
+                                          data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">Cancel</span>
+                                        </button>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-6"></div>
+                                    <!-- <div class="col-md-4"></div> -->
+                                  </div>
+                                    <!-- <div class="modal-footer">
                                         <button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
                                         <button type="submit"  class="btn btn-outline-warning" id="submitFormBtn" >Save</button>  
                                     </div>
-                                </form> 
+                                </form>  -->
+                            </form>
                                 </div>
                             </div>
                         </div>
                         
 <script>
-$(document).on("click","submitFormBtn",function() {
+$(document).on("click","#submitFormBtn",function() {
 $.ajax({
 url: "{% url 'save_account_details' %}",
 type: "POST",
-data: $("#accountForm").serialize(),
+// data: $("#accountForm").serialize(),
+data:{
+        title : $("#title").val(),
+        firstname : $("#fname").val(),
+        lastname : $("#lname").val(),
+        company_name : $("#vcompany").val(),
+        display_name : $('#vdisplayname').text(),
+        email : $("#vemail").val(),
+        website :$("#wsite").val(),
+        work_mobile :$("#vw_mobile").val(),
+        pers_mobile :$("#vp_mobile").val(),
+        skype :$("#vskype").val(),
+        desg :$("#v_desg").val(),
+        dpt :$("#v_dpt").val(),
+        gsttype :$("#v_gsttype").val(),
+        gstin :$("#v_gstin").val(),
+        panno : $("#v_pan").val(),
+        sourceofsupply :$("#v_srcsupply").val(),
+        currency : $("#v_curn").val(),
+        openingbalance : $("#v_open").val(),
+        paymentterms : $("#v_terms").val(),
+        street : $("#vstreet").val(),
+        city : $("#vcity").val(),
+        state : $("#vstate").val(),
+        pincode : $("#vpincode").val(),
+        fax : $("#vfax").val(),
+        phone : $("#vphone").val(),
+        country : $("#vcountry").val(),
+        shipstreet : $("#vsstreet").val(),
+        shipcity : $("#vscity").val(),
+        shipstate : $("#vsstate").val(),
+        shippincode : $("#vspincode").val(),
+        shipcountry : $("#vscountry").val(),
+        shipfax : $("#vsfax").val(),
+        shipphone : $("#vsphone").val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+        
+      },
+    
 success: function(response) {
 document.getElementById("accountForm").reset();
 reloadVendor();
