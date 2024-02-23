@@ -123,6 +123,12 @@ class LoanRepaymentHistory(models.Model):
     action=models.CharField(max_length=255)
 
 
+class Comments(models.Model):
+    login_details = models.ForeignKey(LoginDetails, on_delete=models.CASCADE,null=True,blank=True)
+    company=models.ForeignKey(CompanyDetails,on_delete=models.CASCADE,null=True,blank=True)
+    loan=models.ForeignKey(loan_account,on_delete=models.CASCADE,null=True,blank=True)
+    comment=models.CharField(max_length=255)
+
 
 
     

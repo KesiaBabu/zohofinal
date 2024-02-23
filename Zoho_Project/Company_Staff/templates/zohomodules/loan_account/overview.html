@@ -350,6 +350,9 @@
                         <a class="btn btn-outline-warning small_btn mt-2" href="" data-toggle="modal" data-target="#commentModal2" data-toggle="tooltip" title="history">
                           <i class="fa-solid fa-clock-rotate-left"></i>
                         </a>
+                        <a class="btn btn-outline-warning small_btn mt-2" href="" data-toggle="modal" data-target="#commentModal" data-toggle="tooltip" title="comment">
+                          <i class="far fa-comment"></i>
+                        </a>
                         <a class="btn btn-outline-warning small_btn mt-2 " href="#" title="DELETE" id="delete_btn">
                           <i class="fa fa-trash"></i>
                         </a>
@@ -1352,15 +1355,15 @@
                               <i class="fas fa-ellipsis-v text-warning"></i>
                             </a>
                             <div class="dropdown-menu">
-                              <a class="dropdown-item btn text-black" onclick="edit_trans_details('{{ account.id }}')">
+                              <a class="dropdown-item btn text-black" href="{% if a.type == 'EMI paid' %}{% url 'edit_repayment' a.pk %}{% else %}{% url 'edit_additional_loan' a.pk %}{% endif %}">
                                   &nbsp; <i class="fa fa-pencil"></i> &nbsp;&nbsp; <span style="font-size: medium;">Edit</span>
                               </a>
                               <a class="dropdown-item btn text-black" href="#">
                                 &nbsp; <i class="fas fa-trash-alt"></i> &nbsp;&nbsp; <span style="font-size: medium;">Delete</span>
                               </a>
-                              <a class="dropdown-item btn text-black" href="#">
+                              <a class="dropdown-item btn text-black" href="" data-toggle="modal" data-target="#historyModal{{ a.id }}">
                                 &nbsp; <i class="fas fa-history"></i> &nbsp;&nbsp; <span style="font-size: medium;">History</span>
-                              </a>
+                            </a>
                             </div>
                           </td>
                         </tr>
@@ -1456,9 +1459,6 @@
                                 <td>{{ a.interest_amount }}</td>
                                 <td>{{ a.total_amount }}</td>
                                 <td>{{ balance }}</td>
-                               
-                                
-                                
    
                                 </tr>
                                 {% endwith %}
@@ -1550,6 +1550,111 @@
     </div>
   </div>
 </div>
+
+<!-- Modal for viewing edit history -->
+{% for a in repayment_details %}
+<div class="modal fade" id="historyModal{{ a.id }}" tabindex="-1" role="dialog" aria-labelledby="historyModalLabel{{ repayment.id }}" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content" style="background-color: #3b3b3b;">
+            <div class="modal-header">
+                <h5 class="modal-title text-light" id="historyModalLabel{{ a.id }}"> HISTORY {{ a.id }} </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+              <div class="container " >
+                <table class="table text-light  " style="margin:3px; background-color: #000000;">
+                  <thead>
+                    <tr>
+                      <th>
+                        sl
+                      </th>
+                      <th>
+                        Date
+                      </th>
+                      <th>
+                        Action
+                      </th>
+                      <th>
+                        By
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for h in repayment_history %}
+                    <tr class="table-row">
+                      <td>{{forloop.counter}}</td>
+                      <td>{{h.date}}</td>
+                      <td>{{h.action}}</td>
+                      <td>{{h.login_details.first_name}} {{h.login_details.Last_name}}</td>
+                    </tr>
+                    {% empty %}
+                            <tr class="table-row">
+                                <td colspan="4">No history available.</td>
+                            </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
+        
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+
+        <div class="modal fade" id="commentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"  aria-hidden="true" style="margin-top: 8vh;">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content" style="background-color: #3b3b3b;">
+              <div class="modal-header">
+                <h3 class="modal-title text-light" id="exampleModalLabel">Add Comments</h3>
+                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true" style="font-size: x-large;">&times;</span>
+                </button>
+              </div>
+              <form action="{% url 'add_comment' account.id %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body" style="background-color: #3b3b3b;">
+                  <textarea type="text" class="form-control text-light" name="comments"></textarea>
+                  <div class="container-fluid">
+                    <table class="table  text-white" style="margin:3px; background-color: #000000;">
+                      <thead>
+                        <tr>
+                          <th style="text-align: center; font-size: large;">sl no.</th>
+                          <th style="text-align: center; font-size: large;">Comments</th>
+                          <th style="text-align: center; font-size: large;">By</th>
+                          <th style="text-align: center; font-size: large;">Delete</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for c in comment %}
+                          <tr class="table-row">
+                            <td style="text-align: center;">{{forloop.counter }}</td>
+                            <td style="text-align: center;">{{c.comment}}</td>
+                            <td style="text-align: center;">{{c.login_details.first_name}} {{c.login_details.last_name}}</td>
+                            <td style="text-align: center;">
+                              <a class="text-danger" href="{% url 'delete_comment' c.id account.id %}"><i class="fa fa-trash" style="font-size:20px;"></i></a>
+                            </td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-outline-warning">Save</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        
+      
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>

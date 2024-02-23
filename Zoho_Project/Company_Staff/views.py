@@ -10,6 +10,8 @@ from Company_Staff.models import BankAccount
 from Company_Staff.models import loan_account
 from Company_Staff.models import LoanRepayemnt
 from Company_Staff.models import LoanAccountHistory
+from Company_Staff.models import LoanRepaymentHistory
+from Company_Staff.models import Comments
 from django.shortcuts import render, get_object_or_404
 from datetime import date as dt
 from django.db.models import Sum
@@ -751,15 +753,17 @@ def overview(request,account_id):
                 
                 dash_details = CompanyDetails.objects.get(login_details=log_details, superadmin_approval=1, Distributor_approval=1)
                 allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+                company=dash_details
             else:
-               
+                
                 dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
+                company=dash_details.company
                 allmodules = None
             
             today=date.today()
             today_date = today.strftime("%Y-%m-%d")
             account = get_object_or_404(BankAccount, id=account_id)
-            loan_info = loan_account.objects.filter(bank_holder=account).first()
+            loan_info = loan_account.objects.filter(company=company,bank_holder=account).first()
             repayment_details = LoanRepayemnt.objects.filter(loan=loan_info)
 
             current_balance = loan_info.loan_amount  
@@ -781,7 +785,13 @@ def overview(request,account_id):
             repayment_details_with_balances = zip(repayment_details, balances)
             total_amount= loan_info.loan_amount + loan_info.interest
 
+            repayment_history = {}
+            for repayment in repayment_details:
+                history = LoanRepaymentHistory.objects.filter(repayment=repayment)
+                repayment_history[repayment.id] = history
+
             history=LoanAccountHistory.objects.filter(loan=loan_info)
+            comment=Comments.objects.filter(loan=loan_info)
 
             context = {
                     'details': dash_details,
@@ -795,7 +805,9 @@ def overview(request,account_id):
                     'total_amount':total_amount,
                     'history':history,
                     'loan_side':loan_side,
-                    'today_date':today_date
+                    'today_date':today_date,
+                    'repayment_history':repayment_history,
+                    'comment':comment
                      }          
     
             return render(request,'zohomodules/loan_account/overview.html',context)
@@ -1033,7 +1045,29 @@ def edit_loan(request, account_id):
 
     return redirect('/')
 
-def edit_repayment(request, account_id):
+def calculate_overall_balance(account_id):
+    account = get_object_or_404(BankAccount, id=account_id)
+    loan_info = loan_account.objects.filter(bank_holder=account).first()
+    repayment_details = LoanRepayemnt.objects.filter(loan=loan_info)
+    current_balance = loan_info.loan_amount
+    balances = [] 
+    loan_side = loan_account.objects.all() 
+    for loan in loan_side:
+        total_emis_paid = LoanRepayemnt.objects.filter(loan=loan, type='EMI paid').aggregate(total=Sum('total_amount'))['total'] or 0
+        total_additional_loan = LoanRepayemnt.objects.filter(loan=loan, type='Additional Loan').aggregate(total=Sum('total_amount'))['total'] or 0
+        loan.balance = loan.loan_amount - total_emis_paid + total_additional_loan 
+
+    for repayment in repayment_details:
+        if repayment.type == 'EMI paid':
+            current_balance -= repayment.total_amount
+        elif repayment.type == 'Additional Loan':
+            current_balance += repayment.total_amount     
+        balances.append(current_balance)
+
+    overall_balance = current_balance
+    return overall_balance
+
+def edit_repayment(request, repayment_id):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         if 'login_id' not in request.session:
@@ -1049,7 +1083,65 @@ def edit_repayment(request, account_id):
             else:
                 dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
                 allmodules = None
-            repayment = get_object_or_404(LoanRepayemnt, id=account_id)
+            repayment = get_object_or_404(LoanRepayemnt, id=repayment_id)
+            account_id = repayment.loan.bank_holder_id 
+            
+           
+            if request.method == 'POST':
+                principal_amount = request.POST.get('principal_amount')
+                interest_amount = request.POST.get('interest_amount')
+                payment_method = request.POST.get('payment_method')
+                upi_id = request.POST.get('upi_id')
+                cheque = request.POST.get('cheque_number')
+                payment_date = request.POST.get('date')
+                total_amount = request.POST.get('total_amount')
+                type = 'EMI paid' 
+        
+                repayment.principal_amount = principal_amount
+                repayment.interest_amount = interest_amount
+                repayment.payment_method = payment_method
+                repayment.upi_id = upi_id
+                repayment.cheque = cheque
+                repayment.payment_date = payment_date
+                repayment.total_amount = total_amount
+                repayment.type = type
+        
+                repayment.save()
+                
+                return redirect('overview' ,account_id=account_id)
+            else:
+                repayment_history=LoanRepaymentHistory.objects.create(
+                    login_details=login_details,
+                    company=dash_details,
+                    repayment=repayment,
+                    date=now().date(),
+                    action='Edited'
+                )
+                repayment_history.save()
+                
+                
+                return render(request, 'zohomodules/loan_account/edit_repayment.html', {'repayment': repayment,'details': dash_details,  'allmodules': allmodules, 'repayment_history':repayment_history})
+
+
+def edit_additional_loan(request, repayment_id):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        if 'login_id' not in request.session:
+            return redirect('/')
+        
+        login_details = LoginDetails.objects.get(id=log_id)
+        user_type = login_details.user_type
+
+        if user_type in ['Company', 'Staff']:
+            if user_type == 'Company':
+                dash_details = CompanyDetails.objects.get(login_details=login_details, superadmin_approval=1, Distributor_approval=1)
+                allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+            else:
+                dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
+                allmodules = None
+            repayment = get_object_or_404(LoanRepayemnt, id=repayment_id)
+            account_id = repayment.loan.bank_holder_id 
+            current_balance=calculate_overall_balance(account_id)
     
             if request.method == 'POST':
                 principal_amount = request.POST.get('principal_amount')
@@ -1059,7 +1151,7 @@ def edit_repayment(request, account_id):
                 cheque = request.POST.get('cheque')
                 payment_date = request.POST.get('date')
                 total_amount = request.POST.get('total_amount')
-                repayment_type = request.POST.get('type')
+                type = 'Additional Loan'
         
                 repayment.principal_amount = principal_amount
                 repayment.interest_amount = interest_amount
@@ -1068,13 +1160,21 @@ def edit_repayment(request, account_id):
                 repayment.cheque = cheque
                 repayment.payment_date = payment_date
                 repayment.total_amount = total_amount
-                repayment.type = repayment_type
+                repayment.type = type
         
                 repayment.save()
-                return redirect('overview')
+                
+                return redirect('overview',account_id=account_id)
             else:
-                return render(request, 'zohomodules/loan_account/overview.html', {'repayment': repayment,'details': dash_details,  'allmodules': allmodules})
-            
+                hist=LoanRepaymentHistory.objects.create(
+                    login_details=login_details,
+                    company=dash_details,
+                    repayment=repayment,
+                    date=now().date(),
+                    action='Edited'
+                )
+                hist.save()
+                return render(request, 'zohomodules/loan_account/edit_additional_loan.html', {'repayment': repayment,'details': dash_details,  'allmodules': allmodules,'overall_balance':current_balance,'hist':hist})            
             
 from django.template.loader import render_to_string
 
@@ -1124,6 +1224,67 @@ def share_email(request, account_id):
         print(e)
         messages.error(request, f'{e}')
         return redirect('overview', account_id)
+    
+
+def add_comment(request, account_id):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        if 'login_id' not in request.session:
+            return redirect('/')
+        
+        login_details = LoginDetails.objects.get(id=log_id)
+        user_type = login_details.user_type
+
+        if user_type in ['Company', 'Staff']:
+            if user_type == 'Company':
+                dash_details = CompanyDetails.objects.get(login_details=login_details, superadmin_approval=1, Distributor_approval=1)
+                allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+            else:
+                dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
+                allmodules = None
+
+            loan_info = loan_account.objects.get(pk=account_id)
+            if request.method == 'POST':
+
+                comment = request.POST.get('comments')
+
+                comm=Comments.objects.create(
+                    login_details=login_details,
+                    loan=loan_info,
+                    company=dash_details,
+                    comment=comment
+                )
+                comm.save()
+                context={'details': dash_details,  'allmodules': allmodules}
+                return redirect('overview',account_id=account_id)
+
+        return render(request, 'zohomodules/loan_account/overview.html', context) 
+    
+def delete_comment(request, comment_id,account_id):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        if 'login_id' not in request.session:
+            return redirect('/')
+        
+        login_details = LoginDetails.objects.get(id=log_id)
+        user_type = login_details.user_type
+
+        if user_type in ['Company', 'Staff']:
+            if user_type == 'Company':
+                dash_details = CompanyDetails.objects.get(login_details=login_details, superadmin_approval=1, Distributor_approval=1)
+                allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+            else:
+                dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
+                allmodules = None
+            if request.method == 'POST':
+              
+              comment = get_object_or_404(Comments, id=comment_id)
+              comment.delete()
+
+
+            return redirect('overview',account_id=account_id)
+        return render(request, 'zohomodules/loan_account/overview.html',{'details': dash_details,  'allmodules': allmodules}) 
+                
 
 
 

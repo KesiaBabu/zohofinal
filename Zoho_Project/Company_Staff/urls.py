@@ -45,8 +45,11 @@ urlpatterns = [
     path('zohomodules/loan_account/update_status/<int:account_id>',views.update_status,name='update_status'),
     path('zohomodules/loan_account/edit_loanaccount/<int:account_id>',views.edit_loanaccount, name='edit_loanaccount'),
     path('zohomodules/loan_account/edit_loan/<int:account_id>',views.edit_loan, name='edit_loan'),
-    path('zohomodules/loan_account/edit_repayment/<int:account_id>',views.edit_repayment, name='edit_repayment'),
+    path('zohomodules/loan_account/edit_repayment/<int:repayment_id>',views.edit_repayment, name='edit_repayment'),
+    path('zohomodules/loan_account/edit_additional_loan/<int:repayment_id>',views.edit_additional_loan, name='edit_additional_loan'),
     path('zohomodules/loan_account/share_email/<int:account_id>',views.share_email,name='share_email'),
+    path('zohomodules/loan_account/add_comment/<int:account_id>',views.add_comment,name='add_comment'),
+    path('zohomodules/loan_account/delete_comment/<int:comment_id>/<int:account_id>',views.delete_comment,name='delete_comment'),
 
 
   
