@@ -322,7 +322,7 @@
                   </h5>
                   {% endfor %}
                   <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-7">
                       <a class="btn btn-outline-warning xsmall_btn" onclick="changetab('Overview')" id="overview_btn">
                         <i class="fa fa-eye" style="font-weight: bold; font-size: small;" id="overview_icon"></i> 
                         <span style="font-size: small;">Overview</span>
@@ -336,24 +336,22 @@
                         <span style="font-size: small;">Statement</span>
                       </a>
                       </div>
-                      <!-- <div class="d-sm-flex" style="width: 30%;">
-                        <input class="form-control text-black bg-light mt-4" type="text" id="search_tra" placeholder="Search..." style="margin-right: 10%;">
-                          </div> -->
-                    <div class="col-md-6">
+                      
+                    <div class="col-md-5">
                       <div class="d-sm-flex" style="float: right;">
-                        <a onclick="ExportToExcel()" class="btn btn-outline-warning small_btn mt-2 mx-2" title="EXPORT" >
+                        <a onclick="ExportToExcel()" class="btn btn-outline-warning small_btn mt-2 d-none " id="exp" title="EXPORT" >
                           <i class='fas fa-file-export' ></i> 
                         </a>
-                        <a class="btn btn-outline-warning small_btn mt-2 " title="EDIT" id="edit_btn" href="{% url 'edit_loanaccount' account.id %}">
+                        <a class="btn btn-outline-warning small_btn mt-2 mx-2" title="EDIT" id="edit_btn" href="{% url 'edit_loanaccount' account.id %}">
                           <i class="fa fa-pencil"></i>
                         </a>
-                        <a class="btn btn-outline-warning small_btn mt-2" href="" data-toggle="modal" data-target="#commentModal2" data-toggle="tooltip" title="history">
+                        <a class="btn btn-outline-warning small_btn mt-2 " href="" data-toggle="modal" id="his" data-target="#commentModal2" data-toggle="tooltip" title="history">
                           <i class="fa-solid fa-clock-rotate-left"></i>
                         </a>
-                        <a class="btn btn-outline-warning small_btn mt-2" href="" data-toggle="modal" data-target="#commentModal" data-toggle="tooltip" title="comment">
+                        <a class="btn btn-outline-warning small_btn mt-2 mx-2 " href="" data-toggle="modal" id="com" data-target="#commentModal" data-toggle="tooltip" title="comment">
                           <i class="far fa-comment"></i>
                         </a>
-                        <a class="btn btn-outline-warning small_btn mt-2 " href="#" title="DELETE" id="delete_btn">
+                        <a class="btn btn-outline-warning small_btn mt-2  " href="#" title="DELETE" id="delete_btn">
                           <i class="fa fa-trash"></i>
                         </a>
                         <a class="btn btn-outline-warning small_btn mt-2  d-none" title="SHARE" id="share_btn"data-toggle="dropdown" >
@@ -386,11 +384,17 @@
                     </div>
                   </div>
                   
-                  <div class="row mt-3">
+                  
+                  
+                  <div class="row mt-5">
+                    
+                    <div class="d-sm-flex" style="width: 30%;">
+                      <input class="form-control text-black bg-light mt-4 d-none" type="text" id="search_tra" placeholder="Search..." style="margin-right: 10%;">
+                        </div>
                     <div class="col-md-12 d-flex justify-content-end d-none" id="date-filter" >
                         <form id="date-filter-form" class="d-flex">
                             <div class="d-flex">
-                                <label class="text-white mr-2">From:</label>
+                                <!-- <label class="text-white mr-2">From:</label> -->
                                 <input type="date" class="form-control form-control-sm text-white bg-black mr-2" id="start-date" name="start-date">
                             </div>
                             <div class="d-flex ">
@@ -528,6 +532,9 @@
                                   <option value="Cash">Cash</option>
                                   <option value="UPI">UPI</option>
                                   <option value="Cheque">Cheque</option>
+                                  {% for bank in banks %}
+                                  <option value="{{ bank.bnk_name }}- {{ bank.bnk_acno|slice:'-4:' }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                                  {% endfor %}
                                  
                                 </select>
                               </div>
@@ -616,6 +623,9 @@
                                   <option value="Cash">Cash</option>
                                   <option value="UPI">UPI</option>
                                   <option value="Cheque">Cheque</option>
+                                  {% for bank in banks %}
+                                  <option value="{{ bank.bnk_name }}- {{ bank.bnk_acno|slice:'-4:' }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                                  {% endfor %}
                                   
                                 </select>
                               </div>
@@ -2340,6 +2350,14 @@ document.getElementById('last-date').addEventListener('change', filterTableByDat
       document.getElementById('share_btn').classList.add('d-none');
       document.getElementById('date-filter').classList.remove('d-none');
       document.getElementById('date-filter').classList.add('d-none');
+      document.getElementById('exp').classList.remove('d-block');
+      document.getElementById('exp').classList.add('d-none');
+      document.getElementById('search_tra').classList.remove('d-block');
+      document.getElementById('search_tra').classList.add('d-none');
+     
+      document.getElementById('com').style.display = 'block';
+      
+      document.getElementById('his').style.display = 'block';
       
       document.getElementById('over').style.display = 'block'
       document.getElementById('tran').style.display = 'none'
@@ -2365,14 +2383,22 @@ document.getElementById('last-date').addEventListener('change', filterTableByDat
       document.getElementById('pdf_btn').classList.add('d-none');
       document.getElementById('print_btn').classList.remove('d-block');
       document.getElementById('print_btn').classList.add('d-none');
-      document.getElementById('edit_btn').classList.remove('d-none');
-      document.getElementById('edit_btn').classList.add('d-block');
-      document.getElementById('delete_btn').classList.remove('d-none');
-      document.getElementById('delete_btn').classList.add('d-block');
+      document.getElementById('edit_btn').classList.remove('d-block');
+      document.getElementById('edit_btn').classList.add('d-none');
+      document.getElementById('delete_btn').classList.remove('d-block');
+      document.getElementById('delete_btn').classList.add('d-none');
       document.getElementById('share_btn').classList.remove('d-block');
       document.getElementById('share_btn').classList.add('d-none');
       document.getElementById('date-filter').classList.remove('d-none');
+      document.getElementById('exp').classList.add('d-block');
+      document.getElementById('exp').classList.remove('d-none');
+      document.getElementById('search_tra').classList.add('d-block');
+      document.getElementById('search_tra').classList.remove('d-none');
+      // document.getElementById('com').classList.add('d-none');
       // document.getElementById('date-filter').classList.add('d-none');
+      document.getElementById('com').style.display = 'none';
+     
+      document.getElementById('his').style.display = 'none';
       
       document.getElementById('over').style.display = 'none'
       document.getElementById('tran').style.display = 'block'
@@ -2404,7 +2430,15 @@ document.getElementById('last-date').addEventListener('change', filterTableByDat
       document.getElementById('share_btn').classList.remove('d-none');
       document.getElementById('share_btn').classList.add('d-block');
       document.getElementById('date-filter').classList.remove('d-none');
+      document.getElementById('exp').classList.remove('d-block');
+      document.getElementById('exp').classList.add('d-none');
+      document.getElementById('search_tra').classList.add('d-none');
+      document.getElementById('search_tra').classList.remove('d-block');
+      // document.getElementById('com').classList.remove('d-none');
       // document.getElementById('date-filter').classList.add('d-none');
+      document.getElementById('com').style.display = 'none';
+      document.getElementById('his').style.display = 'none';
+      document.getElementById('exp').style.display = 'none';
       document.getElementById('over').style.display = 'none'
       document.getElementById('tran').style.display = 'none'
       document.getElementById('state').style.display = 'block'

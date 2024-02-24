@@ -92,8 +92,11 @@
                                     <select class="form-control text-dark bg-light" name="payment_method"  >
                                         <option value="" selected hidden>Select</option>
                                         <option value="Cash" {% if loan.payment_method == 'Cash' %} selected {% endif %}>Cash</option>
-                                                        <option value="UPI" {% if loan.payment_method == 'UPI' %} selected {% endif %}>UPI</option>
-                                                        <option value="Cheque" {% if loan.payment_method == 'Cheque' %} selected {% endif %}>Cheque</option>
+                                        <option value="UPI" {% if loan.payment_method == 'UPI' %} selected {% endif %}>UPI</option>
+                                        <option value="Cheque" {% if loan.payment_method == 'Cheque' %} selected {% endif %}>Cheque</option>
+                                        {% for bank in banks %}
+                                        <option value="{{ bank.bnk_name }}- {{ bank.bnk_acno|slice:'-4:' }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                                        {% endfor %}
                                     </select>
                                 </div>
                             </div>

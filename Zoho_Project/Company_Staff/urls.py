@@ -37,7 +37,7 @@ urlpatterns = [
        ## kesia loan account ##
     path('zohomodules/loan_account/loan_listing',views.loan_listing,name='loan_listing'),
     path('zohomodules/loan_account/add_loan',views.add_loan,name='add_loan'),
-    path('save_account_details',views.save_account_details,name='save_account_details'),
+    path('zohomodules/loan_account/save_account_details',views.save_account_details,name='save_account_details'),
     path('zohomodules/loan_account/overview/<int:account_id>',views.overview,name='overview'),
     path('zohomodules/loan_account/transaction/<int:account_id>',views.transaction,name='transaction'),
     path('zohomodules/loan_account/repayment_due_form/<int:account_id>',views.repayment_due_form,name='repayment_due_form'),
@@ -50,6 +50,7 @@ urlpatterns = [
     path('zohomodules/loan_account/share_email/<int:account_id>',views.share_email,name='share_email'),
     path('zohomodules/loan_account/add_comment/<int:account_id>',views.add_comment,name='add_comment'),
     path('zohomodules/loan_account/delete_comment/<int:comment_id>/<int:account_id>',views.delete_comment,name='delete_comment'),
+    path('zohomodules/loan_account/get_account_number/<int:account_id>', views.get_account_number, name='get_account_number'),
 
 
   

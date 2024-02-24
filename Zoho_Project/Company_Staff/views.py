@@ -12,6 +12,7 @@ from Company_Staff.models import LoanRepayemnt
 from Company_Staff.models import LoanAccountHistory
 from Company_Staff.models import LoanRepaymentHistory
 from Company_Staff.models import Comments
+from Company_Staff.models import Banking
 from django.shortcuts import render, get_object_or_404
 from datetime import date as dt
 from django.db.models import Sum
@@ -541,6 +542,14 @@ def loan_listing(request):
             }
   return render(request,'zohomodules/loan_account/loan_listing.html',context)
 
+def get_account_number(request, account_id):
+    try:
+        bank_account = BankAccount.objects.get(id=account_id)
+        account_number = bank_account.account_number
+        return JsonResponse({'account_number': account_number})
+    except BankAccount.DoesNotExist:
+        return JsonResponse({'error': 'Bank account not found'}, status=404)
+
 def add_loan(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
@@ -559,16 +568,23 @@ def add_loan(request):
                 # Fetch staff details
                 dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
                 allmodules = None
+            banks = Banking.objects.values('bnk_name','bnk_acno').distinct()
+            today_date=date.today()
             context = {
                     'details': dash_details,
                     'allmodules': allmodules,
                     'bank_holder': BankAccount.objects.all(),
                     'loan_details': loan_account.objects.all(),
+                    'banks': banks,
+                    'today_date':today_date
                 }
+            
 
             if request.method == 'POST':
-                account_name = request.POST.get('account_name')
-                customer_name = BankAccount.objects.get(id=account_name)
+                # account_name = request.POST.get('customer_name')
+                # customer_name = BankAccount.objects.get(id=account_name)
+                account_id = request.POST.get('customer_name')
+                bank_account = BankAccount.objects.get(id=account_id)
                 # account_number = request.POST.get('account_number')
                 loan_amount = request.POST.get('loan_amount')
                 lender_bank = request.POST.get('lender_bank')
@@ -578,14 +594,15 @@ def add_loan(request):
                 interest = request.POST.get('interest', 0)
                 processing_fee = request.POST.get('processing_fee', 0)
                 description = request.POST.get('description')
-                try:
-                    bank_account = BankAccount.objects.get(id=account_name)
-                    account_number = bank_account.account_number
-                except BankAccount.DoesNotExist:
-                    account_number = ""
+                
+                # try:
+                #     bank_account = BankAccount.objects.get(id=account_name)
+                #     account_number = bank_account.account_number
+                # except BankAccount.DoesNotExist:
+                #     account_number = ""
 
                 loan = loan_account(
-                    bank_holder=customer_name,
+                    bank_holder=bank_account,
                     # account_number=account_number,
                     loan_amount=loan_amount,
                     lender_bank=lender_bank,
@@ -605,11 +622,14 @@ def add_loan(request):
                     action='Created'
                 )
                 history.save()
+                
                 context = {
                     'details': dash_details,
                     'allmodules': allmodules,
                     'bank_holder': BankAccount.objects.all(),
                     'loan_details': loan_account.objects.all(),
+                    'banks':banks,
+                    'today_date':today_date
                 }
 
                 
@@ -626,66 +646,88 @@ def add_loan(request):
     
 
 def save_account_details(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        alias = request.POST.get('alias')
-        phone_number = request.POST.get('phone_number')
-        email = request.POST.get('email')
-        account_type = request.POST.get('account_type')
-        bankname = request.POST.get('bankname')
-        account_number = request.POST.get('account_number')
-        ifsc_code = request.POST.get('ifsc_code')
-        swift_code = request.POST.get('swift_code')
-        branch_name = request.POST.get('branch_name')
-        cheque_book_range = request.POST.get('cheque_book_range')
-        enable_cheque_printing = request.POST.get('enable_cheque_printing')
-        cheque_printing_configuration = request.POST.get('cheque_printing_configuration')
-        mailing_name = request.POST.get('mailing_name')
-        address = request.POST.get('address')
-        country = request.POST.get('country')
-        state = request.POST.get('state')
-        pin = request.POST.get('pin')
-        pan_number = request.POST.get('pan_number')
-        registration_type = request.POST.get('registration_type')
-        gst_num = request.POST.get('gst_num')
-        # alter_gst_details = request.POST.get('alter_gst_details')
-        date = request.POST.get('date')
-        amount_type = request.POST.get('amount_type')
-        amount = request.POST.get('amount')
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        if 'login_id' not in request.session:
+            return redirect('/')
+        
+        log_details = LoginDetails.objects.get(id=log_id)
+        user_type = log_details.user_type
+
+        if user_type in ['Company', 'Staff']:
+            if user_type == 'Company':
+                # Fetch company details
+                dash_details = CompanyDetails.objects.get(login_details=log_details, superadmin_approval=1, Distributor_approval=1)
+                allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+            else:
+                # Fetch staff details
+                dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
+                allmodules = None
+            if request.method == 'POST':
+               customer_name = request.POST.get('customer_name')
+               alias = request.POST.get('alias')
+               phone_number = request.POST.get('phone_number')
+               email = request.POST.get('email')
+               account_type = request.POST.get('account_type')
+               bankname = request.POST.get('bankname')
+               account_number = request.POST.get('account_number')
+               ifsc_code = request.POST.get('ifsc_code')
+               swift_code = request.POST.get('swift_code')
+               branch_name = request.POST.get('branch_name')
+               cheque_book_range = request.POST.get('cheque_book_range')
+               enable_cheque_printing = request.POST.get('enable_cheque_printing')
+               cheque_printing_configuration = request.POST.get('cheque_printing_configuration')
+               mailing_name = request.POST.get('mailing_name')
+               address = request.POST.get('address')
+               country = request.POST.get('country')
+               state = request.POST.get('state')
+               pin = request.POST.get('pin')
+               pan_number = request.POST.get('pan_number')
+               registration_type = request.POST.get('registration_type')
+               gst_num = request.POST.get('gst_num')
+               # alter_gst_details = request.POST.get('alter_gst_details')
+               date = request.POST.get('date')
+               amount_type = request.POST.get('amount_type')
+               amount = request.POST.get('amount')
 
         
-        BankAccount.objects.create(
-            customer_name=name,
-            alias=alias,
-            phone_number=phone_number,
-            email=email,
-            account_type=account_type,
-            bankname=bankname,
-            account_number=account_number,
-            ifsc_code=ifsc_code,
-            swift_code=swift_code,
-            branch_name=branch_name,
-            cheque_book_range=cheque_book_range,
-            enable_cheque_printing=enable_cheque_printing,
-            cheque_printing_configuration=cheque_printing_configuration,
-            mailing_name=mailing_name,
-            address=address,
-            country=country,
-            state=state,
-            pin=pin,
-            pan_number=pan_number,
-            registration_type=registration_type,
-            gst_num=gst_num,
+               BankAccount.objects.create(
+               customer_name=customer_name,
+               alias=alias,
+               phone_number=phone_number,
+               email=email,
+               account_type=account_type,
+               bankname=bankname,
+               account_number=account_number,
+               ifsc_code=ifsc_code,
+               swift_code=swift_code,
+               branch_name=branch_name,
+               cheque_book_range=cheque_book_range,
+               enable_cheque_printing=enable_cheque_printing,
+               cheque_printing_configuration=cheque_printing_configuration,
+               mailing_name=mailing_name,
+               address=address,
+               country=country,
+               state=state,
+               pin=pin,
+               pan_number=pan_number,
+               registration_type=registration_type,
+               gst_num=gst_num,
             # alter_gst_details=alter_gst_details,
-            date=date,
-            amount_type=amount_type,
-            amount=amount
+               date=date,
+               amount_type=amount_type,
+               amount=amount
             
-        )
+            )
+               context = {
+                    'details': dash_details,
+                    'allmodules': allmodules,}
+               
 
-        return render(request,'zohomodules/loan_account/add_loan.html')
+            return redirect('/')
     else:
-        return render(request,'zohomodules/loan_account/add_loan.html')
+        return render(request,'zohomodules/loan_account/add_loan.html',context)
+    
     
 # def holder_dropdown(request):
 #     if 'login_id' in request.session:
@@ -765,6 +807,7 @@ def overview(request,account_id):
             account = get_object_or_404(BankAccount, id=account_id)
             loan_info = loan_account.objects.filter(company=company,bank_holder=account).first()
             repayment_details = LoanRepayemnt.objects.filter(loan=loan_info)
+            banks = Banking.objects.values('bnk_name','bnk_acno').distinct()
 
             current_balance = loan_info.loan_amount  
             balances = [] 
@@ -807,7 +850,8 @@ def overview(request,account_id):
                     'loan_side':loan_side,
                     'today_date':today_date,
                     'repayment_history':repayment_history,
-                    'comment':comment
+                    'comment':comment,
+                    'banks':banks
                      }          
     
             return render(request,'zohomodules/loan_account/overview.html',context)
@@ -879,6 +923,7 @@ def repayment_due_form(request, account_id):
             else:
                 dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
                 allmodules = None
+            banks = Banking.objects.values('bnk_name','bnk_acno').distinct()
 
             if request.method == 'POST':
                 principal_amount = request.POST.get('principal_amount')
@@ -910,7 +955,7 @@ def repayment_due_form(request, account_id):
             else:
                 today_date = dt.today()
                 
-                return render(request, 'zohomodules/loan_account/overview.html', { 'details': dash_details, 'allmodules': allmodules,  'today_date': today_date,'account_id': account_id,})
+                return render(request, 'zohomodules/loan_account/overview.html', { 'details': dash_details, 'allmodules': allmodules,  'today_date': today_date,'account_id': account_id,'banks':banks})
     return redirect('/')
 
 def new_loan(request,account_id):
@@ -929,6 +974,7 @@ def new_loan(request,account_id):
             else:
                 dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
                 allmodules = None
+            banks = Banking.objects.values('bnk_name','bnk_acno').distinct()
 
             today_date = dt.today()
             if request.method == 'POST':
@@ -964,6 +1010,7 @@ def new_loan(request,account_id):
                 'details': dash_details,
                 'today_date': today_date,
                 'account_id': account_id,
+                'banks':banks
                 
             }
             return render(request, 'zohomodules/loan_account/overview.html',context)
@@ -985,12 +1032,14 @@ def edit_loanaccount(request, account_id):
             else:
                 dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
                 allmodules = None
+
+            banks = Banking.objects.values('bnk_name','bnk_acno').distinct()
             bank_holder=BankAccount.objects.all()
 
             loan = loan_account.objects.get(pk=account_id)
 
 
-            return render(request, 'zohomodules/loan_account/edit_loan.html', {'account': loan, 'details':dash_details,'bank_holder':bank_holder, 'user_type': user_type, 'allmodules': allmodules})
+            return render(request, 'zohomodules/loan_account/edit_loan.html', {'account': loan, 'details':dash_details,'bank_holder':bank_holder, 'user_type': user_type, 'allmodules': allmodules,'banks':banks})
 
     return redirect('/')
 
@@ -1012,6 +1061,7 @@ def edit_loan(request, account_id):
                 allmodules = None
 
             loan = loan_account.objects.get(pk=account_id)
+            banks = Banking.objects.values('bnk_name','bnk_acno').distinct()
 
             if request.method == 'POST':
                 
@@ -1041,7 +1091,7 @@ def edit_loan(request, account_id):
                
                 return redirect('overview', account_id=account_id)  
 
-            return render(request, 'zohomodules/loan_account/edit_loanaccount.html', {'loan': loan, 'details': dash_details, 'user_type': user_type, 'allmodules': allmodules,'history':history})
+            return render(request, 'zohomodules/loan_account/edit_loanaccount.html', {'loan': loan, 'details': dash_details, 'user_type': user_type, 'allmodules': allmodules,'history':history,'banks':banks})
 
     return redirect('/')
 
@@ -1085,6 +1135,7 @@ def edit_repayment(request, repayment_id):
                 allmodules = None
             repayment = get_object_or_404(LoanRepayemnt, id=repayment_id)
             account_id = repayment.loan.bank_holder_id 
+            banks = Banking.objects.values('bnk_name','bnk_acno').distinct()
             
            
             if request.method == 'POST':
@@ -1120,7 +1171,7 @@ def edit_repayment(request, repayment_id):
                 repayment_history.save()
                 
                 
-                return render(request, 'zohomodules/loan_account/edit_repayment.html', {'repayment': repayment,'details': dash_details,  'allmodules': allmodules, 'repayment_history':repayment_history})
+                return render(request, 'zohomodules/loan_account/edit_repayment.html', {'repayment': repayment,'details': dash_details,  'allmodules': allmodules, 'repayment_history':repayment_history,'banks':banks})
 
 
 def edit_additional_loan(request, repayment_id):
@@ -1142,6 +1193,7 @@ def edit_additional_loan(request, repayment_id):
             repayment = get_object_or_404(LoanRepayemnt, id=repayment_id)
             account_id = repayment.loan.bank_holder_id 
             current_balance=calculate_overall_balance(account_id)
+            banks = Banking.objects.values('bnk_name','bnk_acno').distinct()
     
             if request.method == 'POST':
                 principal_amount = request.POST.get('principal_amount')
@@ -1174,7 +1226,7 @@ def edit_additional_loan(request, repayment_id):
                     action='Edited'
                 )
                 hist.save()
-                return render(request, 'zohomodules/loan_account/edit_additional_loan.html', {'repayment': repayment,'details': dash_details,  'allmodules': allmodules,'overall_balance':current_balance,'hist':hist})            
+                return render(request, 'zohomodules/loan_account/edit_additional_loan.html', {'repayment': repayment,'details': dash_details,  'allmodules': allmodules,'overall_balance':current_balance,'hist':hist,'banks':banks})            
             
 from django.template.loader import render_to_string
 

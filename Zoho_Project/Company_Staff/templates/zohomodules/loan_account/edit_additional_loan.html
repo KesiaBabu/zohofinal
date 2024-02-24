@@ -69,7 +69,9 @@
                           <option value="Cash" {% if repayment.payment_method == 'Cash' %} selected {% endif %}>Cash</option>
                           <option value="UPI" {% if repayment.payment_method == 'UPI' %} selected {% endif %}>UPI</option>
                           <option value="Cheque" {% if repayment.payment_method == 'Cheque' %} selected {% endif %}>Cheque</option>
-                          
+                          {% for bank in banks %}
+                          <option value="{{ bank.bnk_name }}- {{ bank.bnk_acno|slice:'-4:' }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                          {% endfor %}
                         </select>
                       </div>
                     </div>

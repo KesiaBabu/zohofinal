@@ -40,7 +40,7 @@
                                 </div>
                                 <div class="col-6 d-flex">
                                     
-                                       <select class="form-control text-dark bg-light" name="account_name" >
+                                       <select class="form-control text-dark bg-light" name="account_name" id="account_name">
                                         <option value="" selected hidden>Select</option>
                                          {% for acc in bank_holder %}
                                            <option value="{{ acc.id }}">{{ acc.customer_name }}</option>
@@ -57,7 +57,7 @@
                                     <label for="">Account Number</label>
                                 </div>
                                 <div class="input-container col-6">
-                                    <input type="text" class="form-control text-dark bg-light" name="account_number"  >
+                                    <input type="text" class="form-control text-dark bg-light" name="account_number" id="account_num" >
                                 </div>
                             </div>
                             <div class="row pb-3">
@@ -81,7 +81,7 @@
                                     <label for="">Date</label>
                                 </div>
                                 <div class="input-container col-6">
-                                    <input type="date" class="form-control text-dark bg-light" name="loan_date"  >
+                                    <input type="date" class="form-control text-dark bg-light" name="loan_date" value="{{today_date|date:'Y-m-d'}}" >
                                 </div>
                             </div>
                             <div class="row pb-3">
@@ -91,9 +91,13 @@
                                 <div class="input-container col-6">
                                     <select class="form-control text-dark bg-light" name="payment_method"   id="payment_method">
                                         <option value="" selected hidden>Select</option>
+                                        
                                         <option value="Cash">Cash</option>
                                         <option value="UPI">UPI</option>
                                         <option value="Cheque">Cheque</option>
+                                        {% for bank in banks %}
+                                        <option value="{{ bank.bnk_name }}- {{ bank.bnk_acno|slice:'-4:' }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                                        {% endfor %}
                                     </select>
                                 </div>
                             </div>
@@ -111,6 +115,14 @@
                                 </div>
                                 <div class="input-container col-6">
                                     <input type="text" class="form-control text-dark bg-light" name="upi_id" id="upi_id">
+                                </div>
+                            </div>
+                            <div class="row pb-3" id="accountnumber" style="display: none;">
+                                <div class="col-6">
+                                    <label for="account_number">Account Number</label>
+                                </div>
+                                <div class="input-container col-6">
+                                    <input type="text" class="form-control text-dark bg-light" name="account_number" id="accountnumber" >
                                 </div>
                             </div>
                             
@@ -135,6 +147,9 @@
                                             <option value="Cash">Cash</option>
                                             <option value="UPI">UPI</option>
                                             <option value="Cheque">Cheque</option>
+                                            {% for bank in banks %}
+                                            <option value="{{ bank.bnk_name }}- {{ bank.bnk_acno|slice:'-4:' }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                 </div>
@@ -152,6 +167,14 @@
                                     </div>
                                     <div class="input-container col-6">
                                         <input type="text" class="form-control text-dark bg-light" name="upi_id" id="upi">
+                                    </div>
+                                </div>
+                                <div class="row pb-3" id="account_number" style="display: none;">
+                                    <div class="col-6">
+                                        <label for="account_number">Account Number</label>
+                                    </div>
+                                    <div class="input-container col-6">
+                                        <input type="text" class="form-control text-dark bg-light" name="account_number" id="account_number">
                                     </div>
                                 </div>
                                 
@@ -196,15 +219,18 @@
                                         console.log('Cheque selected'); 
                                         $('#cheque_details').show();
                                         $('#upi_details').hide();
+                                        $('#accountnumber').hide()
                                     } else if (selectedOption === 'UPI') {
                                         console.log('UPI selected'); 
                                         $('#cheque_details').hide();
                                         $('#upi_details').show();
+                                        $('#accountnumber').hide()
                                     } else {
-                                        console.log('Other option selected'); 
-                                        $('#cheque_details').hide();
-                                        $('#upi_details').hide();
-                                    }
+                                        console.log('bank selected');
+                                        $('#cheque').hide();
+                                        $('#upi').hide();
+                                        $('#accountnumber').show()
+                                    } 
                                 });
                             });
                         </script>
@@ -218,15 +244,41 @@
                                         console.log('Cheque selected'); 
                                         $('#cheque').show();
                                         $('#upi').hide();
+                                        $('#account_number').hide()
                                     } else if (selectedOption === 'UPI') {
                                         console.log('UPI selected');
                                         $('#cheque').hide();
                                         $('#upi').show();
+                                        $('#account_number').hide()
                                     } else {
-                                        console.log('Other option selected'); 
+                                        console.log('bank selected');
                                         $('#cheque').hide();
                                         $('#upi').hide();
-                                    }
+                                        $('#account_number').show()
+                                    } 
+                                });
+                                
+                            });
+                        </script>
+                        <script>
+                            $(document).ready(function() {
+                                $('#account_name').change(function() {
+                                    var accountId = $(this).val();
+                                    // AJAX request to fetch the account number corresponding to the selected account name
+                                    $.ajax({
+                                        url: '{% url "get_account_number" 0 %}'.replace('0', accountId), // Replace this with your endpoint URL to fetch account number
+                                        type: 'GET',
+                                        beforeSend: function(xhr, settings) {
+                                        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                                        },
+                                        success: function(response) {
+                                            // Populate the account number input field with the fetched account number
+                                            $('#account_num').val(response.account_number);
+                                        },
+                                        error: function(xhr, status, error) {
+                                            console.error(error);
+                                        }
+                                    });
                                 });
                             });
                         </script>
@@ -241,14 +293,14 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                    <!-- <form method="POST" action="{% url 'save_account_details' %}" > -->
-                                        <form method="POST" id="accountForm" class="needs-validation" novalidate autocomplete="off" >
+                                    <form method="POST" action="{% url 'save_account_details' %}" >
+                                        
                                     {% csrf_token %}                                           
                                         <div class="row">
                                             <div class="col-6">
                                                 <h4 class="text-light">Bank Account Holder Form</h4>
                                                 <h6 class="text-light mt-3"> Name</h6>
-                                                <input type="text" class="form-control text-dark bg-light" name="name" >
+                                                <input type="text" class="form-control text-dark bg-light" name="customer_name" >
                                                 <h6 class="text-light mt-3"> Alias</h6>
                                                 <input type="text" class="form-control text-dark bg-light" name="alias"  >
                                                 <h6 class="text-light mt-3"> Phone Number</h6>
@@ -315,7 +367,7 @@
                                             <h6 class="text-light mt-3">Country</h6>
                                             <input type="text" class="form-control text-dark bg-light" name="country"  >
                                             <h6 class="text-light mt-3">State</h6>
-                                            <select t class="form-control text-dark bg-light"  name="state">
+                                            <select  class="form-control text-dark bg-light"  name="state">
                                                 <option value="" hidden>Select State</option>
                                                 <option value="[AN]-Andaman And Nicobar Islands">[AN]-Andaman And Nicobar Islands</option> <option value="[AD]-Andhra Pradesh">[AD]-Andhra Pradesh</option>
                                                 <option value="[AR]-Arunachal Pradesh">[AR]-Arunachal Pradesh	</option> <option value="volvo">[AS]-Assam</option>
@@ -362,35 +414,47 @@
                                             <h6 class="text-light mt-3">Amount</h6>
                                             <input type="number" class="form-control text-dark bg-light" name="amount" >
                                         </div>
-                                      </div>
+                                    </div>
+                                
+                                
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-outline-warning" >Save</button>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                      <div class="d-flex">
-                                        <button class="btn btn-outline-warning"
-                                        type="submit" data-dismiss="modal" id="submitFormBtn">Submit
-                                        </button> 
-                  
-                                        <button type="button" class="btn btn-outline-warning" 
-                                          data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">Cancel</span>
-                                        </button>
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6"></div>
-                                    <!-- <div class="col-md-4"></div> -->
-                                  </div>
-                                    <!-- <div class="modal-footer">
-                                        <button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
-                                        <button type="submit"  class="btn btn-outline-warning" id="submitFormBtn" >Save</button>  
-                                    </div>
-                                </form>  -->
                             </form>
-                                </div>
                             </div>
                         </div>
+                    </div>
+                               
+                        <!-- <script>
+                        $(document).ready(function() {
+                            // Add an event listener for the form submission
+                            $('#accountForm').submit(function(event) {
+                                // Prevent the default form submission
+                                event.preventDefault();
                         
-<script>
+                                // Serialize the form data
+                                var formData = $(this).serialize();
+                        
+                                // Perform an AJAX request to submit the form data
+                                $.ajax({
+                                    url: $(this).attr('{% url "save_account_details" %}'), // URL to which the form data will be submitted
+                                    type: $(this).attr('POST'), // HTTP method (e.g., POST)
+                                    data: formData, // Form data to be submitted
+                                    success: function(response) {
+                                        // Handle the success response
+                                        console.log('Form submitted successfully!');
+                                        // Optionally, perform any additional actions after successful form submission
+                                    },
+                                    error: function(xhr, status, error) {
+                                        // Handle errors that occur during form submission
+                                        console.error('Error occurred while submitting the form:', error);
+                                    }
+                                });
+                            });
+                        });</script> -->
+                        
+<!-- <script>
 $(document).on("click","#submitFormBtn",function() {
 $.ajax({
 url: "{% url 'save_account_details' %}",
@@ -451,7 +515,7 @@ $.ajax({
   success: function(data) { debugger
     var dropdown = $('#holder');
     dropdown.empty();
-    dropdown.append($('<option></option>').text('Select Account name'));
+    dropdown.append($('<option></option>').text('Account Name'));
     $.each(data, function(key, value) {
       dropdown.append($('<option></option>').attr('value', key).text(value[1] + ' ' + value[2]).val(value[3]+' '+ value[1] + ' ' + value[2]));
     });
@@ -461,9 +525,45 @@ $.ajax({
   }
 });
 }
-</script>
+</script> -->
+<!-- <script>
+    $(document).on("click","#submitFormBtn",function() {
+        $.ajax({
+            url: "{% url 'save_account_details' %}",
+            type: "POST",
+            data: $("#accountForm").serialize(),
+            headers: { "X-CSRFToken": "{{ csrf_token }}" }, // Serialize the form data
+            success: function(response) {
+                document.getElementById("accountForm").reset(); // Reset the form after successful submission
+                reloadVendor(); // Call the reloadVendor function if needed
+            },
+        });
+    });                        
+    
+    function reloadholder() {
+        $.ajax({
+            url: "", // Provide the appropriate URL for retrieving data
+            type: "GET",
+            dataType: "json",
+            data: $(this).serialize(),
+            headers: { "X-CSRFToken": "{{ csrf_token }}" }, // Serialize the data if needed
+            success: function(data) {
+                var dropdown = $('#holder');
+                dropdown.empty();
+                dropdown.append($('<option></option>').text('Account Name'));
+                $.each(data, function(key, value) {
+                    // Modify the key and value to match your data structure
+                    dropdown.append($('<option></option>').attr('value', key).text(value[1] + ' ' + value[2]).val(value[3]+' '+ value[1] + ' ' + value[2]));
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+            }
+        });
+    }
+    </script> -->
 
-<script>
+<!-- <script>
     $(document).ready(function(){
         $('select[name="account_name"]').change(function(){
             var selectedAccountId = $(this).val();           
@@ -481,6 +581,6 @@ $.ajax({
             });
         });
     });
-</script>
+</script> -->
 
 {% endblock %}
