@@ -1489,6 +1489,7 @@
     </div>
   </div>
 </div>
+
 <div class="modal fade" id="commentModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"  aria-hidden="true" style="margin-top: 8vh;">
   <div class="modal-dialog" role="document">
     <div class="modal-content" style="background-color: #3b3b3b;">
@@ -1538,6 +1539,7 @@
   </div>
 </div>
 </div>
+
 <div class="modal fade" id="commentModal4" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"  aria-hidden="true" style="margin-top: 8vh;">
   <div class="modal-dialog" role="document">
     <div class="modal-content" style="background-color: #3b3b3b;">
@@ -1561,7 +1563,7 @@
   </div>
 </div>
 
-<!-- Modal for viewing edit history -->
+<!-----**********Modal for viewing edit history ********-->
 {% for a in repayment_details %}
 <div class="modal fade" id="historyModal{{ a.id }}" tabindex="-1" role="dialog" aria-labelledby="historyModalLabel{{ repayment.id }}" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -1592,18 +1594,19 @@
                     </tr>
                   </thead>
                   <tbody>
+                    
                     {% for h in repayment_history %}
+                    {%if  h.repayment.id == a.id %}
                     <tr class="table-row">
                       <td>{{forloop.counter}}</td>
                       <td>{{h.date}}</td>
                       <td>{{h.action}}</td>
                       <td>{{h.login_details.first_name}} {{h.login_details.Last_name}}</td>
                     </tr>
-                    {% empty %}
-                            <tr class="table-row">
-                                <td colspan="4">No history available.</td>
-                            </tr>
+                    
+                    {% endif %}
                     {% endfor %}
+                    
                   </tbody>
                 </table>
               </div>
@@ -1744,73 +1747,58 @@ document.getElementById('first-date').addEventListener('change', filterTableByDa
 document.getElementById('last-date').addEventListener('change', filterTableByDate);
 
 </script> -->
+<script>
+  $(document).ready(function() {
+      var table = $('#statementtable')[0]; // Assuming the table id is 'statementtable'
+      var fromDate;
+      $('#start-date').on('change', function () {
+          fromDate = new Date($(this).val());
+          console.log('Start date selected:', fromDate);
+          $('#end-date').prop('min', function () {
+              return fromDate.toISOString().split('T')[0];
+          });
+          filterTransactions();
+      });
 
-  <script>
-            $(document).ready(function() {
-                var table = $('#statementtable')[0]; 
-                var fromDate;
-                $('#start-date').on('change', function () {
-                    fromDate = new Date($(this).val());
-                    $('#end-date').prop('min', function () {
-                        return fromDate.toISOString().split('T')[0];
-                    });
-                    filterTransactions();
-                });
-          
-                var toDate;
-                $('#end-date').on('change', function () {
-                    toDate = new Date($(this).val());
-                    $('#start-date').prop('max', function () {
-                        return toDate.toISOString().split('T')[0];
-                    });
-                    filterTransactions();
-                });
-          
-                function filterTransactions() {
-                    var startDate = fromDate;
-                    var endDate = toDate;
-                    var rows = table.rows;
-          
-                    // for (var i = 1; i < rows.length; i++) { // Start from index 1 to skip the header row
-                    //     var row = rows[i];
-                    //     var dateCell = row.cells[1]; // Assuming date is in the second column
-                    //     var rowDate = new Date(dateCell.textContent);
-          
-                    //     if ((rowDate >= startDate) && (rowDate <= endDate)) {
-                    //         $(row).show();
-                           
-                    //     } else {
-                    //         $(row).hide();
-                    //     }
-                      
-                    // }
-                    tableRows.forEach(row => {
-                  const dateCell = new Date(row.cells[1].innerText);
+      var toDate;
+      $('#end-date').on('change', function () {
+          toDate = new Date($(this).val());
+          console.log('End date selected:', toDate);
+          $('#start-date').prop('max', function () {
+              return toDate.toISOString().split('T')[0];
+          });
+          filterTransactions();
+      });
 
-        // Extract date portions for comparison
-                  const cellDate = new Date(dateCell.getFullYear(), dateCell.getMonth(), dateCell.getDate());
-                  const fromDateTime = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-                  const toDateTime = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+      function filterTransactions() {
+          var startDate = fromDate;
+          var endDate = toDate;
+          var rows = table.rows;
 
-                if ((!startDate || cellDate >= fromDateTime) && (!endDate || cellDate <= toDateTime)) {
-                 row.style.display = '';
-                } else {
-                 row.style.display = 'none';
+          for (var i = 1; i < rows.length; i++) { // Start from index 1 to skip the header row
+              var row = rows[i];
+              var dateCell = row.cells[1]; // Assuming date is in the second column
+              var rowDate = new Date(dateCell.textContent);
+
+              if (rowDate <= endDate && rowDate >= startDate) {
+                  $(row).show();
+              } else {
+                  $(row).hide();
               }
-              });
-          
-                    var options = { year: 'numeric', month: 'long', day: 'numeric' };
-          
-                    if (fromDate) {
-                        $('#d1').text(fromDate.toLocaleDateString(undefined, options));
-                    }
-          
-                    if (toDate) {
-                        $('#d2').text(" To " + toDate.toLocaleDateString(undefined, options));
-                    }
-                }
-            });
-          </script>
+          }
+
+          var options = { year: 'numeric', month: 'long', day: 'numeric' };
+
+          if (fromDate) {
+              $('#d1').text("From " + fromDate.toLocaleDateString(undefined, options)); // Show start date
+          }
+
+          if (toDate) {
+              $('#d2').text(" To " + toDate.toLocaleDateString(undefined, options)); // Show end date
+          }
+      }
+  });
+</script>
 <script>
   function ExportToExcel() {
     console.log("transactiontable");

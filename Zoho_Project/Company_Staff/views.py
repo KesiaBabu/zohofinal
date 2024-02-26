@@ -530,8 +530,8 @@ def loan_listing(request):
 
             # Calculate balance for each loan account
             for loan in loan_details:
-                total_emis_paid = LoanRepayemnt.objects.filter(loan=loan, type='EMI paid').aggregate(total=Sum('total_amount'))['total'] or 0
-                total_additional_loan = LoanRepayemnt.objects.filter(loan=loan, type='Additional Loan').aggregate(total=Sum('total_amount'))['total'] or 0
+                total_emis_paid = LoanRepayemnt.objects.filter(loan=loan, type='EMI paid').aggregate(total=Sum('principal_amount'))['total'] or 0
+                total_additional_loan = LoanRepayemnt.objects.filter(loan=loan, type='Additional Loan').aggregate(total=Sum('principal_amount'))['total'] or 0
                 loan.balance = loan.loan_amount - total_emis_paid + total_additional_loan
             
             context = {
@@ -807,31 +807,38 @@ def overview(request,account_id):
             account = get_object_or_404(BankAccount, id=account_id)
             loan_info = loan_account.objects.filter(company=company,bank_holder=account).first()
             repayment_details = LoanRepayemnt.objects.filter(loan=loan_info)
+            repayment_history = LoanRepaymentHistory.objects.filter(repayment__in=repayment_details)
+            # repayment_history = LoanRepaymentHistory.objects.filter(repayment='3')
+            print(repayment_history )
             banks = Banking.objects.values('bnk_name','bnk_acno').distinct()
 
             current_balance = loan_info.loan_amount  
             balances = [] 
             loan_side = loan_account.objects.all() 
             for loan in loan_side:
-                total_emis_paid = LoanRepayemnt.objects.filter(loan=loan, type='EMI paid').aggregate(total=Sum('total_amount'))['total'] or 0
-                total_additional_loan = LoanRepayemnt.objects.filter(loan=loan, type='Additional Loan').aggregate(total=Sum('total_amount'))['total'] or 0
+                total_emis_paid = LoanRepayemnt.objects.filter(loan=loan, type='EMI paid').aggregate(total=Sum('principal_amount'))['total'] or 0
+                total_additional_loan = LoanRepayemnt.objects.filter(loan=loan, type='Additional Loan').aggregate(total=Sum('principal_amount'))['total'] or 0
                 loan.balance = loan.loan_amount - total_emis_paid + total_additional_loan 
 
             for repayment in repayment_details:
                 if repayment.type == 'EMI paid':
-                    current_balance -= repayment.total_amount
+                    current_balance -= repayment.principal_amount
                 elif repayment.type == 'Additional Loan':
-                    current_balance += repayment.total_amount     
+                    current_balance += repayment.principal_amount     
                 balances.append(current_balance)
 
             overall_balance = current_balance
             repayment_details_with_balances = zip(repayment_details, balances)
             total_amount= loan_info.loan_amount + loan_info.interest
 
-            repayment_history = {}
-            for repayment in repayment_details:
-                history = LoanRepaymentHistory.objects.filter(repayment=repayment)
-                repayment_history[repayment.id] = history
+           
+            # repayment_history = LoanRepaymentHistory.objects.filter(repayment=repayment.id)
+                
+            
+            # repayment_history = {}
+            # for repayment in repayment_details:
+            #       repayment_history[repayment.id] = LoanRepaymentHistory.objects.filter(repayment=repayment)
+
 
             history=LoanAccountHistory.objects.filter(loan=loan_info)
             comment=Comments.objects.filter(loan=loan_info)
@@ -851,7 +858,8 @@ def overview(request,account_id):
                     'today_date':today_date,
                     'repayment_history':repayment_history,
                     'comment':comment,
-                    'banks':banks
+                    'banks':banks,
+                    
                      }          
     
             return render(request,'zohomodules/loan_account/overview.html',context)
@@ -1328,14 +1336,16 @@ def delete_comment(request, comment_id,account_id):
             else:
                 dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
                 allmodules = None
-            if request.method == 'POST':
+           
+            
               
-              comment = get_object_or_404(Comments, id=comment_id)
-              comment.delete()
+            comment = get_object_or_404(Comments, id=comment_id)
+            comment.delete()
 
+            context={'details': dash_details,  'allmodules': allmodules,'account_id':account_id}
 
             return redirect('overview',account_id=account_id)
-        return render(request, 'zohomodules/loan_account/overview.html',{'details': dash_details,  'allmodules': allmodules}) 
+        return render(request, 'zohomodules/loan_account/overview.html',context) 
                 
 
 
