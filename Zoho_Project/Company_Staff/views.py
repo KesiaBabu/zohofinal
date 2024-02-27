@@ -549,6 +549,26 @@ def get_account_number(request, account_id):
         return JsonResponse({'account_number': account_number})
     except BankAccount.DoesNotExist:
         return JsonResponse({'error': 'Bank account not found'}, status=404)
+    
+# def full_account_number(request):
+#     try:
+#         bank_id=request.GET.get('id')
+#         acc=Banking.objects.get(bnk_name=bank_id)
+#         data = {'bank':acc.bnk_acno}
+#         print(data)
+#         return JsonResponse(data)
+#     except Banking.DoesNotExist:
+#         return JsonResponse({'error': 'Banking record not found'}, status=404)
+def full_account_number(request):
+    try:
+        print('bank')
+        bank_id = request.GET.get('bank_id')
+        acc = Banking.objects.get(bnk_name=bank_id)
+        data = {'bank':acc.bnk_acno}
+        print(data)
+        return JsonResponse(data)
+    except Banking.DoesNotExist:
+        return JsonResponse({'error': 'Banking record not found'}, status=404)
 
 def add_loan(request):
     if 'login_id' in request.session:
@@ -809,7 +829,7 @@ def overview(request,account_id):
             repayment_details = LoanRepayemnt.objects.filter(loan=loan_info)
             repayment_history = LoanRepaymentHistory.objects.filter(repayment__in=repayment_details)
             # repayment_history = LoanRepaymentHistory.objects.filter(repayment='3')
-            print(repayment_history )
+            
             banks = Banking.objects.values('bnk_name','bnk_acno').distinct()
 
             current_balance = loan_info.loan_amount  
@@ -830,14 +850,6 @@ def overview(request,account_id):
             overall_balance = current_balance
             repayment_details_with_balances = zip(repayment_details, balances)
             total_amount= loan_info.loan_amount + loan_info.interest
-
-           
-            # repayment_history = LoanRepaymentHistory.objects.filter(repayment=repayment.id)
-                
-            
-            # repayment_history = {}
-            # for repayment in repayment_details:
-            #       repayment_history[repayment.id] = LoanRepaymentHistory.objects.filter(repayment=repayment)
 
 
             history=LoanAccountHistory.objects.filter(loan=loan_info)

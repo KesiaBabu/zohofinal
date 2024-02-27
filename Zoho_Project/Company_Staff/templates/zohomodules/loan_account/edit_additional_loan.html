@@ -70,7 +70,7 @@
                           <option value="UPI" {% if repayment.payment_method == 'UPI' %} selected {% endif %}>UPI</option>
                           <option value="Cheque" {% if repayment.payment_method == 'Cheque' %} selected {% endif %}>Cheque</option>
                           {% for bank in banks %}
-                          <option value="{{ bank.bnk_name }}- {{ bank.bnk_acno|slice:'-4:' }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                          <option value="{{ bank.bnk_name }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
                           {% endfor %}
                         </select>
                       </div>
@@ -89,6 +89,13 @@
                           <input type="text" class="form-control text-white bg-black mt-1" id="upi_id" name="upi_id" value="{{repayment.upi_id}}">
                       </div>
                   </div>
+                  <div class="row mt-3" id="accdetails" style="display: none;">
+                    <div class="col-md-6">
+                        <label for="upi_id" style="color: white;">Account Number</label>
+                        <input type="text" class="form-control text-white bg-black mt-1" id="acc_num" name="acc_num"  value="{{repayment.account_number}}">
+                    </div>
+                    
+                </div>
 
                    
 
@@ -127,30 +134,67 @@
                           });
                         </script>
                      
-                        <script>
-                          $(document).ready(function() {
-                              $('#paymentmethod').change(function() {
-                                  var selectedOption = $(this).val();
-                                  if (selectedOption === 'Cheque') {
-                                      $('#chequedetails').show();
-                                      $('#upidetails').hide();
-                                  } else if (selectedOption === 'UPI') {
-                                      $('#chequedetails').hide();
-                                      $('#upidetails').show();
-                                  } else {
-                                      $('#chequedetails').hide();
-                                      $('#upidetails').hide();
-                                  }
-                              });
-                              var selectedOption = $('#paymentmethod').val();
+                     <script>
+                      $(document).ready(function() {
+                          // Function to show the appropriate payment method details based on the selected option
+                          function showPaymentMethodDetails(selectedOption) {
                               if (selectedOption === 'Cheque') {
-                              $('#chequedetails').show();
+                                  $('#chequedetails').show();
+                                  $('#upidetails').hide();
+                                  $('#accdetails').hide();
                               } else if (selectedOption === 'UPI') {
-                              $('#upidetails').show();
+                                  $('#chequedetails').hide();
+                                  $('#upidetails').show();
+                                  $('#accdetails').hide();
+                              } else if (selectedOption === 'Cash') {
+                                  $('#chequedetails').hide();
+                                  $('#upidetails').hide();
+                                  $('#accdetails').hide();
+                              } else {
+                                  console.log('Bank selected');
+                                  $('#chequedetails').hide();
+                                  $('#upidetails').hide();
+                                  $('#accdetails').show();
+                                  $.ajax({
+           url: "{% url 'full_account_number'  %}",
+           type: 'GET',
+           data:{
+           bank_id:selectedOption
+           },
+                                            
+          success: function(response) {
+          console.log('Success:', response);
+          data=response.bank
+          $('#acc_num').val(data);
+          },
+          error: function(xhr, status, error) {
+          console.error(error);
+          }
+          });
                               }
-                              });
-                        
-                        </script>
+                          }
+                          
+                          // Event listener for the payment method dropdown change
+                          $('#paymentmethod').change(function() {
+                              var selectedOption = $(this).val();
+                              showPaymentMethodDetails(selectedOption);
+                          });
+                          
+                          // Show payment method details based on the selected option
+                          var selectedOption = $('#paymentmethod').val();
+                          showPaymentMethodDetails(selectedOption);
+                          
+                          // Check if UPI ID or Cheque Number fields have values and show respective payment method details
+                          var upiIdValue = $('#upi_id').val();
+                          var chequeNumberValue = $('#cheque_number').val();
+                          if (upiIdValue) {
+                              $('#upidetails').show();
+                          }
+                          if (chequeNumberValue) {
+                              $('#chequedetails').show();
+                          }
+                      });
+                  </script>
 
                         
                         

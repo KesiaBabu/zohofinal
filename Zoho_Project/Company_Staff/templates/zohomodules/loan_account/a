@@ -1653,3 +1653,50 @@ console.log('date1',startDate)
   document.getElementById('ldate').addEventListener('change', filterTableByDate);
   
   </script>
+
+
+
+ <!-- <script>
+                            $(document).ready(function() {
+                                $('#processing_method').change(function() {
+                                    console.log('Dropdown changed'); 
+                                    var selectedOption = $(this).val();
+                                    console.log('Selected option:', selectedOption); 
+                                    if (selectedOption === 'Cheque') {
+                                        console.log('Cheque selected'); 
+                                        $('#cheque').show();
+                                        $('#upi').hide();
+                                        $('#account_number').hide()
+                                    } else if (selectedOption === 'UPI') {
+                                        console.log('UPI selected');
+                                        $('#cheque').hide();
+                                        $('#upi').show();
+                                        $('#account_number').hide()
+                                    } else {
+                                        console.log('bank selected');
+                                        $.ajax({
+                                        ', // Modify the URL to your Django view that fetches the full account number
+                                        type: 'GET',
+                                        data: {
+                                        'bank_name': selectedOption.split("-")[0].trim(),
+                                        'bank_acno': selectedOption.split("-")[1].trim()
+                                    },
+                                        success: function(response) {
+                                        console.log('Success:', response);
+                                        $('#cheque_details, #upi_details').hide();
+                                        $('#account_number').show();
+                                        var accountNumbers = response.account_numbers;
+                                        var accountNumberInput = $('#account_number input');
+                                        accountNumberInput.val(''); // Clear previous values
+                                        accountNumbers.forEach(function(accountNumber) {
+                                        accountNumberInput.val(accountNumberInput.val() + accountNumber + '\n');
+                                       });
+                                },
+                                        error: function(xhr, errmsg, err) {
+                                        console.log(xhr.status + ": " + xhr.responseText); // Log any errors
+                                }
+                                  });
+                                }
+                                  });
+                                  });
+                        </script> -->

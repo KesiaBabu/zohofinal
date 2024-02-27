@@ -96,12 +96,12 @@
                                         <option value="UPI">UPI</option>
                                         <option value="Cheque">Cheque</option>
                                         {% for bank in banks %}
-                                        <option value="{{ bank.bnk_name }}- {{ bank.bnk_acno|slice:'-4:' }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                                        <option value="{{ bank.bnk_name }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
                                         {% endfor %}
                                     </select>
                                 </div>
                             </div>
-                            <div class="row pb-3" id="cheque_details" style="display: none;">
+                            <div class="row pb-3" id="cheque_details" style="display: none;" >
                                 <div class="col-6">
                                     <label for="cheque_number">Cheque Number</label>
                                 </div>
@@ -109,7 +109,7 @@
                                     <input type="text" class="form-control text-dark bg-light" name="cheque_number" id="cheque_number">
                                 </div>
                             </div>
-                            <div class="row pb-3" id="upi_details" style="display: none;">
+                            <div class="row pb-3" id="upi_details" style="display: none;" >
                                 <div class="col-6">
                                     <label for="upi_id">UPI ID</label>
                                 </div>
@@ -117,12 +117,12 @@
                                     <input type="text" class="form-control text-dark bg-light" name="upi_id" id="upi_id">
                                 </div>
                             </div>
-                            <div class="row pb-3" id="accountnumber" style="display: none;">
+                            <div class="row pb-3" id="accountnumber" style="display: none;" >
                                 <div class="col-6">
                                     <label for="account_number">Account Number</label>
                                 </div>
                                 <div class="input-container col-6">
-                                    <input type="text" class="form-control text-dark bg-light" name="account_number" id="accountnumber" >
+                                    <input type="text" class="form-control text-dark bg-light" name="account_number" id="accountnum" >
                                 </div>
                             </div>
                             
@@ -148,12 +148,12 @@
                                             <option value="UPI">UPI</option>
                                             <option value="Cheque">Cheque</option>
                                             {% for bank in banks %}
-                                            <option value="{{ bank.bnk_name }}- {{ bank.bnk_acno|slice:'-4:' }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                                            <option value="{{ bank.bnk_name }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
                                             {% endfor %}
                                         </select>
                                     </div>
                                 </div>
-                                <div class="row pb-3" id="cheque" style="display: none;">
+                                <div class="row pb-3" id="cheque_p" style="display: none;">
                                     <div class="col-6">
                                         <label for="cheque_number">Cheque Number</label>
                                     </div>
@@ -161,7 +161,7 @@
                                         <input type="text" class="form-control text-dark bg-light" name="cheque_number" id="cheque">
                                     </div>
                                 </div>
-                                <div class="row pb-3" id="upi" style="display: none;">
+                                <div class="row pb-3" id="upi_p" style="display: none;">
                                     <div class="col-6">
                                         <label for="upi_id">UPI ID</label>
                                     </div>
@@ -169,7 +169,7 @@
                                         <input type="text" class="form-control text-dark bg-light" name="upi_id" id="upi">
                                     </div>
                                 </div>
-                                <div class="row pb-3" id="account_number" style="display: none;">
+                                <div class="row pb-3" id="account_number_p" style="display: none;">
                                     <div class="col-6">
                                         <label for="account_number">Account Number</label>
                                     </div>
@@ -225,41 +225,85 @@
                                         $('#cheque_details').hide();
                                         $('#upi_details').show();
                                         $('#accountnumber').hide()
+                                    } else if(selectedOption==='Cash'){
+                                        $('#cheque_details').hide();
+                                        $('#upi_details').hide();
+                                        $('#accountnumber').hide()
                                     } else {
-                                        console.log('bank selected');
-                                        $('#cheque').hide();
-                                        $('#upi').hide();
+                                        console.log('Bank selected');
+                                        $('#cheque_details').hide();
+                                        $('#upi_details').hide();
                                         $('#accountnumber').show()
-                                    } 
-                                });
-                            });
+                                        console.log('selectedOption');
+                                         $.ajax({
+                                            url: "{% url 'full_account_number'  %}",
+                                            type: 'GET',
+                                            data:{
+                                                bank_id:selectedOption
+                                            },
+                                            
+                                        success: function(response) {
+                                        console.log('Success:', response);
+                                        console.log('Success:');
+                                        data=response.bank
+                                        $('#accountnum').val(data);
+                                        },
+                                       error: function(xhr, status, error) {
+                                     console.error(error);
+                                   }
+                               });
+                            }
+                         });
+                       });       
                         </script>
                         <script>
                             $(document).ready(function() {
                                 $('#processing_method').change(function() {
-                                    console.log('Dropdown changed'); 
+                                    console.log('Dropdown changed');
                                     var selectedOption = $(this).val();
                                     console.log('Selected option:', selectedOption); 
                                     if (selectedOption === 'Cheque') {
                                         console.log('Cheque selected'); 
-                                        $('#cheque').show();
-                                        $('#upi').hide();
-                                        $('#account_number').hide()
+                                        $('#cheque_p').show();
+                                        $('#upi_p').hide();
+                                        $('#account_number_p').hide();
                                     } else if (selectedOption === 'UPI') {
-                                        console.log('UPI selected');
-                                        $('#cheque').hide();
-                                        $('#upi').show();
-                                        $('#account_number').hide()
+                                        console.log('UPI selected'); 
+                                        $('#cheque_p').hide();
+                                        $('#upi_p').show();
+                                        $('#account_number_p').hide()
+                                    } else if(selectedOption==='Cash'){
+                                        $('#cheque_p').hide();
+                                        $('#upi_p').hide();
+                                        $('#account_number_p').hide()
                                     } else {
-                                        console.log('bank selected');
-                                        $('#cheque').hide();
-                                        $('#upi').hide();
-                                        $('#account_number').show()
-                                    } 
-                                });
-                                
-                            });
+                                        console.log('Bank selected');
+                                        $('#cheque_p').hide();
+                                        $('#upi_p').hide();
+                                        $('#account_number_p').show()
+                                        console.log('selectedOption');
+                                         $.ajax({
+                                            url: "{% url 'full_account_number'  %}",
+                                            type: 'GET',
+                                            data:{
+                                                bank_id:selectedOption
+                                            },
+                                            
+                                        success: function(response) {
+                                        console.log('Success:', response);
+                                        console.log('Success:');
+                                        data=response.bank
+                                        $('#account_number').val(data);
+                                        },
+                                       error: function(xhr, status, error) {
+                                     console.error(error);
+                                   }
+                               });
+                            }
+                         });
+                       });       
                         </script>
+                       
                         <script>
                             $(document).ready(function() {
                                 $('#account_name').change(function() {
