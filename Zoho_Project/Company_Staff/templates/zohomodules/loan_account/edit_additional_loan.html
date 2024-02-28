@@ -156,21 +156,21 @@
                                   $('#upidetails').hide();
                                   $('#accdetails').show();
                                   $.ajax({
-           url: "{% url 'full_account_number'  %}",
-           type: 'GET',
-           data:{
-           bank_id:selectedOption
-           },
+                                  url: "{% url 'full_account_number'  %}",
+                                  type: 'GET',
+                                  data:{
+                                  bank_id:selectedOption
+                                     },
                                             
-          success: function(response) {
-          console.log('Success:', response);
-          data=response.bank
-          $('#acc_num').val(data);
-          },
-          error: function(xhr, status, error) {
-          console.error(error);
-          }
-          });
+                                  success: function(response) {
+                                  console.log('Success:', response);
+                                  data=response.bank
+                                 $('#acc_num').val(data);
+                                   },
+                                  error: function(xhr, status, error) {
+                                  console.error(error);
+                                   }
+                                  });
                               }
                           }
                           
@@ -187,11 +187,15 @@
                           // Check if UPI ID or Cheque Number fields have values and show respective payment method details
                           var upiIdValue = $('#upi_id').val();
                           var chequeNumberValue = $('#cheque_number').val();
+                          var accountNumberValue = $('#acc_num').val();
                           if (upiIdValue) {
                               $('#upidetails').show();
                           }
                           if (chequeNumberValue) {
                               $('#chequedetails').show();
+                          }
+                          if (accountNumberValue) {
+                              $('#acc_num').show();
                           }
                       });
                   </script>

@@ -104,6 +104,7 @@ class LoanRepayemnt(models.Model):
     payment_method=models.CharField(max_length=255)
     upi_id=models.CharField(max_length=255)
     cheque=models.CharField(max_length=255)
+    account_number=models.CharField(max_length=255,default='', null=True, blank=True)
     payment_date=models.DateField(default=date.today)
     total_amount=models.IntegerField(null=True,blank=True)
     type=models.CharField(max_length=255,null=True)

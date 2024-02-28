@@ -66,7 +66,7 @@
                       </div>
                       <div class="col-md-6" id="cheque_details" style="display: none;">
                         <label for="cheque_number" style="color: white;">Cheque Number</label>
-                        <input type="text" class="form-control text-white bg-black mt-1" id="cheque_details" name="cheque_number" value="{{ repayment.cheque }}">
+                        <input type="text" class="form-control text-white bg-black mt-1" id="cheque_num" name="cheque_number" value="{{ repayment.cheque }}">
                     </div>
                     <div class="col-md-6" id="upi_details" style="display: none;">
                         <label for="upi_id" style="color: white;">UPI ID</label>
@@ -146,52 +146,67 @@
 </script> -->
 <script>
   $(document).ready(function() {
-      $('#payment_method').change(function() {
-          var selectedOption = $(this).val();
+      // Function to show the appropriate payment method details based on the selected option
+      function showPaymentMethodDetails(selectedOption) {
           if (selectedOption === 'Cheque') {
               $('#cheque_details').show();
               $('#upi_details').hide();
-              $('#acc_details').hide()
+              $('#acc_details').hide();
           } else if (selectedOption === 'UPI') {
               $('#cheque_details').hide();
               $('#upi_details').show();
-              $('#acc_details').hide()
-          } else if(selectedOption==='Cash'){
+              $('#acc_details').hide();
+          } else if (selectedOption === 'Cash') {
               $('#cheque_details').hide();
               $('#upi_details').hide();
-              $('#acc_details').hide()
+              $('#acc_details').hide();
           } else {
-            console.log('Bank selected');
-            $('#cheque_details').hide();
-            $('#upi_details').hide();
-            $('#acc_details').show()
-            console.log('selectedOption');
-            $.ajax({
-           url: "{% url 'full_account_number'  %}",
-           type: 'GET',
-           data:{
-           bank_id:selectedOption
-           },
-                                            
-          success: function(response) {
-          console.log('Success:', response);
-          data=response.bank
-          $('#acc_no').val(data);
-          },
-          error: function(xhr, status, error) {
-          console.error(error);
+              console.log('Bank selected');
+              $('#cheque_details').hide();
+              $('#upi_details').hide();
+              $('#acc_details').show();
+              $.ajax({
+              url: "{% url 'full_account_number'  %}",
+              type: 'GET',
+              data:{
+              bank_id:selectedOption
+                 },
+                        
+              success: function(response) {
+              console.log('Success:', response);
+              data=response.bank
+             $('#acc_no').val(data);
+               },
+              error: function(xhr, status, error) {
+              console.error(error);
+               }
+              });
           }
-          });
-          var selectedOption = $('#payment_method').val();
-      if (selectedOption === 'Cheque') {
-      $('#cheque_details').show();
-      } else if (selectedOption === 'UPI') {
-      $('#upi_details').show();
-      }else  {
-      $('#acc_details').show();
       }
-          }
-          });
-          });  
+      
+      // Event listener for the payment method dropdown change
+      $('#payment_method').change(function() {
+          var selectedOption = $(this).val();
+          showPaymentMethodDetails(selectedOption);
+      });
+      
+      // Show payment method details based on the selected option
+      var selectedOption = $('#payment_method').val();
+      showPaymentMethodDetails(selectedOption);
+      
+      // Check if UPI ID or Cheque Number fields have values and show respective payment method details
+      var upiIdValue = $('#upi_id').val();
+      var chequeNumberValue = $('#cheque_num').val();
+      var accountNumberValue = $('#acc_no').val();
+      if (upiIdValue) {
+          $('#upi_details').show();
+      }
+      if (chequeNumberValue) {
+          $('#cheque_details').show();
+      }
+      if (accountNumberValue) {
+          $('#acc_no').show();
+      }
+  });
 </script>
 {% endblock %}

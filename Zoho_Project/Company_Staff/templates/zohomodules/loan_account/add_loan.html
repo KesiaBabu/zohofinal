@@ -337,22 +337,22 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                    <form method="POST" action="{% url 'save_account_details' %}" >
+                                    <form method="POST" action="" id="modalaccount" >
                                         
                                     {% csrf_token %}                                           
                                         <div class="row">
                                             <div class="col-6">
                                                 <h4 class="text-light">Bank Account Holder Form</h4>
                                                 <h6 class="text-light mt-3"> Name</h6>
-                                                <input type="text" class="form-control text-dark bg-light" name="customer_name" >
+                                                <input type="text" class="form-control text-dark bg-light" name="customer_name" id="holder">
                                                 <h6 class="text-light mt-3"> Alias</h6>
-                                                <input type="text" class="form-control text-dark bg-light" name="alias"  >
+                                                <input type="text" class="form-control text-dark bg-light" name="alias" id="al" >
                                                 <h6 class="text-light mt-3"> Phone Number</h6>
-                                                <input type="number" class="form-control text-dark bg-light" name="phone_number"  >
+                                                <input type="number" class="form-control text-dark bg-light" name="phone_number" id="phone" >
                                                 <h6 class="text-light mt-3">Email</h6>
-                                                <input type="email" class="form-control text-dark bg-light" name="email" id="email" >
+                                                <input type="email" class="form-control text-dark bg-light" name="email" id="email_id" >
                                                 <h6 class="text-light mt-3">Account Type</h6>
-                                                <select class="form-control text-dark bg-light" name="account_type"  >
+                                                <select class="form-control text-dark bg-light" name="account_type" id="acc_type" >
                                                     <option value="" selected hidden>Select</option>
                                                     <option value="savings">Savings</option>
                                                     <option value="current">Current</option>
@@ -362,15 +362,15 @@
                                             <div class="col-6">
                                                 <h4 class="text-light">Bank Account Form</h4>
                                                 <h6 class="text-light mt-3">Bank Name</h6>
-                                                <input type="text" class="form-control text-dark bg-light" name="bankname"  >
+                                                <input type="text" class="form-control text-dark bg-light" name="bankname" id="bank_name" >
                                                 <h6 class="text-light mt-3">Account Number</h6>
-                                                <input type="number" class="form-control text-dark bg-light" name="account_number"  >
+                                                <input type="number" class="form-control text-dark bg-light" name="baccount_no" id="baccount_num" >
                                                 <h6 class="text-light mt-3">IFSC Code</h6>
-                                                <input type="text" class="form-control text-dark bg-light" name="ifsc_code"  >
+                                                <input type="text" class="form-control text-dark bg-light" name="ifsc_code" id="ifsc" >
                                                 <h6 class="text-light mt-3">Swift Code</h6>
-                                                <input type="text" class="form-control text-dark bg-light" name="swift_code"  >
+                                                <input type="text" class="form-control text-dark bg-light" name="swift_code"  id="swift">
                                                 <h6 class="text-light mt-3">Branch Name</h6>
-                                                <input type="text" class="form-control text-dark bg-light" name="branch_name"  >
+                                                <input type="text" class="form-control text-dark bg-light" name="branch_name" id="branchname"  >
                                             </div>
                                         </div>
                                        
@@ -380,14 +380,14 @@
                                         <div class="col-6">
                                             <h4 class="text-light">Bank Configuration Form</h4>
                                             <h6 class="text-light mt-3"> Select cheque book range</h6>
-                                            <select class="form-control text-dark bg-light" name="cheque_book_range"  >
+                                            <select class="form-control text-dark bg-light" name="cheque_book_range" id="cheque_book" >
                                                 <option value="" selected hidden>Select</option>
                                                 <option value="Yes" >Yes</option>
                                                 <option value="No">No</option>
                                                 
                                             </select>
                                             <h6 class="text-light mt-3"> Enable cheque printing</h6>
-                                            <select class="form-control text-dark bg-light" name="enable_cheque_printing"  >
+                                            <select class="form-control text-dark bg-light" name="enable_cheque_printing" id="cheque_printing" >
                                                 <option value="" selected hidden>Select</option>
                                                 <option value="Yes">Yes</option>
                                                 <option value="No">No</option>
@@ -395,7 +395,7 @@
                                             </select>
                                             <h6 class="text-light mt-3"> Set cheque printing configuration</h6>
                                             <!-- <input type="number" class="form-control text-dark bg-light" name="cheque_printing_configuration"  required> -->
-                                            <select class="form-control text-dark bg-light" name="enable_cheque_printing"  >
+                                            <select class="form-control text-dark bg-light" name="cheque_printing_configuration" id="confi_cheque_printing" >
                                                 <option value="" selected hidden>Select</option>
                                                 <option value="Yes">Yes</option>
                                                 <option value="No">No</option>
@@ -405,13 +405,13 @@
                                         <div class="col-6">
                                             <h4 class="text-light">Mailing Address Form</h4>
                                             <h6 class="text-light mt-3">Mailing Name</h6>
-                                            <input type="text" class="form-control text-dark bg-light" name="mailing_name" >
+                                            <input type="text" class="form-control text-dark bg-light" name="mailing_name" id="mailingname">
                                             <h6 class="text-light mt-3">Address</h6>
-                                            <input type="text" class="form-control text-dark bg-light" name="address"  >
+                                            <input type="text" class="form-control text-dark bg-light" name="address" id="m_address" >
                                             <h6 class="text-light mt-3">Country</h6>
-                                            <input type="text" class="form-control text-dark bg-light" name="country"  >
+                                            <input type="text" class="form-control text-dark bg-light" name="country" id="m_country" >
                                             <h6 class="text-light mt-3">State</h6>
-                                            <select  class="form-control text-dark bg-light"  name="state">
+                                            <select  class="form-control text-dark bg-light"  name="state" id="m_state">
                                                 <option value="" hidden>Select State</option>
                                                 <option value="[AN]-Andaman And Nicobar Islands">[AN]-Andaman And Nicobar Islands</option> <option value="[AD]-Andhra Pradesh">[AD]-Andhra Pradesh</option>
                                                 <option value="[AR]-Arunachal Pradesh">[AR]-Arunachal Pradesh	</option> <option value="volvo">[AS]-Assam</option>
@@ -432,73 +432,113 @@
                                                 <option value="[OT]-Other Territory">[OT]-Other Territory</option>
                                             </select>
                                             <h6 class="text-light mt-3">Pin</h6>
-                                            <input type="text" class="form-control text-dark bg-light" name="pin"  >
+                                            <input type="text" class="form-control text-dark bg-light" name="pin" id="m_pin" >
                                         </div>
                                     </div>
                                     <div class="row mt-2 mx-2 mb-2 pb-5">
                                         <div class="col-6">
                                             <h4 class="text-light">Tax Registration Form</h4>
                                             <h6 class="text-light mt-3"> PAN number</h6>
-                                            <input type="text" class="form-control text-dark bg-light" name="pan_number"  >
+                                            <input type="text" class="form-control text-dark bg-light" name="pan_number" id="pannumber" >
 
                                             <h6 class="text-light mt-3"> Registration type</h6>
-                                            <select class="form-control text-dark bg-light" name="registration_type"  >
+                                            <select class="form-control text-dark bg-light" name="registration_type" id="registrationtype" >
                                                 <option value="" selected hidden>Select</option>
                                                 <option value="Regular">Regular</option>
                                                 
                                             </select>
                                             <h6 class="text-light mt-3"> GST Number </h6>
-                                            <input type="text" class="form-control text-dark bg-light" name="gst_num" >
+                                            <input type="text" class="form-control text-dark bg-light" name="gst_num" id="gst_number">
                                             
                                         </div>
                                         <div class="col-6">
                                             <h4 class="text-light">Opening Balance Form</h4>
                                             <h6 class="text-light mt-3">Date</h6>
-                                            <input type="date" class="form-control text-dark bg-light" name="date"  >
+                                            <input type="date" class="form-control text-dark bg-light" name="date" id="l_date" >
                                             <h6 class="text-light mt-3">Amount</h6>
-                                            <input type="number" class="form-control text-dark bg-light" name="amount" >
+                                            <input type="number" class="form-control text-dark bg-light" name="amount" id="l_amount">
                                         </div>
                                     </div>
                                 
                                 
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-outline-warning" >Save</button>
+                                    <button type="submit" class="btn btn-outline-warning" id="submitFormBtn" data-dismiss="modal">Save</button>
                                 </div>
                             </form>
                             </div>
                         </div>
                     </div>
-                               
-                        <!-- <script>
-                        $(document).ready(function() {
-                            // Add an event listener for the form submission
-                            $('#accountForm').submit(function(event) {
-                                // Prevent the default form submission
-                                event.preventDefault();
+                    <script>
+                        $(document).on("click","#submitFormBtn",function() {
+                        $.ajax({
+                        url: "{% url 'save_account_details' %}",
+                        type: "POST",
                         
-                                // Serialize the form data
-                                var formData = $(this).serialize();
-                        
-                                // Perform an AJAX request to submit the form data
-                                $.ajax({
-                                    url: $(this).attr('{% url "save_account_details" %}'), // URL to which the form data will be submitted
-                                    type: $(this).attr('POST'), // HTTP method (e.g., POST)
-                                    data: formData, // Form data to be submitted
-                                    success: function(response) {
-                                        // Handle the success response
-                                        console.log('Form submitted successfully!');
-                                        // Optionally, perform any additional actions after successful form submission
-                                    },
-                                    error: function(xhr, status, error) {
-                                        // Handle errors that occur during form submission
-                                        console.error('Error occurred while submitting the form:', error);
-                                    }
-                                });
-                            });
-                        });</script> -->
-                        
-<!-- <script>
+                        data:{
+                                customer_name: $("#holder").val(),
+                                alias : $("#al").val(),
+                                lastname : $("#lname").val(),
+                                phone_number : $("#phone").val(),
+                                email : $('#email_id').val(),
+                                account_type : $("#acc_type").val(),
+                                bankname :$("#bank_name").val(),
+                                baccount_no :$("#baccount_num").val(),
+                                ifsc_code :$("#ifsc").val(),
+                                swift_code :$("#swift").val(),
+                                branch_name :$("#branchname").val(),
+                                cheque_book_range :$("#cheque_book").val(),
+                                enable_cheque_printing :$("#cheque_printing").val(),
+                                cheque_printing_configuration :$("#confi_cheque_printing").val(),
+                                mailing_name : $("#mailingname").val(),
+                                address :$("#m_address").val(),
+                                country : $("#m_country").val(),
+                                state : $("#m_state").val(),
+                                pin : $("#m_pin").val(),
+                                pan_number : $("#pannumber").val(),
+                                registration_type : $("#registrationtype").val(),
+                                gst_num : $("#gst_number").val(),
+                                date : $("#l_date").val(),
+                                amount : $("#l_amount").val(),
+                          
+                                csrfmiddlewaretoken: '{{ csrf_token }}'
+                                
+                              },
+                              success: function (response) {
+                            console.log("added")
+                             console.log(joindate)
+                            document.getElementById("modalaccount").reset();
+                              reloadVendor();
+        },
+    });
+});
+</script>
+<script>
+function reloadVendor() {
+
+    $.ajax({
+      url: "{% url 'holder_dropdown' %}",
+      type: "GET",
+      dataType: "json",
+      data: $(this).serialize(),
+      csrfmiddlewaretoken: '{{ csrf_token }}',
+  
+      success: function(data) { debugger
+        var dropdown = $('#account_name');
+        dropdown.empty();
+        dropdown.append($('<option></option>').text('Account Name'));
+        $.each(data, function(index, item) {
+                dropdown.append($('<option></option>').attr('value', item.id).text(item.customer_name));
+            });
+      },
+      error: function(xhr, status, error) {
+      console.error(xhr.responseText);
+      }
+    });
+  }
+</script>
+<!--                    
+ <script>
 $(document).on("click","#submitFormBtn",function() {
 $.ajax({
 url: "{% url 'save_account_details' %}",
