@@ -351,7 +351,7 @@
                         <a class="btn btn-outline-warning small_btn mt-2 mx-2 " href="" data-toggle="modal" id="com" data-target="#commentModal" data-toggle="tooltip" title="comment">
                           <i class="far fa-comment"></i>
                         </a>
-                        <a class="btn btn-outline-warning small_btn mt-2  " href="#" title="DELETE" id="delete_btn">
+                        <a class="btn btn-outline-warning small_btn mt-2  " href="{% url 'delete_loan' account_id=loan_info.bank_holder.id %}" title="DELETE" id="delete_btn">
                           <i class="fa fa-trash"></i>
                         </a>
                         <a class="btn btn-outline-warning small_btn mt-2  d-none" title="SHARE" id="share_btn"data-toggle="dropdown" >
@@ -395,11 +395,11 @@
                         <form id="date-filter-form" class="d-flex">
                             <div class="d-flex">
                                 <!-- <label class="text-white mr-2">From:</label> -->
-                                <input type="date" class="form-control form-control-sm text-white bg-black mr-2" id="start-date" name="start-date">
+                                <input type="date" class="form-control form-control-sm text-white bg-black mr-2" id="start-date" name="startdate">
                             </div>
                             <div class="d-flex ">
                                 <label class="text-white mr-2">To:</label>
-                                <input type="date" class="form-control form-control-sm text-white bg-black mr-2" id="end-date" name="end-date">
+                                <input type="date" class="form-control form-control-sm text-white bg-black mr-2" id="end-date" name="enddate">
                             </div>
                         </form>
                     </div>
@@ -1378,7 +1378,7 @@
                               <a class="dropdown-item btn text-black" href="{% if a.type == 'EMI paid' %}{% url 'edit_repayment' a.pk %}{% else %}{% url 'edit_additional_loan' a.pk %}{% endif %}">
                                   &nbsp; <i class="fa fa-pencil"></i> &nbsp;&nbsp; <span style="font-size: medium;">Edit</span>
                               </a>
-                              <a class="dropdown-item btn text-black" href="#">
+                              <a class="dropdown-item btn text-black" href="{% url 'delete_repayment' a.id %}">
                                 &nbsp; <i class="fas fa-trash-alt"></i> &nbsp;&nbsp; <span style="font-size: medium;">Delete</span>
                               </a>
                               <a class="dropdown-item btn text-black" href="" data-toggle="modal" data-target="#historyModal{{ a.id }}">
@@ -1767,97 +1767,157 @@
           });
           });  
 </script>
-<!-- <script>
-  function filterDate(element) {
-      if (element.value == 'Custom') {
-          document.getElementById('frdate').style.display = 'block';
-          document.getElementById('todate').style.display = 'block';
-      } else {
-          document.getElementById('frdate').style.display = 'none';
-          document.getElementById('todate').style.display = 'none';
+<script>
+  var table = document.getElementById("transactiontable");
+
+  var fromDate;
+  $('#start-date').on('change', function () {
+      fromDate = $(this).val();
+      $('#end-date').prop('min', function () {
+          return fromDate;
+      })
+      var startDate = new Date(document.getElementById("start-date").value);
+      var sDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+      // var endDate = new Date(document.getElementById("in2").value);
+      var rows = table.getElementsByTagName("tr");
+      //window.alert(startDate);
+      console.log('date1',startDate)
+      //window.alert("Printing rows");
+      for (var i = 1; i <= rows.length; i++) {
+          var row = rows[i];
+          var dateCell = row.cells[1];
+          console.log('date3', dateCell)
+          //window.alert(dateCell);
+          var rowDate = new Date(dateCell.textContent);
+          var rDate = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+          console.log('date2',rowDate)
+          //window.alert(rowDate);
+          if (rDate >= sDate) {
+              row.style.display = "";
+          } else {
+              row.style.display = "none";
+          }
       }
-    }
-  
+      var tdate = new Date(fromDate)
+      var options = { year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById("d1").innerHTML = tdate.toLocaleDateString(undefined, options);
+      
+  })
+  var toDate;
+  $('#end-date').on('change', function () {
+      toDate = $(this).val();
+      $('#start-date').prop('max', function () {
+          return toDate;
+      })
+      var startDate = new Date(document.getElementById("start-date").value);
+      var endDate = new Date(document.getElementById("end-date").value);
+
+      var sDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+      var eDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+      var rows = table.getElementsByTagName("tr");
+      for (var i = 1; i <= rows.length; i++) {
+          var row = rows[i];
+          var dateCell = row.cells[1];
+          var rowDate = new Date(dateCell.textContent);
+          var rDate = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+          //window.alert(i);
+          //window.alert(sDate);
+          //window.alert(rDate);
+          if (rDate <= eDate && rDate >= sDate) {
+          // if ((rowDate == startDate)) {
+          //   window.alert("inside first if");
+          // if (rowDate <= endDate){
+              row.style.display = "";
+              console.log("display");
+             // window.alert("display");
+          } else {
+              row.style.display = "none";
+              //window.alert("do not display");
+
+          }
+      }
+      var tdate = new Date(toDate)
+      var options = { year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById("d2").innerHTML = "  To  " + tdate.toLocaleDateString(undefined, options);
+  })
+
+
 </script>
-
 <script>
-  function filterTableByDate() {
-    const fromDate = new Date(document.getElementById('first-date').value);
-    const toDate = new Date(document.getElementById('last-date').value);
-    const tableRows = document.querySelectorAll('#statementtable tbody tr');
+  var table = document.getElementById("statementtable");
 
-    tableRows.forEach(row => {
-        const dateCell = new Date(row.cells[1].innerText);
-
-        // Extract date portions for comparison
-        const cellDate = new Date(dateCell.getFullYear(), dateCell.getMonth(), dateCell.getDate());
-        const fromDateTime = new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
-        const toDateTime = new Date(toDate.getFullYear(), toDate.getMonth(), toDate.getDate());
-
-        if ((!fromDate || cellDate >= fromDateTime) && (!toDate || cellDate <= toDateTime)) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    });
-}
-
-// Listen for changes in date inputs
-document.getElementById('first-date').addEventListener('change', filterTableByDate);
-document.getElementById('last-date').addEventListener('change', filterTableByDate);
-
-</script> -->
-<script>
-  $(document).ready(function() {
-      var table = $('#statementtable')[0]; // Assuming the table id is 'statementtable'
-      var fromDate;
-      $('#start-date').on('change', function () {
-          fromDate = new Date($(this).val());
-          console.log('Start date selected:', fromDate);
-          $('#end-date').prop('min', function () {
-              return fromDate.toISOString().split('T')[0];
-          });
-          filterTransactions();
-      });
-
-      var toDate;
-      $('#end-date').on('change', function () {
-          toDate = new Date($(this).val());
-          console.log('End date selected:', toDate);
-          $('#start-date').prop('max', function () {
-              return toDate.toISOString().split('T')[0];
-          });
-          filterTransactions();
-      });
-
-      function filterTransactions() {
-          var startDate = fromDate;
-          var endDate = toDate;
-          var rows = table.rows;
-
-          for (var i = 1; i < rows.length; i++) { // Start from index 1 to skip the header row
-              var row = rows[i];
-              var dateCell = row.cells[1]; // Assuming date is in the second column
-              var rowDate = new Date(dateCell.textContent);
-
-              if (rowDate <= endDate && rowDate >= startDate) {
-                  $(row).show();
-              } else {
-                  $(row).hide();
-              }
-          }
-
-          var options = { year: 'numeric', month: 'long', day: 'numeric' };
-
-          if (fromDate) {
-              $('#d1').text("From " + fromDate.toLocaleDateString(undefined, options)); // Show start date
-          }
-
-          if (toDate) {
-              $('#d2').text(" To " + toDate.toLocaleDateString(undefined, options)); // Show end date
+  var fromDate;
+  $('#start-date').on('change', function () {
+      fromDate = $(this).val();
+      $('#end-date').prop('min', function () {
+          return fromDate;
+      })
+      var startDate = new Date(document.getElementById("start-date").value);
+      var sDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+      // var endDate = new Date(document.getElementById("in2").value);
+      var rows = table.getElementsByTagName("tr");
+      //window.alert(startDate);
+      console.log('date1',startDate)
+      //window.alert("Printing rows");
+      for (var i = 1; i <= rows.length; i++) {
+          var row = rows[i];
+          var dateCell = row.cells[1];
+          console.log('date3', dateCell)
+          //window.alert(dateCell);
+          var rowDate = new Date(dateCell.textContent);
+          var rDate = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+          console.log('date2',rowDate)
+          //window.alert(rowDate);
+          if (rDate >= sDate) {
+              row.style.display = "";
+          } else {
+              row.style.display = "none";
           }
       }
-  });
+      var tdate = new Date(fromDate)
+      var options = { year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById("d1").innerHTML = tdate.toLocaleDateString(undefined, options);
+      
+  })
+  var toDate;
+  $('#end-date').on('change', function () {
+      toDate = $(this).val();
+      $('#start-date').prop('max', function () {
+          return toDate;
+      })
+      var startDate = new Date(document.getElementById("start-date").value);
+      var endDate = new Date(document.getElementById("end-date").value);
+
+      var sDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+      var eDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+      var rows = table.getElementsByTagName("tr");
+      for (var i = 1; i <= rows.length; i++) {
+          var row = rows[i];
+          var dateCell = row.cells[1];
+          var rowDate = new Date(dateCell.textContent);
+          var rDate = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+          //window.alert(i);
+          //window.alert(sDate);
+          //window.alert(rDate);
+          if (rDate <= eDate && rDate >= sDate) {
+          // if ((rowDate == startDate)) {
+          //   window.alert("inside first if");
+          // if (rowDate <= endDate){
+              row.style.display = "";
+              console.log("display");
+             // window.alert("display");
+          } else {
+              row.style.display = "none";
+              //window.alert("do not display");
+
+          }
+      }
+      var tdate = new Date(toDate)
+      var options = { year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById("d2").innerHTML = "  To  " + tdate.toLocaleDateString(undefined, options);
+  })
+
+
 </script>
 <script>
   function ExportToExcel() {
@@ -2499,7 +2559,7 @@ document.getElementById('last-date').addEventListener('change', filterTableByDat
 <script>
   function export_as_pdf() {
     const content = document.getElementById('Statement');
-    html2pdf().from(content).save('{{bnk.bnk_name }}.pdf');
+    html2pdf().from(content).save('statement.pdf');
   }
 </script>
 {% endblock %}

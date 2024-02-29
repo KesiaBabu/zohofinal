@@ -82,7 +82,7 @@ class loan_account(models.Model):
     payment_method=models.CharField(max_length=255)
     upi_id=models.CharField(max_length=255)
     cheque=models.CharField(max_length=255)
-    loan_rec_bank_acc=models.CharField(max_length=255)
+    payment_accountnumber=models.CharField(max_length=255)
     processing_method=models.CharField(max_length=255)
     processing_upi=models.CharField(max_length=255,null=True)
     processing_cheque=models.CharField(max_length=255,null=True)

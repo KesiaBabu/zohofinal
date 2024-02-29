@@ -1700,3 +1700,168 @@ console.log('date1',startDate)
                                   });
                                   });
                         </script> -->
+
+
+
+
+
+
+
+
+
+                        <!-- <script>
+function reloadholder() {
+    alert("reload")
+    $.ajax({
+      url: "{% url 'holder_dropdown' %}",
+      type: "GET",
+      dataType: "json",
+      data: $(this).serialize(),
+      csrfmiddlewaretoken: '{{ csrf_token }}',
+      
+      success: function(data) { debugger
+        alert("success");
+        var dropdown = $('#account_name');
+        dropdown.empty();
+        dropdown.append($('<option></option>').text('Account Name'));
+        $.each(data, function(index, item) {
+            alert(item.customer_name)
+                dropdown.append($('<option></option>').attr('value', item.id).text(item.customer_name));
+            });
+      },
+      error: function(xhr, status, error) {
+        alert("error");
+      console.error(xhr.responseText);
+      }
+    });
+  }
+</script> -->
+<!--                    
+ <script>
+$(document).on("click","#submitFormBtn",function() {
+$.ajax({
+url: "{% url 'save_account_details' %}",
+type: "POST",
+// data: $("#accountForm").serialize(),
+data:{
+        title : $("#title").val(),
+        firstname : $("#fname").val(),
+        lastname : $("#lname").val(),
+        company_name : $("#vcompany").val(),
+        display_name : $('#vdisplayname').text(),
+        email : $("#vemail").val(),
+        website :$("#wsite").val(),
+        work_mobile :$("#vw_mobile").val(),
+        pers_mobile :$("#vp_mobile").val(),
+        skype :$("#vskype").val(),
+        desg :$("#v_desg").val(),
+        dpt :$("#v_dpt").val(),
+        gsttype :$("#v_gsttype").val(),
+        gstin :$("#v_gstin").val(),
+        panno : $("#v_pan").val(),
+        sourceofsupply :$("#v_srcsupply").val(),
+        currency : $("#v_curn").val(),
+        openingbalance : $("#v_open").val(),
+        paymentterms : $("#v_terms").val(),
+        street : $("#vstreet").val(),
+        city : $("#vcity").val(),
+        state : $("#vstate").val(),
+        pincode : $("#vpincode").val(),
+        fax : $("#vfax").val(),
+        phone : $("#vphone").val(),
+        country : $("#vcountry").val(),
+        shipstreet : $("#vsstreet").val(),
+        shipcity : $("#vscity").val(),
+        shipstate : $("#vsstate").val(),
+        shippincode : $("#vspincode").val(),
+        shipcountry : $("#vscountry").val(),
+        shipfax : $("#vsfax").val(),
+        shipphone : $("#vsphone").val(),
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+        
+      },
+    
+success: function(response) {
+document.getElementById("accountForm").reset();
+reloadVendor();
+},
+});
+});                        
+function reloadholder() {
+$.ajax({
+  url: "",
+  type: "GET",
+  dataType: "json",
+  data: $(this).serialize(),
+  csrfmiddlewaretoken: '{{ csrf_token }}',
+
+  success: function(data) { debugger
+    var dropdown = $('#holder');
+    dropdown.empty();
+    dropdown.append($('<option></option>').text('Account Name'));
+    $.each(data, function(key, value) {
+      dropdown.append($('<option></option>').attr('value', key).text(value[1] + ' ' + value[2]).val(value[3]+' '+ value[1] + ' ' + value[2]));
+    });
+  },
+  error: function(xhr, status, error) {
+  console.error(xhr.responseText);
+  }
+});
+}
+</script> -->
+<!-- <script>
+    $(document).on("click","#submitFormBtn",function() {
+        $.ajax({
+            url: "{% url 'save_account_details' %}",
+            type: "POST",
+            data: $("#accountForm").serialize(),
+            headers: { "X-CSRFToken": "{{ csrf_token }}" }, // Serialize the form data
+            success: function(response) {
+                document.getElementById("accountForm").reset(); // Reset the form after successful submission
+                reloadVendor(); // Call the reloadVendor function if needed
+            },
+        });
+    });                        
+    
+    function reloadholder() {
+        $.ajax({
+            url: "", // Provide the appropriate URL for retrieving data
+            type: "GET",
+            dataType: "json",
+            data: $(this).serialize(),
+            headers: { "X-CSRFToken": "{{ csrf_token }}" }, // Serialize the data if needed
+            success: function(data) {
+                var dropdown = $('#holder');
+                dropdown.empty();
+                dropdown.append($('<option></option>').text('Account Name'));
+                $.each(data, function(key, value) {
+                    // Modify the key and value to match your data structure
+                    dropdown.append($('<option></option>').attr('value', key).text(value[1] + ' ' + value[2]).val(value[3]+' '+ value[1] + ' ' + value[2]));
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+            }
+        });
+    }
+    </script> -->
+
+<!-- <script>
+    $(document).ready(function(){
+        $('select[name="account_name"]').change(function(){
+            var selectedAccountId = $(this).val();           
+            $.ajax({
+                url: '{% url "add_loan" %}', 
+                type: 'POST',
+                data: {account_id: selectedAccountId},
+                success: function(data) {
+                    
+                    $('input[name="account_number"]').val(data.account_number);
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+</script> -->

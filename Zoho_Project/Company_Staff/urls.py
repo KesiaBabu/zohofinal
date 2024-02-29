@@ -53,6 +53,8 @@ urlpatterns = [
     path('zohomodules/loan_account/delete_comment/<int:comment_id>/<int:account_id>',views.delete_comment,name='delete_comment'),
     path('zohomodules/loan_account/get_account_number/<int:account_id>', views.get_account_number, name='get_account_number'),
     path('zohomodules/loan_account/full_account_number', views.full_account_number, name='full_account_number'),
+    path('zohomodules/loan_account/delete_repayment/<int:id>',views.delete_repayment,name='delete_repayment'),
+    path('zohomodules/loan_account/delete_loan/<int:account_id>',views.delete_loan,name='delete_loan'),
 
 
   

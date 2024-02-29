@@ -60,7 +60,7 @@
                           <option value="UPI" {% if repayment.payment_method == 'UPI' %} selected {% endif %}>UPI</option>
                           <option value="Cheque" {% if repayment.payment_method == 'Cheque' %} selected {% endif %}>Cheque</option>
                           {% for bank in banks %}
-                          <option value="{{ bank.bnk_name }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                          <option value="{{ bank.bnk_name }}" {% if repayment.payment_method == bank.bnk_name %} selected {% endif %}>{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
                           {% endfor %}
                         </select>
                       </div>
@@ -205,7 +205,7 @@
           $('#cheque_details').show();
       }
       if (accountNumberValue) {
-          $('#acc_no').show();
+          $('#acc_details').show();
       }
   });
 </script>

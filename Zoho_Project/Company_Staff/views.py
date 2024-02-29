@@ -604,7 +604,7 @@ def add_loan(request):
                 # account_name = request.POST.get('customer_name')
                 # customer_name = BankAccount.objects.get(id=account_name)
                 account_name = request.POST.get('account_name')
-                account_number = request.POST.get('account_number')
+                # account_number = request.POST.get('account_number')
                 loan_amount = request.POST.get('loan_amount')
                 lender_bank = request.POST.get('lender_bank')
                 loan_date = request.POST.get('loan_date')
@@ -614,15 +614,11 @@ def add_loan(request):
                 processing_fee = request.POST.get('processing_fee', 0)
                 description = request.POST.get('description')
                 
-                # try:
-                #     bank_account = BankAccount.objects.get(id=account_name)
-                #     account_number = bank_account.account_number
-                # except BankAccount.DoesNotExist:
-                #     account_number = ""
+               
 
                 loan = loan_account(
                     bank_holder_id=account_name,
-                    account_number=account_number,
+                    # account_number=account_number,
                     loan_amount=loan_amount,
                     lender_bank=lender_bank,
                     loan_date=loan_date,
@@ -633,6 +629,7 @@ def add_loan(request):
                     description=description
                 )
                 loan.save()
+                
                 history=LoanAccountHistory.objects.create(
                     login_details=log_details,
                     company=dash_details,
@@ -648,7 +645,9 @@ def add_loan(request):
                     'bank_holder': BankAccount.objects.all(),
                     'loan_details': loan_account.objects.all(),
                     'banks':banks,
-                    'today_date':today_date
+                    'today_date':today_date,
+                    'selected_account_name': account_name,
+                    'loan': loan,
                 }
 
                 
@@ -677,11 +676,14 @@ def save_account_details(request):
             if user_type == 'Company':
                 # Fetch company details
                 dash_details = CompanyDetails.objects.get(login_details=log_details, superadmin_approval=1, Distributor_approval=1)
+                company=dash_details
                 allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+                
             else:
                 # Fetch staff details
                 dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
-                allmodules = None
+                company=dash_details
+                allmodules = ZohoModules.objects.get(company=dash_details.company, status='New')
             if request.method == 'POST':
                print('inside post')
                customer_name = request.POST.get('customer_name')
@@ -736,7 +738,8 @@ def save_account_details(request):
             # alter_gst_details=alter_gst_details,
                date=date,
             #    amount_type=amount_type,
-               amount=amount
+               amount=amount,
+               company=company
             
             )
                print('created')
@@ -764,10 +767,39 @@ def save_account_details(request):
 #         options[option.id] = [option.salutation, option.first_name, option.last_name, option.id]
 #     return JsonResponse(options)
     
+# def holder_dropdown(request):
+#     print('holderfunction')
+#     data = BankAccount.objects.values('id', 'customer_name')
+#     return JsonResponse(list(data), safe=False)
 def holder_dropdown(request):
-    print('holderfunction')
-    data = BankAccount.objects.values('id', 'customer_name')
-    return JsonResponse(list(data), safe=False)
+    print("start fuction")
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        if 'login_id' not in request.session:
+            return redirect('/')
+        
+        log_details = LoginDetails.objects.get(id=log_id)
+        user_type = log_details.user_type
+
+        if user_type in ['Company', 'Staff']:
+            if user_type == 'Company':
+                
+                dash_details = CompanyDetails.objects.get(login_details=log_details, superadmin_approval=1, Distributor_approval=1)
+                allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+                company=dash_details
+            else:
+                
+                dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
+                company=dash_details.company
+                allmodules =ZohoModules.objects.get(company=dash_details.company, status='New')
+                
+            print("inside holder")
+            options = {}
+            option_objects = BankAccount.objects.filter(company=company)
+            for option in option_objects:
+                options[option.id] = [option.customer_name, option.id]
+                print(option.customer_name)
+            return JsonResponse(options)
 
 # def employeeloan_create(request):
 #     if 'login_id' in request.session:
@@ -881,6 +913,7 @@ def overview(request,account_id):
                     'repayment_history':repayment_history,
                     'comment':comment,
                     'banks':banks,
+                    
                     'account_id':account_id
                     
                     
@@ -892,7 +925,8 @@ from django.http import JsonResponse
 
 def update_status(request, account_id):
     try:
-        loan = loan_account.objects.get(pk=account_id)     
+        bank_account = get_object_or_404(BankAccount, id=account_id)
+        loan = loan_account.objects.get(bank_holder=bank_account)     
         if loan.status == 'Active':
             loan.status = 'Inactive'
         else:
@@ -1080,12 +1114,13 @@ def edit_loanaccount(request, account_id):
             banks = Banking.objects.values('bnk_name','bnk_acno').distinct()
             bank_holder=BankAccount.objects.all()
 
-            loan = loan_account.objects.get(pk=account_id)
+            bank_account = get_object_or_404(BankAccount, id=account_id)
+            loan = loan_account.objects.get(bank_holder=bank_account)
 
 
             return render(request, 'zohomodules/loan_account/edit_loan.html', {'account': loan, 'details':dash_details,'bank_holder':bank_holder, 'user_type': user_type, 'allmodules': allmodules,'banks':banks})
 
-    return redirect('/')
+    
 
 def edit_loan(request, account_id):
     if 'login_id' in request.session:
@@ -1104,19 +1139,25 @@ def edit_loan(request, account_id):
                 dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
                 allmodules = None
 
-            loan = loan_account.objects.get(pk=account_id)
+            bank_account = get_object_or_404(BankAccount, id=account_id)
+            loan = loan_account.objects.get(bank_holder=bank_account)
             banks = Banking.objects.values('bnk_name','bnk_acno').distinct()
 
             if request.method == 'POST':
                 
                 loan.bank_holder.customer_name = request.POST.get('account_name')
-                loan.account_number = request.POST.get('account_number')
                 loan.loan_amount = request.POST.get('loan_amount')
                 loan.lender_bank = request.POST.get('lender_bank')
                 loan.loan_date = request.POST.get('loan_date')
                 loan.payment_method = request.POST.get('payment_method')
+                loan.upi_id = request.POST.get('upi_id')
+                loan.cheque = request.POST.get('cheque_number')
+                loan.payment_accountnumber = request.POST.get('account_number')
                 loan.term = request.POST.get('terms')
                 loan.processing_method = request.POST.get('processing_method')
+                loan.processing_upi = request.POST.get('p_upi_id')
+                loan.processing_cheque = request.POST.get('p_cheque_number')
+                loan.processing_acc = request.POST.get('p_account_number')
                 loan.interest = request.POST.get('interest')
                 loan.processing_fee = request.POST.get('processing_fee')
                 loan.description = request.POST.get('description')
@@ -1135,9 +1176,9 @@ def edit_loan(request, account_id):
                
                 return redirect('overview', account_id=account_id)  
 
-            return render(request, 'zohomodules/loan_account/edit_loanaccount.html', {'loan': loan, 'details': dash_details, 'user_type': user_type, 'allmodules': allmodules,'history':history,'banks':banks})
+        return render(request, 'zohomodules/loan_account/edit_loan.html', {'loan': loan, 'details': dash_details, 'allmodules': allmodules,'history':history,'banks':banks,'account_id':account_id})
 
-    return redirect('/')
+
 
 def calculate_overall_balance(account_id):
     account = get_object_or_404(BankAccount, id=account_id)
@@ -1279,7 +1320,8 @@ def share_email(request, account_id):
         if request.method == 'POST':
             emails_string = request.POST['email']
             emails_list = [email.strip() for email in emails_string.split(',')]
-            loan_info = loan_account.objects.get(pk=account_id)
+            bank_account = get_object_or_404(BankAccount, id=account_id)
+            loan_info = loan_account.objects.get(bank_holder=bank_account)
 
             repayment_details = LoanRepayemnt.objects.filter(loan=loan_info)
             current_balance = loan_info.loan_amount  
@@ -1339,7 +1381,8 @@ def add_comment(request, account_id):
                 dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
                 allmodules = None
 
-            loan_info = loan_account.objects.get(pk=account_id)
+            bank_account = get_object_or_404(BankAccount, id=account_id)
+            loan_info = loan_account.objects.get(bank_holder=bank_account)
             if request.method == 'POST':
 
                 comment = request.POST.get('comments')
@@ -1371,9 +1414,7 @@ def delete_comment(request, comment_id,account_id):
                 allmodules = ZohoModules.objects.get(company=dash_details, status='New')
             else:
                 dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
-                allmodules = None
-           
-            
+                allmodules = None   
               
             comment = get_object_or_404(Comments, id=comment_id)
             comment.delete()
@@ -1382,6 +1423,66 @@ def delete_comment(request, comment_id,account_id):
 
             return redirect('overview',account_id=account_id)
         return render(request, 'zohomodules/loan_account/overview.html',context) 
+    
+
+def delete_repayment(request, id):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        if 'login_id' not in request.session:
+            return redirect('/')
+        
+        login_details = LoginDetails.objects.get(id=log_id)
+        user_type = login_details.user_type
+
+        if user_type in ['Company', 'Staff']:
+            if user_type == 'Company':
+                dash_details = CompanyDetails.objects.get(login_details=login_details, superadmin_approval=1, Distributor_approval=1)
+                allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+            else:
+                dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
+                allmodules = ZohoModules.objects.get(company=dash_details.company, status='New')
+
+            repayment = get_object_or_404(LoanRepayemnt, id=id)
+            repayment.delete()
+            account_id = repayment.loan.bank_holder_id
+            context={'details': dash_details,  'allmodules': allmodules}
+
+            return redirect('overview',account_id=account_id)
+        return render(request, 'zohomodules/loan_account/overview.html',context)
+    
+def delete_loan(request,account_id):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        if 'login_id' not in request.session:
+            return redirect('/')
+        
+        login_details = LoginDetails.objects.get(id=log_id)
+        user_type = login_details.user_type
+
+        if user_type in ['Company', 'Staff']:
+            if user_type == 'Company':
+                dash_details = CompanyDetails.objects.get(login_details=login_details, superadmin_approval=1, Distributor_approval=1)
+                allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+            else:
+                dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
+                allmodules = ZohoModules.objects.get(company=dash_details.company, status='New')
+
+            bank_account = get_object_or_404(BankAccount, id=account_id)
+            loan_info = loan_account.objects.get(bank_holder=bank_account)
+            transactions = LoanRepayemnt.objects.filter(loan=loan_info)
+           
+            context={'details': dash_details,  'allmodules': allmodules,'loanaccount': loan_info}
+            if transactions.exists():
+                 messages.error(request, 'This account can be deleted as it has done some transactions !!')
+                 return redirect('overview', account_id=account_id)
+            else:
+                loan_info.delete()
+                return redirect('loan_listing')
+        return render(request, 'zohomodules/loan_account/overview.html',context)
+            
+
+        
+
                 
 
 
