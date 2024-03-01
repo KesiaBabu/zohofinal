@@ -239,7 +239,7 @@
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>
         <li class="breadcrumb-item"><a class="text-warning-emphasis">Cash & Bank</a></li>
-        <li class="breadcrumb-item"><a href="#" class="text-warning-emphasis">Loan Account</a></li>
+        <li class="breadcrumb-item"><a  class="text-warning-emphasis">Loan Account</a></li>
         <li class="breadcrumb-item" aria-current="page" id="over">Overview</li>
         <li class="breadcrumb-item" aria-current="page" id="tran" style="display: none;">Transaction</li>
         <li class="breadcrumb-item" aria-current="page" id="state" style="display: none;">Statement</li>
@@ -387,10 +387,10 @@
                   
                   
                   <div class="row mt-5">
-                    
+        
                     <div class="d-sm-flex" style="width: 30%;">
                       <input class="form-control text-black bg-light mt-4 d-none" type="text" id="search_tra" placeholder="Search..." style="margin-right: 10%;">
-                        </div>
+                    </div>
                     <div class="col-md-12 d-flex justify-content-end d-none" id="date-filter" >
                         <form id="date-filter-form" class="d-flex">
                             <div class="d-flex">
@@ -403,10 +403,24 @@
                             </div>
                         </form>
                     </div>
+                    <div class="col-md-12 d-flex justify-content-end d-none" id="date-fil" >
+                      <form id="date-filter-form" class="d-flex">
+                          <div class="d-flex">
+                              <!-- <label class="text-white mr-2">From:</label> -->
+                              <input type="date" class="form-control form-control-sm text-white bg-black mr-2" id="st-date" name="start_date">
+                          </div>
+                          <div class="d-flex ">
+                              <label class="text-white mr-2">To:</label>
+                              <input type="date" class="form-control form-control-sm text-white bg-black mr-2" id="en-date" name="end_date">
+                          </div>
+                      </form>
+                  </div>
+
                 </div><br>
+                
 
                   <!-- Send Mail  -->
-                  <div class="modal fade" id="snd_mail">
+                  <!-- <div class="modal fade" id="snd_mail">
                     <div class="modal-dialog modal-lg">
                       <div class="modal-content" style="background:black; border: 1px solid #ffae1f;">
                         <div class="modal-body">
@@ -443,10 +457,10 @@
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
 
                   <!-- Add Document  -->
-                  <div class="modal fade" id="bnk_files">
+                  <!-- <div class="modal fade" id="bnk_files">
                     <div class="modal-dialog modal-lg">
                       <div class="modal-content" style="background:black; border: 1px solid #ffae1f;">
                         <div class="modal-body">
@@ -485,9 +499,9 @@
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
     
-                  <!-- Bank to Cash -->
+                  <!-- repayment_due -->
                   <div class="modal fade" id="emi_repayment">
                     <div class="modal-dialog modal-lg">
                       <div class="modal-content" style="background:black; border: 1px solid #ffae1f;">
@@ -527,8 +541,7 @@
                               <div class="col-md-6">
                                 <label for="origin" style="color: white;">Paid From</label>
                                 <select class="form-control text-white bg-black form-select mt-1" id="payment_method" name="payment_method" >
-                                  <option value="" hidden>-- Select --</option>
-                                  
+                                  <option value="" selected hidden>-- Select --</option>
                                   <option value="Cash">Cash</option>
                                   <option value="UPI">UPI</option>
                                   <option value="Cheque">Cheque</option>
@@ -571,7 +584,7 @@
                     </div>
                   </div>
     
-                  <!-- Cash to Bank -->
+                  <!-- new_loan -->
                   <div class="modal fade" id="additional_loan">
                     <div class="modal-dialog modal-lg">
                       <div class="modal-content" style="background:black; border: 1px solid #ffae1f;">
@@ -674,7 +687,7 @@
                   </div>  
     
                   <!-- Bank to Bank -->
-                  <div class="modal fade" id="bank_to_bank">
+                  <!-- <div class="modal fade" id="bank_to_bank">
                     <div class="modal-dialog modal-lg">
                       <div class="modal-content" style="background:black; border: 1px solid #ffae1f;">
                         <div class="modal-body">
@@ -742,10 +755,10 @@
                         </div>
                       </div>
                     </div>
-                  </div>  
+                  </div>   -->
     
                   <!-- Adjust Balance -->
-                  <div class="modal fade" id="adjbank">
+                  <!-- <div class="modal fade" id="adjbank">
                     <div class="modal-dialog modal-lg">
                       <div class="modal-content" style="background:black; border: 1px solid #ffae1f;">
                         <div class="modal-body">
@@ -814,10 +827,10 @@
                         </div>
                       </div>
                     </div>
-                  </div>  
+                  </div>   -->
     
                   <!-- Bank to Cash Edit -->
-                  <div class="modal fade" id="edit_emi">
+                  <!-- <div class="modal fade" id="edit_emi">
                     <div class="modal-dialog modal-lg">
                       <div class="modal-content" style="background:black; border: 1px solid #ffae1f;">
                         <div class="modal-body">
@@ -885,10 +898,10 @@
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
     
                   <!-- Cash to Bank Edit -->
-                  <div class="modal fade" id="edit_cash_to_bank">
+                  <!-- <div class="modal fade" id="edit_cash_to_bank">
                     <div class="modal-dialog modal-lg">
                       <div class="modal-content" style="background:black; border: 1px solid #ffae1f;">
                         <div class="modal-body">
@@ -953,10 +966,10 @@
                         </div>
                       </div>
                     </div>
-                  </div>  
+                  </div>   -->
     
                   <!-- Bank to Bank Edit -->
-                  <div class="modal fade" id="edit_bank_to_bank">
+                  <!-- <div class="modal fade" id="edit_bank_to_bank">
                     <div class="modal-dialog modal-lg">
                       <div class="modal-content" style="background:black; border: 1px solid #ffae1f;">
                         <div class="modal-body">
@@ -1026,10 +1039,10 @@
                         </div>
                       </div>
                     </div>
-                  </div>  
+                  </div>   -->
     
                   <!-- Adjust Balance Edit -->
-                  <div class="modal fade" id="edit_adjbank">
+                  <!-- <div class="modal fade" id="edit_adjbank">
                     <div class="modal-dialog modal-lg">
                       <div class="modal-content" style="background:black; border: 1px solid #ffae1f;">
                         <div class="modal-body">
@@ -1098,7 +1111,7 @@
                       </div>
                     </div>
                   </div>  
-                </div>
+                </div> -->
 
                 <div id="Overview" style="background-color: #aba9a9;">
                   <div class="row">
@@ -1168,7 +1181,7 @@
                             <span class="bnk-colon text-black">:</span>
                         </div>
                         <div class="col-md-5 text-right">
-                            <span class="bank-value text-black">{{ loan_info.loan_rec_bank_acc }}</span>
+                            <span class="bank-value text-black">{{ loan_info.bank_holder.bankname }}</span>
                         </div>
                       </div>
                       <div class="bank-row d-md-flex mt-5">
@@ -1190,7 +1203,7 @@
                             <span class="bnk-colon text-black">:</span>
                         </div>
                         <div class="col-md-5 text-right">
-                            <span class="bank-value text-black">{{ loan_info.terms }}</span>
+                            <span class="bank-value text-black">{{ loan_info.term }}</span>
                         </div>
                       </div>
                     </div>
@@ -1200,17 +1213,7 @@
                         <br>
                         <h3 class="text-white" style="text-align: center;">Account Holder</h3>
                         <hr class="text-white" style="margin-left: 5%; margin-right: 5%">
-                        <div class="bank-row d-md-flex mt-4">
-                          <div class="col-md-5">
-                              <span class="bank-label text-white">Name</span>
-                          </div>
-                          <div class="col-md-2 text-center">
-                              <span class="bnk-colon text-white">:</span>
-                          </div>
-                          <div class="col-md-5 text-right">
-                              <span class="bank-value text-white">{{account.customer_name}}</span>
-                          </div>
-                        </div>
+                       
                         <div class="bank-row d-md-flex mt-4">
                           <div class="col-md-5">
                               <span class="bank-label text-white">Account Number</span>
@@ -1310,8 +1313,7 @@
                             <option value="" class="hidden-option">Make Payment</option>
                             <option value="Repayment Due">Repayment Due</option>
                             <option value="Issue New Loan">Issue New Loan</option>
-                            <!-- <option value="Bank To Bank Transfer">Bank To Bank Transfer</option>
-                            <option value="Adjust Bank Balance">Adjust Bank Balance</option> -->
+                            
                           </select>
                         </div>
                       </div>
@@ -1348,10 +1350,10 @@
                               <i class="fas fa-ellipsis-v text-warning"></i>
                             </a>
                             <div class="dropdown-menu">
-                              <a class="dropdown-item btn text-black" href="#">
+                              <a class="dropdown-item btn text-black" href="{% url 'edit_loanaccount' account.id %}">
                                 &nbsp; <i class="fa fa-pencil"></i> &nbsp;&nbsp; <span style="font-size: medium;">Edit</span>
                               </a>
-                              <a class="dropdown-item btn text-black" href="#">
+                              <a class="dropdown-item btn text-black" data-toggle="modal" id="his" data-target="#commentModal2" data-toggle="tooltip">
                                 &nbsp; <i class="fas fa-history"></i> &nbsp;&nbsp; <span style="font-size: medium;">History</span>
                               </a>
                             </div>
@@ -1514,9 +1516,9 @@
         <table class="table text-light  " style="margin:3px; background-color: #000000;">
           <thead>
             <tr>
-              <th>
+              <!-- <th>
                 sl
-              </th>
+              </th> -->
               <th>
                 Date
               </th>
@@ -1531,7 +1533,7 @@
           <tbody>
             {% for i in history %}
             <tr class="table-row">
-              <td>{{forloop.counter}}</td>
+              <!-- <td>{{forloop.counter}}</td> -->
               <td>{{i.date}}</td>
               <td>{{i.action}}</td>
               <td>{{i.login_details.first_name}} {{i.login_details.Last_name}}</td>
@@ -1589,9 +1591,9 @@
                 <table class="table text-light  " style="margin:3px; background-color: #000000;">
                   <thead>
                     <tr>
-                      <th>
+                      <!-- <th>
                         sl
-                      </th>
+                      </th> -->
                       <th>
                         Date
                       </th>
@@ -1608,7 +1610,7 @@
                     {% for h in repayment_history %}
                     {%if  h.repayment.id == a.id %}
                     <tr class="table-row">
-                      <td>{{forloop.counter}}</td>
+                      <!-- <td>{{forloop.counter}}</td> -->
                       <td>{{h.date}}</td>
                       <td>{{h.action}}</td>
                       <td>{{h.login_details.first_name}} {{h.login_details.Last_name}}</td>
@@ -1768,22 +1770,24 @@
           });  
 </script>
 <script>
-  var table = document.getElementById("transactiontable");
 
+  var transacTable = document.getElementById("transactiontable");
+  
   var fromDate;
-  $('#start-date').on('change', function () {
+  $('#st-date').on('change', function () {
       fromDate = $(this).val();
-      $('#end-date').prop('min', function () {
+      $('#en-date').prop('min', function () {
           return fromDate;
       })
-      var startDate = new Date(document.getElementById("start-date").value);
+      var startDate = new Date(document.getElementById("st-date").value);
       var sDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
       // var endDate = new Date(document.getElementById("in2").value);
-      var rows = table.getElementsByTagName("tr");
+      var rows = transacTable.getElementsByTagName("tr");
       //window.alert(startDate);
       console.log('date1',startDate)
       //window.alert("Printing rows");
       for (var i = 1; i <= rows.length; i++) {
+        //window.alert("script start tra")
           var row = rows[i];
           var dateCell = row.cells[1];
           console.log('date3', dateCell)
@@ -1804,18 +1808,19 @@
       
   })
   var toDate;
-  $('#end-date').on('change', function () {
+  $('#en-date').on('change', function () {
       toDate = $(this).val();
-      $('#start-date').prop('max', function () {
+      $('#st-date').prop('max', function () {
           return toDate;
       })
-      var startDate = new Date(document.getElementById("start-date").value);
-      var endDate = new Date(document.getElementById("end-date").value);
+      var startDate = new Date(document.getElementById("st-date").value);
+      var endDate = new Date(document.getElementById("en-date").value);
 
       var sDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
       var eDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
-      var rows = table.getElementsByTagName("tr");
+      var rows = transacTable.getElementsByTagName("tr");
       for (var i = 1; i <= rows.length; i++) {
+        //window.alert("script end tra")
           var row = rows[i];
           var dateCell = row.cells[1];
           var rowDate = new Date(dateCell.textContent);
@@ -1825,14 +1830,14 @@
           //window.alert(rDate);
           if (rDate <= eDate && rDate >= sDate) {
           // if ((rowDate == startDate)) {
-          //   window.alert("inside first if");
+          //window.alert("inside first if");
           // if (rowDate <= endDate){
               row.style.display = "";
               console.log("display");
-             // window.alert("display");
+             //window.alert("transaction display");
           } else {
               row.style.display = "none";
-              //window.alert("do not display");
+             // window.alert("transa do not display");
 
           }
       }
@@ -1845,7 +1850,7 @@
 </script>
 <script>
   var table = document.getElementById("statementtable");
-
+  //window.alert("script start stat")
   var fromDate;
   $('#start-date').on('change', function () {
       fromDate = $(this).val();
@@ -1905,10 +1910,10 @@
           // if (rowDate <= endDate){
               row.style.display = "";
               console.log("display");
-             // window.alert("display");
+              //window.alert("stat display");
           } else {
               row.style.display = "none";
-              //window.alert("do not display");
+              //window.alert("stat do not display");
 
           }
       }
@@ -1941,7 +1946,7 @@
     window.open(whatsappLink, '_blank');
   }
 </script> 
-<script>
+<!-- <script>
   $(document).ready(function() {
       $('#status_btn').click(function(e) {
           e.preventDefault();
@@ -1969,7 +1974,7 @@
           });
       });
   });
-  </script>
+  </script> -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
         var principalInput = document.getElementById('principalamount');
@@ -2114,7 +2119,7 @@
   })
 </script>
 
-<script>
+<!-- <script>
   $('#corigin').change(function(){
     $('#cdest').empty();
     $('#cdest').append($('<option selected hidden></option>').text('-- Select a Bank --').val(''));
@@ -2141,9 +2146,9 @@
       }
     });
   })
-</script>
+</script> -->
 
-<script>
+<!-- <script>
   function edit_trans_details(id) {
     $.ajax({
       type: "POST", 
@@ -2201,9 +2206,9 @@
       },
     });
   }
-</script>
+</script> -->
 
-<script>
+<!-- <script>
   $("#btcpaysave").click(function () {
     $('#edit_emi').modal('hide');
     $.ajax({
@@ -2293,7 +2298,7 @@
       },
     });
   });
-</script>
+</script> -->
 
 <script>
   document.querySelector('#edit_emi .close').addEventListener('click', function() {
@@ -2353,7 +2358,7 @@
 </script>
 
 <!-- Bank to Bank -->
-<script>
+<!-- <script>
   document.getElementById('selectOption').addEventListener('change', function() {
     var selectedValue = this.value;
     if (selectedValue === 'Bank To Bank Transfer') {
@@ -2367,10 +2372,10 @@
     $('#bank_to_bank').modal('hide');
     window.location.href = '?Transaction=True';
   });
-</script>
+</script> -->
 
 <!-- Adjust Balance -->
-<script>
+<!-- <script>
   document.getElementById('selectOption').addEventListener('change', function() {
     var selectedValue = this.value;
     if (selectedValue === 'Adjust Bank Balance') {
@@ -2384,7 +2389,7 @@
     $('#adjbank').modal('hide');
     window.location.href = '?Transaction=True';
   });
-</script>
+</script> -->
 
 <script>
   jQuery(document).ready(function($){
@@ -2456,8 +2461,10 @@
       document.getElementById('delete_btn').classList.add('d-block');
       document.getElementById('share_btn').classList.remove('d-block');
       document.getElementById('share_btn').classList.add('d-none');
-      document.getElementById('date-filter').classList.remove('d-none');
+      document.getElementById('date-filter').classList.remove('d-block');
       document.getElementById('date-filter').classList.add('d-none');
+      document.getElementById('date-fil').classList.remove('d-block');
+      document.getElementById('date-fil').classList.add('d-none');
       document.getElementById('exp').classList.remove('d-block');
       document.getElementById('exp').classList.add('d-none');
       document.getElementById('search_tra').classList.remove('d-block');
@@ -2497,7 +2504,10 @@
       document.getElementById('delete_btn').classList.add('d-none');
       document.getElementById('share_btn').classList.remove('d-block');
       document.getElementById('share_btn').classList.add('d-none');
-      document.getElementById('date-filter').classList.remove('d-none');
+      document.getElementById('date-filter').classList.remove('d-block');
+      document.getElementById('date-filter').classList.add('d-none');
+      document.getElementById('date-fil').classList.remove('d-none');
+      document.getElementById('date-fil').classList.add('d-block');
       document.getElementById('exp').classList.add('d-block');
       document.getElementById('exp').classList.remove('d-none');
       document.getElementById('search_tra').classList.add('d-block');
@@ -2538,6 +2548,9 @@
       document.getElementById('share_btn').classList.remove('d-none');
       document.getElementById('share_btn').classList.add('d-block');
       document.getElementById('date-filter').classList.remove('d-none');
+      document.getElementById('date-filter').classList.add('d-block');
+      document.getElementById('date-fil').classList.remove('d-block');
+      document.getElementById('date-fil').classList.add('d-none');
       document.getElementById('exp').classList.remove('d-block');
       document.getElementById('exp').classList.add('d-none');
       document.getElementById('search_tra').classList.add('d-none');

@@ -9,9 +9,10 @@
   <div class="container-fluid">
       <nav aria-label="breadcrumb">
           <ol class="breadcrumb">
-            {% if log_id.user_type == 'Staff' %} <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
-            {% if log_id.user_type == 'Company' %} <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
-             <li class="breadcrumb-item"><a href="{% url 'loan_listing' %}" class="text-warning-emphasis">Loan Account</a></li>
+            {% if log_details.user_type == 'Staff' %} <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
+            {% if log_details.user_type == 'Company' %} <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
+            <li class="breadcrumb-item"><a class="text-warning-emphasis">Cash & Bank</a></li>
+            <li class="breadcrumb-item"><a  class="text-warning-emphasis">Loan Account</a></li>
              <li class="breadcrumb-item" aria-current="page">Loan Listing</li>
           </ol>
       </nav>
@@ -93,7 +94,7 @@
             </table>
           </div>
         </div>
-        <div class="row" hidden>
+        <!-- <div class="row" hidden>
           <table id="employeemodeltable">
             <thead>
               <th>TTITLE</th>
@@ -175,12 +176,12 @@
             </tbody>
           </table>
         </div>
-      </div>
+      </div> -->
 </div>
       </div>
       </div>
 
-      <div class="modal fade" id="importmodal" style="margin-top: 7vh;">
+      <!-- <div class="modal fade" id="importmodal" style="margin-top: 7vh;">
         <div class="modal-dialog ">
           <div class="modal-content" style="background: rgb(32, 35, 37);border-radius: 20px;">
             <div class="modal-header">
@@ -213,7 +214,7 @@
     
 </div>
   </div>
-  </div>
+  </div> -->
 
 <!-- <script>
   function sortTableName() {
@@ -365,7 +366,7 @@
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-<script>
+<!-- <script>
   function uploadFile() {
     const form = document.getElementById('excelForm');
     const formData = new FormData(form);
@@ -395,7 +396,7 @@
             })
         });
   }
-</script>
+</script> -->
 
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
     integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"

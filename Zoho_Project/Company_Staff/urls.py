@@ -40,7 +40,7 @@ urlpatterns = [
     path('zohomodules/loan_account/holder_dropdown',views.holder_dropdown,name='holder_dropdown'),
     path('zohomodules/loan_account/save_account_details',views.save_account_details,name='save_account_details'),
     path('zohomodules/loan_account/overview/<int:account_id>',views.overview,name='overview'),
-    path('zohomodules/loan_account/transaction/<int:account_id>',views.transaction,name='transaction'),
+    # path('zohomodules/loan_account/transaction/<int:account_id>',views.transaction,name='transaction'),
     path('zohomodules/loan_account/repayment_due_form/<int:account_id>',views.repayment_due_form,name='repayment_due_form'),
     path('zohomodules/loan_account/new_loan/<int:account_id>',views.new_loan,name='new_loan'),
     path('zohomodules/loan_account/update_status/<int:account_id>',views.update_status,name='update_status'),
@@ -55,6 +55,7 @@ urlpatterns = [
     path('zohomodules/loan_account/full_account_number', views.full_account_number, name='full_account_number'),
     path('zohomodules/loan_account/delete_repayment/<int:id>',views.delete_repayment,name='delete_repayment'),
     path('zohomodules/loan_account/delete_loan/<int:account_id>',views.delete_loan,name='delete_loan'),
+   
 
 
   

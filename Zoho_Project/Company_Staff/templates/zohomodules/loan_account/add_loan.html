@@ -12,12 +12,12 @@
     <div class="container-fluid">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                {% if log_id.user_type == 'Staff' %} <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}"
+                {% if log_details.user_type == 'Staff' %} <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}"
                         class="text-warning-emphasis">Dashboard</a></li>{% endif %}
-                {% if log_id.user_type == 'Company' %} <li class="breadcrumb-item"><a
+                {% if log_details.user_type == 'Company' %} <li class="breadcrumb-item"><a
                         href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
-                <li class="breadcrumb-item"><a href="{% url 'loan_listing' %}" class="text-warning-emphasis">Loan
-                        Account</a></li>
+                        <li class="breadcrumb-item"><a class="text-warning-emphasis">Cash & Bank</a></li>
+                        <li class="breadcrumb-item"><a  class="text-warning-emphasis">Loan Account</a></li>
                 <li class="breadcrumb-item" aria-current="page">Add Loan</li>
         </nav>
         <div class="row mt-5">
@@ -110,8 +110,7 @@
                                                         <option value="UPI">UPI</option>
                                                         <option value="Cheque">Cheque</option>
                                                         {% for bank in banks %}
-                                                        <option value="{{ bank.bnk_name }}">{{ bank.bnk_name }}-( {{
-                                                            bank.bnk_acno|slice:'-4:' }})</option>
+                                                        <option value="{{ bank.bnk_name }}">{{ bank.bnk_name }}-( {{bank.bnk_acno|slice:'-4:' }})</option>
                                                         {% endfor %}
                                                     </select>
                                                 </div>
@@ -140,7 +139,7 @@
                                                 </div>
                                                 <div class="input-container col-6">
                                                     <input type="text" class="form-control text-dark bg-light"
-                                                        name="account_number" id="accountnum">
+                                                        name="laccount_number" id="accountnum">
                                                 </div>
                                             </div>
 
@@ -151,7 +150,7 @@
                                                 </div>
                                                 <div class="input-container col-6">
                                                     <input type="text" class="form-control text-dark bg-light"
-                                                        name="terms" value="0">
+                                                        name="terms" >
                                                 </div>
                                             </div>
 
@@ -168,8 +167,7 @@
                                                         <option value="UPI">UPI</option>
                                                         <option value="Cheque">Cheque</option>
                                                         {% for bank in banks %}
-                                                        <option value="{{ bank.bnk_name }}">{{ bank.bnk_name }}-( {{
-                                                            bank.bnk_acno|slice:'-4:' }})</option>
+                                                        <option value="{{ bank.bnk_name }}">{{ bank.bnk_name }}-( {{bank.bnk_acno|slice:'-4:' }})</option>
                                                         {% endfor %}
                                                     </select>
                                                 </div>
@@ -180,7 +178,7 @@
                                                 </div>
                                                 <div class="input-container col-6">
                                                     <input type="text" class="form-control text-dark bg-light"
-                                                        name="cheque_number" id="cheque">
+                                                        name="pcheque_number" id="cheque">
                                                 </div>
                                             </div>
                                             <div class="row pb-3" id="upi_p" style="display: none;">
@@ -189,7 +187,7 @@
                                                 </div>
                                                 <div class="input-container col-6">
                                                     <input type="text" class="form-control text-dark bg-light"
-                                                        name="upi_id" id="upi">
+                                                        name="pupi_id" id="upi">
                                                 </div>
                                             </div>
                                             <div class="row pb-3" id="account_number_p" style="display: none;">
@@ -198,7 +196,7 @@
                                                 </div>
                                                 <div class="input-container col-6">
                                                     <input type="text" class="form-control text-dark bg-light"
-                                                        name="account_number" id="account_number">
+                                                        name="paccount_number" id="account_number">
                                                 </div>
                                             </div>
 
@@ -230,7 +228,10 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        </div>
+                                       
                                         <button type="submit" class="btn btn-outline-warning mt-2">Save</button>
+                                    </form>
                                     </div>
                             </div>
 
@@ -389,22 +390,29 @@
                                                     <select class="form-control text-dark bg-light" name="account_type"
                                                         id="acc_type">
                                                         <option value="" selected hidden>Select</option>
-                                                        <option value="savings">Savings</option>
-                                                        <option value="current">Current</option>
+                                                        <option value="Bank Account">Bank Account</option>
+                                                        
 
                                                     </select>
                                                 </div>
                                                 <div class="col-6">
                                                     <h4 class="text-light">Bank Account Form</h4>
                                                     <h6 class="text-light mt-3">Bank Name</h6>
-                                                    <input type="text" class="form-control text-dark bg-light"
-                                                        name="bankname" id="bank_name">
+                                                    <select class="form-control text-dark bg-light" name="bankname"
+                                                    id="bank_name"> 
+                                                    <option value="" selected hidden>Select</option>              
+                                                        {% for bank in banks %}
+                                                        <option value="{{ bank.bnk_name}} " data-account="{{ bank.bnk_acno }}"  data-ifsc="{{ bank.bnk_ifsc }}">{{ bank.bnk_name }}-( {{bank.bnk_acno|slice:'-4:' }})</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <!-- <input type="text" class="form-control text-dark bg-light"
+                                                        name="bankname" id="bank_name"> -->
                                                     <h6 class="text-light mt-3">Account Number</h6>
                                                     <input type="number" class="form-control text-dark bg-light"
                                                         name="baccount_no" id="baccount_num">
                                                     <h6 class="text-light mt-3">IFSC Code</h6>
                                                     <input type="text" class="form-control text-dark bg-light"
-                                                        name="ifsc_code" id="ifsc">
+                                                        name="ifsc_code" id="bifsc">
                                                     <h6 class="text-light mt-3">Swift Code</h6>
                                                     <input type="text" class="form-control text-dark bg-light"
                                                         name="swift_code" id="swift">
@@ -516,11 +524,22 @@
                                                 id="registrationtype">
                                                 <option value="" selected hidden>Select</option>
                                                 <option value="Regular">Regular</option>
+                                                <option value="Composition">Composition</option>
+                                                <option value="Consumer">Consumer</option>
+                                                <option value="Unregister">Unregister</option>
 
                                             </select>
                                             <h6 class="text-light mt-3"> GST Number </h6>
                                             <input type="text" class="form-control text-dark bg-light" name="gst_num"
                                                 id="gst_number">
+
+                                            <h6 class="text-light mt-3"> Set Alter GST Details </h6>
+                                            <select class="form-control text-dark bg-light"
+                                                name="gst_alter_details" id="gst_alter">
+                                                <option value="" selected hidden>Select</option>
+                                                <option value="Yes">Yes</option>
+                                                <option value="No">No</option>
+                                            </select>
 
                                         </div>
                                         <div class="col-6">
@@ -563,10 +582,10 @@
                                         alert("success");
                                         var dropdown = $('#account_name');
                                         dropdown.empty();
-                                        dropdown.append($('<option></option>').text('Account Name'));
-                                        $.each(data, function (index, item) {
+                                        //dropdown.append($('<option></option>').text('Account Name'));
+                                        $.each(data, function (key, value) {
                                             alert(item.customer_name)
-                                            dropdown.append($('<option></option>').attr('value', item.id).text(item.customer_name));
+                                            dropdown.append($('<option></option>').attr('value', key).text(value));
                                         });
                                     },
                                     error: function (xhr, status, error) {
@@ -590,7 +609,7 @@
                                         account_type: $("#acc_type").val(),
                                         bankname: $("#bank_name").val(),
                                         baccount_no: $("#baccount_num").val(),
-                                        ifsc_code: $("#ifsc").val(),
+                                        ifsc_code: $("#bifsc").val(),
                                         swift_code: $("#swift").val(),
                                         branch_name: $("#branchname").val(),
                                         cheque_book_range: $("#cheque_book").val(),
@@ -604,6 +623,7 @@
                                         pan_number: $("#pannumber").val(),
                                         registration_type: $("#registrationtype").val(),
                                         gst_num: $("#gst_number").val(),
+                                        gst_alter_details: $("#gst_alter").val(),
                                         date: $("#l_date").val(),
                                         amount: $("#l_amount").val(),
 
@@ -623,4 +643,23 @@
                                 });
                             });
                         </script>
-                        {% endblock %}
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const bankNameSelect = document.getElementById('bank_name');
+                                const accountNumberInput = document.getElementById('baccount_num');
+                                const ifscCodeInput = document.getElementById('bifsc');
+                            
+                                bankNameSelect.addEventListener('change', function() {
+                                    const selectedOption = bankNameSelect.options[bankNameSelect.selectedIndex];
+                                    const accountNumber = selectedOption.getAttribute('data-account');
+                                    window.alert(accountNumber)
+                                    const ifscCode = selectedOption.getAttribute('data-ifsc'); 
+                                    window.alert(ifscCode)
+
+                                    accountNumberInput.value = accountNumber;
+                                    ifscCodeInput.value = ifscCode;
+                                });
+                            });
+                            </script>
+                        
+{% endblock %}

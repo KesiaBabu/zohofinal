@@ -9,10 +9,11 @@
     <div class="container-fluid">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                {% if log_id.user_type == 'Staff' %} <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
-                {% if log_id.user_type == 'Company' %} <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
-                 <li class="breadcrumb-item"><a href="#" class="text-warning-emphasis">Payroll_list</a></li>
-                 <li class="breadcrumb-item" aria-current="page">CREATE employee</li>
+                {% if login_details.user_type == 'Staff' %} <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
+                {% if login_details.user_type == 'Company' %} <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
+                <li class="breadcrumb-item"><a class="text-warning-emphasis">Cash & Bank</a></li>
+                <li class="breadcrumb-item"><a  class="text-warning-emphasis">Loan Account</a></li>
+                 <li class="breadcrumb-item" aria-current="page">Edit Repayment Due</li>
         </nav>
         <div class="row mt-5">
             <div class="col-md-12">
@@ -55,7 +56,8 @@
                       </div>
                       <div class="col-md-6">
                         <label for="origin" style="color: white;">Paid From</label>
-                        <select class="form-control text-white bg-black form-select mt-1" id="payment_method" name="payment_method" >
+                        <select class="form-control text-white bg-black form-select mt-1" id="rpayment_method" name="payment_method" >
+                          <option value="" selected hidden>Select</option>
                           <option value="Cash" {% if repayment.payment_method == 'Cash' %} selected {% endif %}>Cash</option>
                           <option value="UPI" {% if repayment.payment_method == 'UPI' %} selected {% endif %}>UPI</option>
                           <option value="Cheque" {% if repayment.payment_method == 'Cheque' %} selected {% endif %}>Cheque</option>
@@ -121,29 +123,7 @@
         calculateTotal(); // Call initially
     });
 </script>
-<!-- <script>
-  $(document).ready(function() {
-      $('#payment_method').change(function() {
-          var selectedOption = $(this).val();
-          if (selectedOption === 'Cheque') {
-              $('#cheque_details').show();
-              $('#upi_details').hide();
-          } else if (selectedOption === 'UPI') {
-              $('#cheque_details').hide();
-              $('#upi_details').show();
-          } else {
-              $('#cheque_details').hide();
-              $('#upi_details').hide();
-          }
-      });
-      var selectedOption = $('#payment_method').val();
-      if (selectedOption === 'Cheque') {
-      $('#cheque_details').show();
-      } else if (selectedOption === 'UPI') {
-      $('#upi_details').show();
-      }
-  });
-</script> -->
+
 <script>
   $(document).ready(function() {
       // Function to show the appropriate payment method details based on the selected option
@@ -184,21 +164,21 @@
           }
       }
       
-      // Event listener for the payment method dropdown change
-      $('#payment_method').change(function() {
+    
+      $('#rpayment_method').change(function() {
           var selectedOption = $(this).val();
           showPaymentMethodDetails(selectedOption);
       });
       
-      // Show payment method details based on the selected option
-      var selectedOption = $('#payment_method').val();
+     
+      var selectedOption = $('#rpayment_method').val();
       showPaymentMethodDetails(selectedOption);
-      
-      // Check if UPI ID or Cheque Number fields have values and show respective payment method details
+
       var upiIdValue = $('#upi_id').val();
       var chequeNumberValue = $('#cheque_num').val();
       var accountNumberValue = $('#acc_no').val();
       if (upiIdValue) {
+          
           $('#upi_details').show();
       }
       if (chequeNumberValue) {

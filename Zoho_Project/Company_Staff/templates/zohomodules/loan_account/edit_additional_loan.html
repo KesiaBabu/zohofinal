@@ -10,10 +10,11 @@
     <div class="container-fluid">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                {% if log_id.user_type == 'Staff' %} <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
-                {% if log_id.user_type == 'Company' %} <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
-                 <li class="breadcrumb-item"><a href="#" class="text-warning-emphasis">Payroll_list</a></li>
-                 <li class="breadcrumb-item" aria-current="page">CREATE employee</li>
+                {% if login_details.user_type == 'Staff' %} <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
+                {% if login_details.user_type == 'Company' %} <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
+                <li class="breadcrumb-item"><a class="text-warning-emphasis">Cash & Bank</a></li>
+                        <li class="breadcrumb-item"><a  class="text-warning-emphasis">Loan Account</a></li>
+                 <li class="breadcrumb-item" aria-current="page">Edit Additional Loan</li>
         </nav>
         <div class="row mt-5">
             <div class="col-md-12">
@@ -70,7 +71,7 @@
                           <option value="UPI" {% if repayment.payment_method == 'UPI' %} selected {% endif %}>UPI</option>
                           <option value="Cheque" {% if repayment.payment_method == 'Cheque' %} selected {% endif %}>Cheque</option>
                           {% for bank in banks %}
-                          <option value="{{ bank.bnk_name }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                          <option value="{{ bank.bnk_name }}" {% if repayment.payment_method == bank.bnk_name %} selected {% endif %}>{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
                           {% endfor %}
                         </select>
                       </div>
@@ -195,7 +196,7 @@
                               $('#chequedetails').show();
                           }
                           if (accountNumberValue) {
-                              $('#acc_num').show();
+                              $('#accdetails').show();
                           }
                       });
                   </script>
