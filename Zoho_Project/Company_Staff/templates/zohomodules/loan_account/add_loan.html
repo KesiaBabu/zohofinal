@@ -51,6 +51,7 @@
                                                         id="account_name">
                                                         <option value="" selected hidden>Select</option>
                                                         {% for acc in bank_holder %}
+                                                        <!-- <option value="" selected hidden>Select</option> -->
                                                         <option value="{{ acc.id }}">{{ acc.customer_name }}</option>
                                                         {% endfor %}
 
@@ -231,6 +232,7 @@
                                         </div>
                                        
                                         <button type="submit" class="btn btn-outline-warning mt-2">Save</button>
+                                        <button type="reset" class="btn btn-outline-warning mt-2">Reset</button>
                                     </form>
                                     </div>
                             </div>
@@ -376,7 +378,7 @@
                                                     <h4 class="text-light">Bank Account Holder Form</h4>
                                                     <h6 class="text-light mt-3"> Name</h6>
                                                     <input type="text" class="form-control text-dark bg-light"
-                                                        name="customer_name" id="holder">
+                                                        name="customer_name" id="customer_name">
                                                     <h6 class="text-light mt-3"> Alias</h6>
                                                     <input type="text" class="form-control text-dark bg-light"
                                                         name="alias" id="al">
@@ -564,36 +566,8 @@
                                 </div>
                             </div>
                         </div>
-                        <script>
-                            function reloadholder() {
-                                alert("reload")
-                                $.ajax({
-                                    url: "{% url 'holder_dropdown' %}",
-                                    type: "GET",
-                                    dataType: "json",
-                                    data: $(this).serialize(),
-                                    //csrfmiddlewaretoken: '{{ csrf_token }}',
-                                    beforeSend: function (xhr, settings) {
-                                        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-                                    },
-
-                                    success: function (data) {
-                                        debugger
-                                        alert("success");
-                                        var dropdown = $('#account_name');
-                                        dropdown.empty();
-                                        //dropdown.append($('<option></option>').text('Account Name'));
-                                        $.each(data, function (key, value) {
-                                            alert(item.customer_name)
-                                            dropdown.append($('<option></option>').attr('value', key).text(value));
-                                        });
-                                    },
-                                    error: function (xhr, status, error) {
-                                        alert("error");
-                                        console.error(xhr.responseText);
-                                    }
-                                });
-                            }
+                        <!-- <script>
+                            
 
                             $(document).on("click", "#submitFormBtn", function () {
                                 $.ajax({
@@ -642,6 +616,87 @@
                                     }
                                 });
                             });
+                            function reloadholder() {
+                                alert("reload")
+                                $.ajax({
+                                    url: "{% url 'holder_dropdown' %}",
+                                    type: "GET",
+                                    dataType: "json",
+                                    //data: $(this).serialize(),
+                                    //csrfmiddlewaretoken: '{{ csrf_token }}',
+                                    //beforeSend: function (xhr, settings) {
+                                       // xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                                    //},
+
+                                    success: function (data) {
+                                        //debugger
+                                        alert("success");
+                                        var dropdown = $('#account_name');
+                                        dropdown.empty();
+                                        //dropdown.append($('<option></option>').text('Account Name'));
+                                        $.each(data, function (key, value) {
+                                            //alert(item.customer_name)
+                                            dropdown.append($('<option></option>').attr('value', key).text(value));
+                                        });
+                                    },
+                                    error: function (xhr, status, error) {
+                                        alert("error");
+                                        console.error(xhr.responseText);
+                                    }
+                                });
+                            }
+                        </script> -->
+                        <script>
+                            
+
+                            $(document).on("click", "#submitFormBtn", function() {
+							var formData = new FormData(document.getElementById('modalaccount'));
+                                $.ajax({
+                                    url: "{% url 'save_account_details' %}",
+                                    type: "POST",
+
+                                    data:formData ,
+									processData: false,
+                                    contentType: false,
+                                    headers: {
+                                    "X-CSRFToken": "{{ csrf_token }}"
+                                     },
+                                    success: function(response) {
+                                        
+                                        document.getElementById("modalaccount").reset();
+                                        reloadholder();
+                                       
+                                    },
+                                    error: function(xhr, status, error) {
+                                        //alert('Error adding employee: ' + error);
+                                        console.error("Error occurred:", error);
+                                    }
+                                });
+                            });
+                            function reloadholder() {
+                                
+                                $.ajax({
+                                    url: "{% url 'holder_dropdown' %}",
+                                    type: "GET",
+                                    dataType: "json",
+                                    
+                                
+                                    success: function(data) {
+                                      
+                                        var dropdown = $('#account_name');
+                                        dropdown.empty();
+                                        dropdown.append($('<option></option>').text('Select'));
+                                        $.each(data, function(key, value) {
+                                           
+                                            dropdown.append($('<option></option>').attr('value', key).text(value));
+                                        });
+                                    },
+                                    error: function(xhr, status, error) {
+                                       // alert("error");
+                                        console.error(xhr.responseText);
+                                    }
+                                });
+                            }
                         </script>
                         <script>
                             document.addEventListener('DOMContentLoaded', function() {
@@ -652,9 +707,9 @@
                                 bankNameSelect.addEventListener('change', function() {
                                     const selectedOption = bankNameSelect.options[bankNameSelect.selectedIndex];
                                     const accountNumber = selectedOption.getAttribute('data-account');
-                                    window.alert(accountNumber)
+                                    //window.alert(accountNumber)
                                     const ifscCode = selectedOption.getAttribute('data-ifsc'); 
-                                    window.alert(ifscCode)
+                                   // window.alert(ifscCode)
 
                                     accountNumberInput.value = accountNumber;
                                     ifscCodeInput.value = ifscCode;

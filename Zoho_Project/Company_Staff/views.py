@@ -738,57 +738,70 @@ def save_account_details(request):
                date = request.POST.get('date')
                #amount_type = request.POST.get('amount_type')
                amount = request.POST.get('amount')
-
-        
-               bank=BankAccount(
-               customer_name=customer_name,
-               alias=alias,
-               phone_number=phone_number,
-               email=email,
-               account_type=account_type,
-               bankname=bankname,
-               account_number=account_number,
-               ifsc_code=ifsc_code,
-               swift_code=swift_code,
-               branch_name=branch_name,
-               cheque_book_range=cheque_book_range,
-               enable_cheque_printing=enable_cheque_printing,
-               cheque_printing_configuration=cheque_printing_configuration,
-               mailing_name=mailing_name,
-               address=address,
-               country=country,
-               state=state,
-               pin=pin,
-               pan_number=pan_number,
-               registration_type=registration_type,
-               gst_num=gst_num,
-               #alter_gst_details=alter_gst_details,
-               date=date,
-            #    amount_type=amount_type,
-               amount=amount,
-               company=company,
-               login_details=log_details,
+            try:
+                bank=BankAccount(
+                customer_name=customer_name,
+                alias=alias,
+                phone_number=phone_number,
+                email=email,
+                account_type=account_type,
+                bankname=bankname,
+                account_number=account_number,
+                ifsc_code=ifsc_code,
+                swift_code=swift_code,
+                branch_name=branch_name,
+                cheque_book_range=cheque_book_range,
+                enable_cheque_printing=enable_cheque_printing,
+                cheque_printing_configuration=cheque_printing_configuration,
+                mailing_name=mailing_name,
+                address=address,
+                country=country,
+                state=state,
+                pin=pin,
+                pan_number=pan_number,
+                registration_type=registration_type,
+                gst_num=gst_num,
+                #alter_gst_details=alter_gst_details,
+                date=date,
+                #    amount_type=amount_type,
+                amount=amount,
+                company=company,
+                login_details=log_details,
+                    
+                    )
+                bank.save()
+                    
+                BankAccountHistory
+                bank_history=BankAccountHistory.objects.create(
+                            logindetails=log_details,
+                            company=dash_details,
+                            bank_holder=bank,
+                            date=now().date(),
+                            action='Created'
+                        )
+                bank_history.save()
+                new_account_id = bank.id  
+                new_account_name = customer_name
+                data = {
+                        'status': 'success',
+                        'account_id': new_account_id,
+                        'customer_name': new_account_name
+                    }
+                    
+                print(data)
+                print('created')
+                return JsonResponse(data)
+            except Exception as e:
+                error_message = str(e)
+                return JsonResponse({'status': 'error', 'message': error_message})
+            #    context = {
+            #         'details': dash_details,
+            #         'allmodules': allmodules,}
                
-            )
-               bank.save()
-               print('created')
-               BankAccountHistory
-               bank_history=BankAccountHistory.objects.create(
-                    logindetails=log_details,
-                    company=dash_details,
-                    bank_holder=bank,
-                    date=now().date(),
-                    action='Created'
-                )
-               bank_history.save()
-               context = {
-                    'details': dash_details,
-                    'allmodules': allmodules,}
-               
 
-            return redirect('add_loan')
-    else:
-        return render(request,'zohomodules/loan_account/add_loan.html',context)
+            # return redirect('add_loan')
+    # else:
+    #     return render(request,'zohomodules/loan_account/add_loan.html')
     
     
 
@@ -896,13 +909,97 @@ def overview(request,account_id):
                     'comment':comment,
                     'banks':banks,
                     
-                    'account_id':account_id
+                    'account_id':account_id,
+                    'loanpage':'0'
                     
                     
                      }          
     
             return render(request,'zohomodules/loan_account/overview.html',context)
         
+
+def transactoverview(request,account_id):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        if 'login_id' not in request.session:
+            return redirect('/')
+        
+        log_details = LoginDetails.objects.get(id=log_id)
+        user_type = log_details.user_type
+
+        if user_type in ['Company', 'Staff']:
+            if user_type == 'Company':
+                dash_details = CompanyDetails.objects.get(login_details=log_details, superadmin_approval=1, Distributor_approval=1)
+                company=dash_details
+                allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+                
+            else: 
+                dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
+                company=dash_details.company
+                allmodules = ZohoModules.objects.get(company=dash_details.company, status='New')
+            
+            today=date.today()
+            today_date = today.strftime("%Y-%m-%d")
+
+            # loan_info = get_object_or_404(loan_account, id=account_id, company=company)
+            # account = loan_info.bank_holder
+            account = get_object_or_404(BankAccount, id=account_id,company=company)
+            loan_info = loan_account.objects.filter(bank_holder=account,company=company).first()
+            repayment_details = LoanRepayemnt.objects.filter(loan=loan_info,company=company)
+            repayment_history = LoanRepaymentHistory.objects.filter(repayment__in=repayment_details,company=company)
+            # repayment_history = LoanRepaymentHistory.objects.filter(repayment='3')
+            
+            banks = Banking.objects.values('bnk_name','bnk_acno').filter(company=company).distinct()
+
+            current_balance = loan_info.loan_amount  
+            balances = [] 
+            loan_side = loan_account.objects.filter(company=company) 
+            for loan in loan_side:
+                total_emis_paid = LoanRepayemnt.objects.filter(company=company,loan=loan, type='EMI paid').aggregate(total=Sum('principal_amount'))['total'] or 0
+                total_additional_loan = LoanRepayemnt.objects.filter(company=company,loan=loan, type='Additional Loan').aggregate(total=Sum('principal_amount'))['total'] or 0
+                loan.balance = loan.loan_amount - total_emis_paid + total_additional_loan 
+
+            for repayment in repayment_details:
+                if repayment.type == 'EMI paid':
+                    current_balance -= repayment.principal_amount
+                elif repayment.type == 'Additional Loan':
+                    current_balance += repayment.principal_amount     
+                balances.append(current_balance)
+
+            overall_balance = current_balance
+            repayment_details_with_balances = zip(repayment_details, balances)
+            total_amount= loan_info.loan_amount + loan_info.interest
+
+
+            history=LoanAccountHistory.objects.filter(loan=loan_info,company=company)
+            comment=Comments.objects.filter(loan=loan_info,company=company)
+
+            context = {
+                    'details': dash_details,
+                    'allmodules': allmodules,
+                    'log_id':log_details,
+                    'account':account,
+                    'loan_info':loan_info,
+                    'repayment_details': repayment_details,
+                    'repayment_details_with_balances': repayment_details_with_balances,
+                    'overall_balance': overall_balance, 
+                    'total_amount':total_amount,
+                    'history':history,
+                    'loan_side':loan_side,
+                    'today_date':today_date,
+                    'repayment_history':repayment_history,
+                    'comment':comment,
+                    'banks':banks,
+                    
+                    'account_id':account_id,
+                    'loanpage':'1'
+                    
+                    
+                     }          
+    
+            return render(request,'zohomodules/loan_account/overview.html',context)
+        
+
 from django.http import JsonResponse
 
 def update_status(request, account_id):
@@ -937,7 +1034,7 @@ def update_status(request, account_id):
          return render(request, 'zohomodules/loan_account/overview.html', {'message': 'Loan account does not exist'})
 
 
-
+from django.urls import reverse
 def repayment_due_form(request, account_id):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
@@ -998,8 +1095,9 @@ def repayment_due_form(request, account_id):
                     action='Created'
                 )
                 repayment_history.save()
-                
-                return redirect('overview', account_id=account_id)
+                # url = reverse('overview', kwargs={'account_id': account_id}) + '?Transaction=True'
+                # return redirect(url)
+                return redirect('transactoverview', account_id=account_id)
             else:
                 today_date = dt.today()
                 
@@ -1068,7 +1166,7 @@ def new_loan(request,account_id):
                 )
                 repayment_history.save()
                 
-                return redirect('overview', account_id=account_id)    
+                return redirect('transactoverview', account_id=account_id)    
 
             context={
                 'allmodules':allmodules,
@@ -1113,7 +1211,7 @@ def edit_loanaccount(request, account_id):
 
     
 
-def edit_loan(request, account_id):
+def edit_loantable(request, account_id):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         if 'login_id' not in request.session:
@@ -1258,7 +1356,7 @@ def edit_repayment(request, repayment_id):
         
                 repayment.save()
                 
-                return redirect('overview' ,account_id=account_id)
+                return redirect('transactoverview' ,account_id=account_id)
             else:
                 repayment_history=LoanRepaymentHistory.objects.create(
                     login_details=login_details,
@@ -1319,7 +1417,7 @@ def edit_additional_loan(request, repayment_id):
         
                 repayment.save()
                 
-                return redirect('overview',account_id=account_id)
+                return redirect('transactoverview',account_id=account_id)
             else:
                 hist=LoanRepaymentHistory.objects.create(
                     login_details=login_details,
@@ -1382,7 +1480,7 @@ def share_email(request, account_id):
         return redirect('overview', account_id)
     
 
-def add_comment(request, account_id):
+def adding_comment(request, account_id):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         if 'login_id' not in request.session:
@@ -1447,7 +1545,7 @@ def delete_comment(request, comment_id,account_id):
         return render(request, 'zohomodules/loan_account/overview.html',context) 
     
 
-def delete_repayment(request, id):
+def delete_repaymenttable(request, id):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
         if 'login_id' not in request.session:
@@ -1471,7 +1569,7 @@ def delete_repayment(request, id):
             account_id = repayment.loan.bank_holder_id
             context={'details': dash_details,  'allmodules': allmodules}
 
-            return redirect('overview',account_id=account_id)
+            return redirect('transactoverview',account_id=account_id)
         return render(request, 'zohomodules/loan_account/overview.html',context)
     
 def delete_loan(request,account_id):

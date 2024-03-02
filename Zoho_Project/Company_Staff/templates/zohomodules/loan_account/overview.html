@@ -1380,7 +1380,7 @@
                               <a class="dropdown-item btn text-black" href="{% if a.type == 'EMI paid' %}{% url 'edit_repayment' a.pk %}{% else %}{% url 'edit_additional_loan' a.pk %}{% endif %}">
                                   &nbsp; <i class="fa fa-pencil"></i> &nbsp;&nbsp; <span style="font-size: medium;">Edit</span>
                               </a>
-                              <a class="dropdown-item btn text-black" href="{% url 'delete_repayment' a.id %}">
+                              <a class="dropdown-item btn text-black" href="{% url 'delete_repaymenttable' a.id %}">
                                 &nbsp; <i class="fas fa-trash-alt"></i> &nbsp;&nbsp; <span style="font-size: medium;">Delete</span>
                               </a>
                               <a class="dropdown-item btn text-black" href="" data-toggle="modal" data-target="#historyModal{{ a.id }}">
@@ -1641,7 +1641,7 @@
                   <span aria-hidden="true" style="font-size: x-large;">&times;</span>
                 </button>
               </div>
-              <form action="{% url 'add_comment' account.id %}" method="POST" enctype="multipart/form-data">
+              <form action="{% url 'adding_comment' account.id %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="modal-body" style="background-color: #3b3b3b;">
                   <textarea type="text" class="form-control text-light" name="comments"></textarea>
@@ -2434,6 +2434,12 @@
 </script>
 
 <script>
+  loanpage = '{{loanpage}}'
+  if(loanpage == '1'){
+    changetab('Transaction')
+  }else{
+    changetab('Overview')
+  }
   function changetab(tab) {
     if (tab === "Overview") {
       document.getElementById('Overview').style.display = "block"; 

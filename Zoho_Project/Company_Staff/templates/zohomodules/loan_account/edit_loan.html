@@ -31,7 +31,7 @@
                     </h5>
                     {% endfor %}
                 </div>
-                <form method="POST" action="{% url 'edit_loan' account.bank_holder.id %}" enctype="multipart/form-data" >
+                <form method="POST" action="{% url 'edit_loantable' account.bank_holder.id %}" enctype="multipart/form-data" >
                     {% csrf_token %}
                     <div class="row">
                         <div class="data  col-lg-8 col-md-6 col-sm-16">
