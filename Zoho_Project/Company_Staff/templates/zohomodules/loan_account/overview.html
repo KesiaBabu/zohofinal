@@ -521,7 +521,7 @@
                             <div class="row">
                               <div class="col-md-6">
                                 <label for="dest" style="color: white;">Principal Amount</label>
-                                <input type="text" class="form-control text-white bg-black mt-1" id="principal_amount" maxlength="10" name="principal_amount"  >
+                                <input type="text" class="form-control text-white bg-black mt-1" id="principal_amount" maxlength="10" name="principal_amount" required >
                               </div>
                               <div class="col-md-6">
                                 <label for="date" style="color: white;">Date</label>
@@ -540,7 +540,7 @@
                               </div>
                               <div class="col-md-6">
                                 <label for="origin" style="color: white;">Paid From</label>
-                                <select class="form-control text-white bg-black form-select mt-1" id="payment_method" name="payment_method" >
+                                <select class="form-control text-white bg-black form-select mt-1" id="payment_method" name="payment_method" required>
                                   <option value="" selected hidden>-- Select --</option>
                                   <option value="Cash">Cash</option>
                                   <option value="UPI">UPI</option>
@@ -608,7 +608,7 @@
                               </div>
                               <div class="col-md-6">
                                 <label for="origin" style="color: white;">New Loan</label>
-                                <input type="number" class="form-control text-white bg-black mt-1" id="principalamount" name="principal_amount" >
+                                <input type="number" class="form-control text-white bg-black mt-1" id="principalamount" name="principal_amount" required>
                               </div>
                               
                             </div>
@@ -632,7 +632,7 @@
                               </div>
                               <div class="col-md-6">
                                 <label for="dest" style="color: white;">Payment Method</label>
-                                <select class="form-control text-white bg-black form-select mt-1" id="paymentmethod" name="payment_method">
+                                <select class="form-control text-white bg-black form-select mt-1" id="paymentmethod" name="payment_method" required>
                                   <option value="" hidden>-- Select --</option>
                                   
                                   <option value="Cash">Cash</option>
@@ -1291,8 +1291,8 @@
                     <div class="col-md-6">
                       <div class="info-container"  style="padding-left: 5%;">
                         <div class="info-row d-md-flex">
-                            <span class="info-label text-white">Bank Name :</span>
-                            <span class="info-value text-white">{{ bnk.bnk_name }}</span>
+                            <span class="info-label text-white">Loan Amount :</span>
+                            <span class="info-value text-white">{{ loan_info.loan_amount }}</span>
                         </div>
                         <div class="info-row d-md-flex mt-3">
                             <span class="info-label text-white">Account Holder :</span>
@@ -1581,7 +1581,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content" style="background-color: #3b3b3b;">
             <div class="modal-header">
-                <h5 class="modal-title text-light" id="historyModalLabel{{ a.id }}"> HISTORY {{ a.id }} </h5>
+                <h5 class="modal-title text-light" id="historyModalLabel{{ a.id }}"> HISTORY </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>

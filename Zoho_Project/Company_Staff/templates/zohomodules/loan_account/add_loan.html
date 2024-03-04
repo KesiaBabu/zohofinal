@@ -48,11 +48,13 @@
                                                 <div class="col-6 d-flex">
 
                                                     <select class="form-control text-dark bg-light" name="account_name"
-                                                        id="account_name">
+                                                        id="account_name" required>
                                                         <option value="" selected hidden>Select</option>
                                                         {% for acc in bank_holder %}
+                                                        
                                                         <!-- <option value="" selected hidden>Select</option> -->
                                                         <option value="{{ acc.id }}">{{ acc.customer_name }}</option>
+                                                       
                                                         {% endfor %}
 
                                                     </select>
@@ -77,7 +79,7 @@
                                                 </div>
                                                 <div class="input-container col-6">
                                                     <input type="text" class="form-control text-dark bg-light"
-                                                        name="loan_amount">
+                                                        name="loan_amount" required>
                                                 </div>
                                             </div>
                                             <div class="row pb-3">
@@ -86,7 +88,7 @@
                                                 </div>
                                                 <div class="input-container col-6">
                                                     <input type="text" class="form-control text-dark bg-light"
-                                                        name="lender_bank">
+                                                        name="lender_bank" required>
                                                 </div>
                                             </div>
                                             <div class="row pb-3">
@@ -104,7 +106,7 @@
                                                 </div>
                                                 <div class="input-container col-6">
                                                     <select class="form-control text-dark bg-light"
-                                                        name="payment_method" id="payment_method">
+                                                        name="payment_method" id="payment_method" required>
                                                         <option value="" selected hidden>Select</option>
 
                                                         <option value="Cash">Cash</option>
@@ -151,7 +153,16 @@
                                                 </div>
                                                 <div class="input-container col-6">
                                                     <input type="text" class="form-control text-dark bg-light"
-                                                        name="terms" >
+                                                        name="terms" required>
+                                                </div>
+                                            </div>
+                                            <div class="row pb-3">
+                                                <div class="col-6">
+                                                    <label for="">Processing fee</label>
+                                                </div>
+                                                <div class="input-container col-6">
+                                                    <input type="number" class="form-control text-dark bg-light"
+                                                        name="processing_fee" value="0">
                                                 </div>
                                             </div>
 
@@ -203,22 +214,14 @@
 
                                             <div class="row pb-3">
                                                 <div class="col-6">
-                                                    <label for="">Interest rate</label>
+                                                    <label for="">Interest </label>
                                                 </div>
                                                 <div class="input-container col-6">
                                                     <input type="number" class="form-control text-dark bg-light"
                                                         name="interest" value="0">
                                                 </div>
                                             </div>
-                                            <div class="row pb-3">
-                                                <div class="col-6">
-                                                    <label for="">Processing fee</label>
-                                                </div>
-                                                <div class="input-container col-6">
-                                                    <input type="number" class="form-control text-dark bg-light"
-                                                        name="processing_fee" value="0">
-                                                </div>
-                                            </div>
+                                            
                                             <div class="row pb-3">
                                                 <div class="col-6">
                                                     <label for="">Description</label>
@@ -378,19 +381,20 @@
                                                     <h4 class="text-light">Bank Account Holder Form</h4>
                                                     <h6 class="text-light mt-3"> Name</h6>
                                                     <input type="text" class="form-control text-dark bg-light"
-                                                        name="customer_name" id="customer_name">
+                                                        name="customer_name" id="customer_name" required>
                                                     <h6 class="text-light mt-3"> Alias</h6>
                                                     <input type="text" class="form-control text-dark bg-light"
-                                                        name="alias" id="al">
-                                                    <h6 class="text-light mt-3"> Phone Number</h6>
-                                                    <input type="number" class="form-control text-dark bg-light"
-                                                        name="phone_number" id="phone">
+                                                        name="alias" id="al" required>
+                                                    <h6 class="text-light mt-3">Phone Number</h6>
+                                                    <input type="tel" class="form-control text-dark bg-light" name="phone_number" id="phone" required>
+                                                        <small class="text-danger error-message" id="phone-error"></small>
+                                                        
                                                     <h6 class="text-light mt-3">Email</h6>
-                                                    <input type="email" class="form-control text-dark bg-light"
-                                                        name="email" id="email_id">
+                                                    <input type="email" class="form-control text-dark bg-light" name="email" id="email_id" required>
+                                                    <small class="text-danger error-message" id="email-error"></small>
                                                     <h6 class="text-light mt-3">Account Type</h6>
                                                     <select class="form-control text-dark bg-light" name="account_type"
-                                                        id="acc_type">
+                                                        id="acc_type" required>
                                                         <option value="" selected hidden>Select</option>
                                                         <option value="Bank Account">Bank Account</option>
                                                         
@@ -401,7 +405,7 @@
                                                     <h4 class="text-light">Bank Account Form</h4>
                                                     <h6 class="text-light mt-3">Bank Name</h6>
                                                     <select class="form-control text-dark bg-light" name="bankname"
-                                                    id="bank_name"> 
+                                                    id="bank_name" required> 
                                                     <option value="" selected hidden>Select</option>              
                                                         {% for bank in banks %}
                                                         <option value="{{ bank.bnk_name}} " data-account="{{ bank.bnk_acno }}"  data-ifsc="{{ bank.bnk_ifsc }}">{{ bank.bnk_name }}-( {{bank.bnk_acno|slice:'-4:' }})</option>
@@ -411,16 +415,16 @@
                                                         name="bankname" id="bank_name"> -->
                                                     <h6 class="text-light mt-3">Account Number</h6>
                                                     <input type="number" class="form-control text-dark bg-light"
-                                                        name="baccount_no" id="baccount_num">
+                                                        name="baccount_no" id="baccount_num" required>
                                                     <h6 class="text-light mt-3">IFSC Code</h6>
                                                     <input type="text" class="form-control text-dark bg-light"
-                                                        name="ifsc_code" id="bifsc">
+                                                        name="ifsc_code" id="bifsc" required>
                                                     <h6 class="text-light mt-3">Swift Code</h6>
                                                     <input type="text" class="form-control text-dark bg-light"
-                                                        name="swift_code" id="swift">
+                                                        name="swift_code" id="swift" required>
                                                     <h6 class="text-light mt-3">Branch Name</h6>
                                                     <input type="text" class="form-control text-dark bg-light"
-                                                        name="branch_name" id="branchname">
+                                                        name="branch_name" id="branchname" required>
                                                 </div>
                                             </div>
 
@@ -431,7 +435,7 @@
                                             <h4 class="text-light">Bank Configuration Form</h4>
                                             <h6 class="text-light mt-3"> Select cheque book range</h6>
                                             <select class="form-control text-dark bg-light" name="cheque_book_range"
-                                                id="cheque_book">
+                                                id="cheque_book" required>
                                                 <option value="" selected hidden>Select</option>
                                                 <option value="Yes">Yes</option>
                                                 <option value="No">No</option>
@@ -439,7 +443,7 @@
                                             </select>
                                             <h6 class="text-light mt-3"> Enable cheque printing</h6>
                                             <select class="form-control text-dark bg-light"
-                                                name="enable_cheque_printing" id="cheque_printing">
+                                                name="enable_cheque_printing" id="cheque_printing" required>
                                                 <option value="" selected hidden>Select</option>
                                                 <option value="Yes">Yes</option>
                                                 <option value="No">No</option>
@@ -448,7 +452,7 @@
                                             <h6 class="text-light mt-3"> Set cheque printing configuration</h6>
                                             <!-- <input type="number" class="form-control text-dark bg-light" name="cheque_printing_configuration"  required> -->
                                             <select class="form-control text-dark bg-light"
-                                                name="cheque_printing_configuration" id="confi_cheque_printing">
+                                                name="cheque_printing_configuration" id="confi_cheque_printing" required>
                                                 <option value="" selected hidden>Select</option>
                                                 <option value="Yes">Yes</option>
                                                 <option value="No">No</option>
@@ -462,12 +466,16 @@
                                                 name="mailing_name" id="mailingname">
                                             <h6 class="text-light mt-3">Address</h6>
                                             <input type="text" class="form-control text-dark bg-light" name="address"
-                                                id="m_address">
+                                                id="m_address" required>
                                             <h6 class="text-light mt-3">Country</h6>
-                                            <input type="text" class="form-control text-dark bg-light" name="country"
-                                                id="m_country">
+                                            <!-- <input type="text" class="form-control text-dark bg-light" name="country"
+                                                id="m_country" required> -->
+                                            <select class="form-control text-dark bg-light" name="country" id="m_country" required>
+                                                <option value="" selected hidden>Select</option>
+                                                <option value="India">India</option>
+                                            </select>
                                             <h6 class="text-light mt-3">State</h6>
-                                            <select class="form-control text-dark bg-light" name="state" id="m_state">
+                                            <select class="form-control text-dark bg-light" name="state" id="m_state" required>
                                                 <option value="" hidden>Select State</option>
                                                 <option value="[AN]-Andaman And Nicobar Islands">[AN]-Andaman And
                                                     Nicobar Islands</option>
@@ -511,19 +519,19 @@
                                             </select>
                                             <h6 class="text-light mt-3">Pin</h6>
                                             <input type="text" class="form-control text-dark bg-light" name="pin"
-                                                id="m_pin">
+                                                id="m_pin" required>
                                         </div>
                                     </div>
                                     <div class="row mt-2 mx-2 mb-2 pb-5">
                                         <div class="col-6">
                                             <h4 class="text-light">Tax Registration Form</h4>
-                                            <h6 class="text-light mt-3"> PAN number</h6>
-                                            <input type="text" class="form-control text-dark bg-light" name="pan_number"
-                                                id="pannumber">
+                                            <h6 class="text-light mt-3">PAN number</h6>
+                                            <input type="text" class="form-control text-dark bg-light" name="pan_number" id="pannumber" required>
+                                             <small class="text-danger error-message" id="pan-error"></small>
 
                                             <h6 class="text-light mt-3"> Registration type</h6>
                                             <select class="form-control text-dark bg-light" name="registration_type"
-                                                id="registrationtype">
+                                                id="registrationtype" required>
                                                 <option value="" selected hidden>Select</option>
                                                 <option value="Regular">Regular</option>
                                                 <option value="Composition">Composition</option>
@@ -531,16 +539,16 @@
                                                 <option value="Unregister">Unregister</option>
 
                                             </select>
-                                            <h6 class="text-light mt-3"> GST Number </h6>
-                                            <input type="text" class="form-control text-dark bg-light" name="gst_num"
-                                                id="gst_number">
+                                            <h6 class="text-light mt-3">GST Number</h6>
+                                               <input type="text" class="form-control text-dark bg-light" name="gst_num" id="gst_number" required>
+                                            <small class="text-danger error-message" id="gst-error"></small>
 
                                             <h6 class="text-light mt-3"> Set Alter GST Details </h6>
                                             <select class="form-control text-dark bg-light"
                                                 name="gst_alter_details" id="gst_alter">
                                                 <option value="" selected hidden>Select</option>
-                                                <option value="Yes">Yes</option>
-                                                <option value="No">No</option>
+                                                <option value="True">Yes</option>
+                                                <option value="False">No</option>
                                             </select>
 
                                         </div>
@@ -716,5 +724,70 @@
                                 });
                             });
                             </script>
+    <script>
+    document.getElementById('phone').addEventListener('input', function() {
+    var phoneInput = this.value;
+    var phoneError = document.getElementById('phone-error');
+
+    if (!/^\d{10}$/.test(phoneInput)) {
+        phoneError.textContent = "Please enter a valid 10-digit phone number";
+    } else {
+        phoneError.textContent = "";
+    }
+});
+
+document.getElementById('email_id').addEventListener('input', function() {
+    var emailInput = this.value;
+    var emailError = document.getElementById('email-error');
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput)) {
+        emailError.textContent = "Please enter a valid email address";
+    } else {
+        emailError.textContent = "";
+    }
+});
+
+document.getElementById('pannumber').addEventListener('input', function() {
+    var panInput = this.value;
+    var panError = document.getElementById('pan-error');
+    var panPattern = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
+
+    if (!panPattern.test(panInput)) {
+        panError.textContent = "Please enter a valid PAN number (e.g., ABCDE1234F)";
+    } else {
+        panError.textContent = ""; // Clear error message if input is valid
+    }
+});
+
+// Function to validate GST number
+document.getElementById('gst_number').addEventListener('input', function() {
+    var gstInput = this.value.toUpperCase(); // Convert to uppercase to match GST format
+    var gstError = document.getElementById('gst-error');
+    var gstPattern = /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}\d{1}[A-Z1-9]{1}\d{1}$/;
+
+    if (!gstPattern.test(gstInput)) {
+        gstError.textContent = "Please enter a valid GST number (e.g., 22AAAAA0000A1Z5)";
+    } else {
+        gstError.textContent = ""; // Clear error message if input is valid
+    }
+});
+
+document.getElementById('gst_number').addEventListener('change', function() {
+    var gstInput = this.value.toUpperCase(); // Convert to uppercase to match GST format
+    var gstError = document.getElementById('gst-error');
+    var gstPattern = /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}\d{1}[A-Z1-9]{1}\d{1}$/;
+
+    if (!gstPattern.test(gstInput)) {
+        gstError.textContent = "Please enter a valid GST number (e.g., 22AAAAA0000A1Z5)";
+    } else {
+        gstError.textContent = "";
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    var currentDate = new Date().toISOString().slice(0, 10);
+    document.getElementById('l_date').value = currentDate;
+});
+</script>
                         
 {% endblock %}

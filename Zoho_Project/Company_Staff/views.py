@@ -596,10 +596,11 @@ def add_loan(request):
                 allmodules = ZohoModules.objects.get(company=dash_details.company, status='New')
             banks = Banking.objects.values('bnk_name','bnk_acno','bnk_ifsc').filter(company=company).distinct()
             today_date=date.today()
+            loaned_bank_account_ids = loan_account.objects.values_list('bank_holder_id', flat=True)
             context = {
                     'details': dash_details,
                     'allmodules': allmodules,
-                    'bank_holder': BankAccount.objects.filter(company=company),
+                    'bank_holder': BankAccount.objects.filter(company=company).exclude(id__in=loaned_bank_account_ids),
                     'loan_details': loan_account.objects.filter(company=company),
                     'banks': banks,
                     'today_date':today_date,
@@ -630,7 +631,7 @@ def add_loan(request):
                 term=request.POST.get('terms')
                 
                
-
+                loaned_bank_account_ids = loan_account.objects.values_list('bank_holder_id', flat=True)
                 loan = loan_account(
                     company=company,
                     logindetails=log_details,
@@ -667,7 +668,7 @@ def add_loan(request):
                 context = {
                     'details': dash_details,
                     'allmodules': allmodules,
-                    'bank_holder': BankAccount.objects.filter(company=company),
+                    'bank_holder': BankAccount.objects.filter(company=company).exclude(id__in=loaned_bank_account_ids),
                     'loan_details': loan_account.objects.filter(company=company),
                     'banks':banks,
                     'today_date':today_date,
@@ -734,7 +735,7 @@ def save_account_details(request):
                pan_number = request.POST.get('pan_number')
                registration_type = request.POST.get('registration_type')
                gst_num = request.POST.get('gst_num')
-               #alter_gst_details = request.POST.get('gst_alter_details')
+               alter_gst_details = request.POST.get('gst_alter_details')
                date = request.POST.get('date')
                #amount_type = request.POST.get('amount_type')
                amount = request.POST.get('amount')
@@ -761,7 +762,7 @@ def save_account_details(request):
                 pan_number=pan_number,
                 registration_type=registration_type,
                 gst_num=gst_num,
-                #alter_gst_details=alter_gst_details,
+                alter_gst_details=alter_gst_details,
                 date=date,
                 #    amount_type=amount_type,
                 amount=amount,
@@ -824,10 +825,11 @@ def holder_dropdown(request):
                 dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
                 company=dash_details.company
                 allmodules =ZohoModules.objects.get(company=dash_details.company, status='New')
-                
+
+            loaned_bank_account_ids = loan_account.objects.values_list('bank_holder_id', flat=True)    
             print("inside holder")
             options = {}
-            option_objects = BankAccount.objects.filter(company=company)
+            option_objects = BankAccount.objects.filter(company=company).exclude(id__in=loaned_bank_account_ids)
             for option in option_objects:
                 options[option.id] = option.customer_name
                 print(option.customer_name)
