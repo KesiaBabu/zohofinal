@@ -625,12 +625,13 @@ def add_loan(request):
                 processing_upi=request.POST.get('pupi_id')
                 processing_cheque=request.POST.get('pcheque_number')
                 processing_acc=request.POST.get('paccount_number')
-                interest = request.POST.get('interest', 0)
-                processing_fee = request.POST.get('processing_fee', 0)
+                interest = request.POST.get('interest')
+                processing_fee = request.POST.get('processing_fee')
                 description = request.POST.get('description')
                 term=request.POST.get('terms')
                 
-               
+                interest = float(interest) if interest else 0
+                processing_fee = float(processing_fee) if processing_fee else 0
                 loaned_bank_account_ids = loan_account.objects.values_list('bank_holder_id', flat=True)
                 loan = loan_account(
                     company=company,
@@ -689,7 +690,7 @@ def add_loan(request):
     else:
         return redirect('/')
     
-
+from django.db.models import Q
 def save_account_details(request):
     if 'login_id' in request.session:
         log_id = request.session['login_id']
@@ -739,6 +740,10 @@ def save_account_details(request):
                date = request.POST.get('date')
                #amount_type = request.POST.get('amount_type')
                amount = request.POST.get('amount')
+
+               if BankAccount.objects.filter( Q(pan_number=pan_number) | Q(gst_num=gst_num) | Q(phone_number=phone_number),company=company).exists():
+                   return JsonResponse({'status': 'error', 'message': 'Phone number, email, PAN number, and GST number should be unique'})   
+
             try:
                 bank=BankAccount(
                 customer_name=customer_name,
@@ -1067,7 +1072,11 @@ def repayment_due_form(request, account_id):
                 cheque=request.POST.get('cheque_number')
                 account_number=request.POST.get('acc_no')
                 date = request.POST.get('date')
-                total_amount = float(principal_amount) + float(interest_amount)
+                principal_amount = float(principal_amount) if principal_amount else 0
+                interest_amount = float(interest_amount) if interest_amount else 0
+                
+                total_amount = principal_amount + interest_amount
+                # total_amount = float(principal_amount) + float(interest_amount)
                 type = 'EMI paid'
                 print(payment_method)
                 repayment = LoanRepayemnt(
@@ -1103,6 +1112,7 @@ def repayment_due_form(request, account_id):
             else:
                 today_date = dt.today()
                 
+                
                 return render(request, 'zohomodules/loan_account/overview.html', { 'details': dash_details, 'allmodules': allmodules,  'today_date': today_date,'account_id': account_id,'banks':banks,'repayment_history':repayment_history,'login_details':login_details})
     return redirect('/')
 
@@ -1137,6 +1147,10 @@ def new_loan(request,account_id):
                 cheque=request.POST.get('cheque_number')
                 account_number=request.POST.get('acc_num')
                 date = request.POST.get('date')
+                principal_amount = float(principal_amount) if principal_amount else 0
+                interest_amount = float(interest_amount) if interest_amount else 0
+                
+                # total_amount = principal_amount + interest_amount
                 total_amount = request.POST.get('total_amount')
                 type = 'Additional Loan'
                 
@@ -1251,10 +1265,16 @@ def edit_loantable(request, account_id):
                 loan.processing_upi = request.POST.get('p_upi_id')
                 loan.processing_cheque = request.POST.get('p_cheque_number')
                 loan.processing_acc = request.POST.get('p_account_number')
-                loan.interest = request.POST.get('interest')
-                loan.processing_fee = request.POST.get('processing_fee')
+                # loan.interest = request.POST.get('interest')
+                # loan.processing_fee = request.POST.get('processing_fee')
                 loan.description = request.POST.get('description')
-                
+                interest = request.POST.get('interest')
+                processing_fee = request.POST.get('processing_fee')
+                interest = float(interest) if interest else 0
+                processing_fee = float(processing_fee) if processing_fee else 0
+
+                loan.interest = interest
+                loan.processing_fee = processing_fee
                 loan.save()
 
                 history=LoanAccountHistory.objects.create(
@@ -1343,6 +1363,10 @@ def edit_repayment(request, repayment_id):
                 cheque = request.POST.get('cheque_number')
                 account_number=request.POST.get('acc_no')
                 payment_date = request.POST.get('date')
+                principal_amount = float(principal_amount) if principal_amount else 0
+                interest_amount = float(interest_amount) if interest_amount else 0
+                
+                # total_amount = principal_amount + interest_amount
                 total_amount = request.POST.get('total_amount')
                 type = 'EMI paid' 
                 print(repayment.payment_method)
@@ -1404,7 +1428,11 @@ def edit_additional_loan(request, repayment_id):
                 cheque = request.POST.get('cheque_number')
                 account_number=request.POST.get('acc_num')
                 payment_date = request.POST.get('date')
-                total_amount = request.POST.get('total_amount')
+                principal_amount = float(principal_amount) if principal_amount else 0
+                interest_amount = float(interest_amount) if interest_amount else 0
+                
+                total_amount = principal_amount + interest_amount
+                # total_amount = request.POST.get('total_amount')
                 type = 'Additional Loan'
         
                 repayment.principal_amount = principal_amount
@@ -1432,50 +1460,74 @@ def edit_additional_loan(request, repayment_id):
                 return render(request, 'zohomodules/loan_account/edit_additional_loan.html', {'repayment': repayment,'details': dash_details,  'allmodules': allmodules,'overall_balance':current_balance,'hist':hist,'banks':banks,'login_details':login_details})            
             
 from django.template.loader import render_to_string
-
+from django.core.mail import EmailMultiAlternatives
 def share_email(request, account_id):
     try:
         if request.method == 'POST':
             emails_string = request.POST['email']
             emails_list = [email.strip() for email in emails_string.split(',')]
-            bank_account = get_object_or_404(BankAccount, id=account_id)
-            loan_info = loan_account.objects.get(bank_holder=bank_account)
+            if 'login_id' in request.session:
+                log_id = request.session['login_id']
+                if 'login_id' not in request.session:
+                    return redirect('/')
+        
+            login_details = LoginDetails.objects.get(id=log_id)
+            user_type = login_details.user_type
 
-            repayment_details = LoanRepayemnt.objects.filter(loan=loan_info)
-            current_balance = loan_info.loan_amount  
-            balances = [] 
-            for repayment in repayment_details:
-                if repayment.type == 'EMI paid':
-                    current_balance -= repayment.total_amount
-                elif repayment.type == 'Additional Loan':
-                    current_balance += repayment.total_amount     
-                balances.append(current_balance)
-            overall_balance = current_balance
-            total_amount= loan_info.loan_amount + loan_info.interest
+            if user_type in ['Company', 'Staff']:
+                if user_type == 'Company':
+                    dash_details = CompanyDetails.objects.get(login_details=login_details, superadmin_approval=1, Distributor_approval=1)
+                    company=dash_details
+                    allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+                else:
+                    dash_details = StaffDetails.objects.get(login_details=login_details, company_approval=1)
+                    company=dash_details.company
+                    allmodules = ZohoModules.objects.get(company=dash_details.company, status='New')
 
-            context = {
+
+                emails_string = request.POST['email']
+                emails_list = [email.strip() for email in emails_string.split(',')]
+                bank_account = get_object_or_404(BankAccount, id=account_id,company=company)
+                loan_info = loan_account.objects.get(bank_holder=bank_account,company=company)
+
+                repayment_details = LoanRepayemnt.objects.filter(loan=loan_info,company=company)
+                current_balance = loan_info.loan_amount  
+                balances = [] 
+                for repayment in repayment_details:
+                  if repayment.type == 'EMI paid':
+                      current_balance -= repayment.total_amount
+                  elif repayment.type == 'Additional Loan':
+                      current_balance += repayment.total_amount     
+                      balances.append(current_balance)
+                overall_balance = current_balance
+                total_amount= loan_info.loan_amount + loan_info.interest
+
+                context = {
                 'loan_info': loan_info,
                 'repayment_details': repayment_details,
                 'repayment_details_with_balances': zip(repayment_details, balances),
                 'overall_balance': overall_balance, 
                 'total_amount': total_amount,
-            }
+                'details': dash_details,  
+                'allmodules': allmodules,
+                'login_details':login_details
+               }
+                template_path = 'zohomodules/loan_account/mailoverview.html'
+                template = get_template(template_path)
+                html  = template.render(context)
+                # html_content = render_to_string('zohomodules/loan_account/mailoverview.html', context)
+                result = BytesIO()
+                pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+                pdf = result.getvalue()
 
-            html_content = render_to_string('zohomodules/loan_account/mailoverview.html', context)
+                filename = f'{loan_info.bank_holder.customer_name}-statement - {loan_info.id}.pdf'
+                subject = f"{loan_info.bank_holder.customer_name} - {loan_info.id}- statement"
+                email=EmailMultiAlternatives(subject, f"Hi,\nPlease find the attached statement - File-{loan_info.bank_holder.customer_name}  .\n--\nRegards,\n",from_email=settings.EMAIL_HOST_USER, to=emails_list)
+                email.attach(filename, pdf, "application/pdf") 
+                email.send(fail_silently=False)
 
-            result = BytesIO()
-            pdf = pisa.pisaDocument(BytesIO(html_content.encode("UTF-8")), result)
-            pdf = result.getvalue()
-
-            filename = f'{loan_info.bank_holder.customer_name}-statement - {loan_info.id}.pdf'
-            subject = f"{loan_info.bank_holder.customer_name} - {loan_info.id}- statement"
-            email = EmailMessage(subject, f"Hi,\nPlease find the attached statement - File-{loan_info.bank_holder.customer_name}  .\n--\nRegards,\n", to=emails_list)
-            email.attach(filename, pdf, "application/pdf")
-            email.from_email = settings.EMAIL_HOST_USER  
-            email.send(fail_silently=False)
-
-            messages.success(request, 'Statement has been shared via email successfully..!')
-            return redirect('overview', account_id)
+                messages.success(request, 'Statement has been shared via email successfully..!')
+                return redirect('overview', account_id)
     except Exception as e:
         print(e)
         messages.error(request, f'{e}')

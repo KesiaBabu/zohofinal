@@ -1197,6 +1197,17 @@
                       </div>
                       <div class="bank-row d-md-flex mt-5">
                         <div class="col-md-5">
+                            <span class="bank-label text-black">Interest</span>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <span class="bnk-colon text-black">:</span>
+                        </div>
+                        <div class="col-md-5 text-right">
+                            <span class="bank-value text-black">{{ loan_info.interest }}</span>
+                        </div>
+                      </div>
+                      <div class="bank-row d-md-flex mt-5">
+                        <div class="col-md-5">
                             <span class="bank-label text-black">Terms</span>
                         </div>
                         <div class="col-md-2 text-center">
@@ -1352,6 +1363,9 @@
                             <div class="dropdown-menu">
                               <a class="dropdown-item btn text-black" href="{% url 'edit_loanaccount' account.id %}">
                                 &nbsp; <i class="fa fa-pencil"></i> &nbsp;&nbsp; <span style="font-size: medium;">Edit</span>
+                              </a>
+                              <a class="dropdown-item btn text-black" href="{% url 'delete_loan' account_id=loan_info.bank_holder.id %}">
+                                &nbsp; <i class="fas fa-trash-alt"></i> &nbsp;&nbsp; <span style="font-size: medium;">Delete</span>
                               </a>
                               <a class="dropdown-item btn text-black" data-toggle="modal" id="his" data-target="#commentModal2" data-toggle="tooltip">
                                 &nbsp; <i class="fas fa-history"></i> &nbsp;&nbsp; <span style="font-size: medium;">History</span>

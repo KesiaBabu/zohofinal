@@ -670,6 +670,24 @@
                                     "X-CSRFToken": "{{ csrf_token }}"
                                      },
                                     success: function(response) {
+
+                if (response.status === 'success') {
+                    // Do something if the submission was successful
+                    alert('Account details saved successfully');
+                } else if (response.status === 'error') {
+                    // Handle errors
+                    if (response.message.includes('phone_number')) {
+                        alert('Phone number exist');
+                    } 
+                     else if (response.message.includes('gst_num')) {
+                        alert('GST number exist');
+                    } else if (response.message.includes('pan_number')) {
+                        alert('PAN number exist');
+                    } else {
+                        alert('An error occurred while saving account details');
+                    }
+                }
+            
                                         
                                         document.getElementById("modalaccount").reset();
                                         reloadholder();
@@ -789,5 +807,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('l_date').value = currentDate;
 });
 </script>
+
                         
 {% endblock %}
