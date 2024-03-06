@@ -738,11 +738,22 @@ def save_account_details(request):
                gst_num = request.POST.get('gst_num')
                alter_gst_details = request.POST.get('gst_alter_details')
                date = request.POST.get('date')
-               #amount_type = request.POST.get('amount_type')
+               amount_type = request.POST.get('amount_type')
                amount = request.POST.get('amount')
 
-               if BankAccount.objects.filter( Q(pan_number=pan_number) | Q(gst_num=gst_num) | Q(phone_number=phone_number),company=company).exists():
-                   return JsonResponse({'status': 'error', 'message': 'Phone number, email, PAN number, and GST number should be unique'})   
+               if BankAccount.objects.filter( Q(pan_number=pan_number),company=company).exists():
+                   print("inside panbankaccount filter")
+                   return JsonResponse({'status': 'error', 'message': 'pan_number'}) 
+               if gst_num and BankAccount.objects.filter(  Q(gst_num=gst_num),company=company).exists():
+                   print("inside bgstankaccount filter")
+                   return JsonResponse({'status': 'error', 'message': 'gst_num'}) 
+               if BankAccount.objects.filter(  Q(phone_number=phone_number),company=company).exists():
+                   print("inside phbankaccount filter")
+                   return JsonResponse({'status': 'error', 'message': 'phone_number'}) 
+               if BankAccount.objects.filter( Q(account_number=account_number),company=company).exists():
+                   print("inside accbankaccount filter")
+                   return JsonResponse({'status': 'error', 'message': 'account_number'}) 
+               print('outside bank account filter')        
 
             try:
                 bank=BankAccount(
@@ -769,7 +780,7 @@ def save_account_details(request):
                 gst_num=gst_num,
                 alter_gst_details=alter_gst_details,
                 date=date,
-                #    amount_type=amount_type,
+                amount_type=amount_type,
                 amount=amount,
                 company=company,
                 login_details=log_details,

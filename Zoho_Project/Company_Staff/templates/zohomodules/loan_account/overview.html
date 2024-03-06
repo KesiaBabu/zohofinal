@@ -239,7 +239,7 @@
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>
         <li class="breadcrumb-item"><a class="text-warning-emphasis">Cash & Bank</a></li>
-        <li class="breadcrumb-item"><a  class="text-warning-emphasis">Loan Account</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'loan_listing' %}" class="text-warning-emphasis">Loan Account</a></li>
         <li class="breadcrumb-item" aria-current="page" id="over">Overview</li>
         <li class="breadcrumb-item" aria-current="page" id="tran" style="display: none;">Transaction</li>
         <li class="breadcrumb-item" aria-current="page" id="state" style="display: none;">Statement</li>
@@ -516,7 +516,7 @@
                               </button>
                             </div>
                           </div><br>
-                          <form action="{% url 'repayment_due_form' account.id %}" method="post" class="needs-validation" novalidate autocomplete="off">
+                          <form action="{% url 'repayment_due_form' account.id %}" method="post" class="needs-validation"  autocomplete="off">
                             {%csrf_token%}
                             <div class="row">
                               <div class="col-md-6">
@@ -536,7 +536,7 @@
                               </div>
                               <div class="col-md-6">
                                 <label for="amount" style="color: white;">Total Amount</label>
-                                <input type="number" class="form-control text-white bg-black mt-1" id="total_amount"  name="total_amount">
+                                <input type="number" class="form-control text-white bg-black mt-1" id="total_amount"  name="total_amount" readonly>
                               </div>
                               <div class="col-md-6">
                                 <label for="origin" style="color: white;">Paid From</label>
@@ -599,7 +599,7 @@
                               </button>
                             </div>
                           </div><br>
-                          <form action="{% url 'new_loan' account.id %}" method="post" class="needs-validation" novalidate autocomplete="off">
+                          <form action="{% url 'new_loan' account.id %}" method="post" class="needs-validation"  autocomplete="off">
                             {%csrf_token%}
                             <div class="row">
                               <div class="col-md-6">
@@ -628,7 +628,7 @@
                             <div class="row mt-3">
                               <div class="col-md-6">
                                 <label for="amount" style="color: white;">Total Loan</label>
-                                <input type="number" class="form-control text-white bg-black mt-1" id="totalamount"  name="total_amount">
+                                <input type="number" class="form-control text-white bg-black mt-1" id="totalamount"  name="total_amount" readonly>
                               </div>
                               <div class="col-md-6">
                                 <label for="dest" style="color: white;">Payment Method</label>
@@ -648,7 +648,7 @@
                             <div class="row mt-3" id="chequedetails" style="display: none;">
                               <div class="col-md-6">
                                   <label for="cheque_number" style="color: white;">Cheque Number</label>
-                                  <input type="text" class="form-control text-white bg-black mt-1" id="cheque_number" name="cheque_number">
+                                  <input type="text" class="form-control text-white bg-black mt-1" id="cheque_number" name="cheque_number" >
                               </div>
                           </div>
       
@@ -663,7 +663,7 @@
                           <div class="row mt-3" id="accdetails" style="display: none;">
                             <div class="col-md-6">
                                 <label for="upi_id" style="color: white;">Account Number</label>
-                                <input type="text" class="form-control text-white bg-black mt-1" id="acc_num" name="acc_num">
+                                <input type="text" class="form-control text-white bg-black mt-1" id="acc_num" name="acc_num" >
                             </div>
                             
                         </div>
@@ -1217,6 +1217,40 @@
                             <span class="bank-value text-black">{{ loan_info.term }}</span>
                         </div>
                       </div>
+                      <div class="bank-row d-md-flex mt-5">
+                        <div class="col-md-5">
+                            <span class="bank-label text-black">Processing Fee</span>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <span class="bnk-colon text-black">:</span>
+                        </div>
+                        <div class="col-md-5 text-right">
+                            <span class="bank-value text-black">{{ loan_info.processing_fee }}</span>
+                        </div>
+                      </div>
+                      <div class="bank-row d-md-flex mt-5">
+                        <div class="col-md-5">
+                            <span class="bank-label text-black">Processing Method</span>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <span class="bnk-colon text-black">:</span>
+                        </div>
+                        <div class="col-md-5 text-right">
+                            <span class="bank-value text-black">{{ loan_info.processing_method }}</span>
+                        </div>
+                      </div>
+                      <div class="bank-row d-md-flex mt-5">
+                        <div class="col-md-5">
+                            <span class="bank-label text-black">Description</span>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <span class="bnk-colon text-black">:</span>
+                        </div>
+                        <div class="col-md-5 text-right">
+                            <span class="bank-value text-black">{{ loan_info.description }}</span>
+                        </div>
+                      </div>
+                      
                     </div>
 
                     <div class="col-md-6 p-4">

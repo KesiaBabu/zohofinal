@@ -11,7 +11,7 @@
                 {% if login_details.user_type == 'Staff' %} <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
                 {% if login_details.user_type == 'Company' %} <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
                 <li class="breadcrumb-item"><a class="text-warning-emphasis">Cash & Bank</a></li>
-                <li class="breadcrumb-item"><a  class="text-warning-emphasis">Loan Account</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'loan_listing' %}" class="text-warning-emphasis">Loan Account</a></li>
                  <li class="breadcrumb-item" aria-current="page">Edit Loan Account Details</li>
         </nav>
         <div class="row mt-5">
@@ -41,13 +41,14 @@
                                 </div>
                                 <div class="col-6 d-flex">
                                     
-                                       <select class="form-control text-dark bg-light" name="account_name" >
+                                       <!-- <select class="form-control text-dark bg-light" name="account_name" required readonly>
                                         <option value="" selected hidden>Select</option>
                                          {% for acc in bank_holder %}
                                            <option value="{{ acc.id }}" {% if account.bank_holder.id == acc.id %} selected {% endif %}>{{ acc.customer_name }}</option>
                                         {% endfor %}
                                         
-                                    </select>
+                                    </select> -->
+                                    <input type="text" class="form-control text-dark bg-light" name="account_name" value="{{account.bank_holder.customer_name}}" required readonly>
                                     <!-- <button type="submit" class="btn btn-primary ml-2" data-toggle="modal" data-target="#accountModal">+</button> -->
                                         
                                      
@@ -58,7 +59,7 @@
                                     <label for="">Account Number</label>
                                 </div>
                                 <div class="input-container col-6">
-                                    <input type="text" class="form-control text-dark bg-light" name="acc_number" value="{{account.bank_holder.account_number}}" >
+                                    <input type="text" class="form-control text-dark bg-light" name="acc_number" value="{{account.bank_holder.account_number}}" required>
                                 </div>
                             </div>
                             <div class="row pb-3">
@@ -66,7 +67,7 @@
                                     <label for="">Loan Amount</label>
                                 </div>
                                 <div class="input-container col-6">
-                                    <input type="text" class="form-control text-dark bg-light" name="loan_amount" value="{{account.loan_amount}}" >
+                                    <input type="text" class="form-control text-dark bg-light" name="loan_amount" value="{{account.loan_amount}}" required>
                                 </div>
                             </div>
                             <div class="row pb-3">
@@ -74,7 +75,7 @@
                                     <label for="">Lender Bank</label>
                                 </div>
                                 <div class="input-container col-6">
-                                    <input type="text" class="form-control text-dark bg-light" name="lender_bank" value="{{account.lender_bank}}">
+                                    <input type="text" class="form-control text-dark bg-light" name="lender_bank" value="{{account.lender_bank}}" required>
                                 </div>
                             </div>
                             <div class="row pb-3">
@@ -90,7 +91,7 @@
                                     <label for="sdate">Loan Recieved</label>
                                 </div>
                                 <div class="input-container col-6">
-                                    <select class="form-control text-dark bg-light" name="payment_method" id="lpayment_method" >
+                                    <select class="form-control text-dark bg-light" name="payment_method" id="lpayment_method" required>
                                         <option value="" selected hidden>Select</option>
                                         <option value="Cash" {% if account.payment_method == 'Cash' %} selected {% endif %}>Cash</option>
                                         <option value="UPI" {% if account.payment_method == 'UPI' %} selected {% endif %}>UPI</option>
@@ -132,7 +133,7 @@
                                         <label for="">Terms</label>
                                     </div>
                                     <div class="input-container col-6">
-                                        <input type="text" class="form-control text-dark bg-light" name="terms"  value="{{account.term}}">
+                                        <input type="text" class="form-control text-dark bg-light" name="terms"  value="{{account.term}}" required>
                                     </div>
                                 </div>
                            

@@ -12,7 +12,7 @@
                 {% if login_details.user_type == 'Staff' %} <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
                 {% if login_details.user_type == 'Company' %} <li class="breadcrumb-item"><a href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
                 <li class="breadcrumb-item"><a class="text-warning-emphasis">Cash & Bank</a></li>
-                <li class="breadcrumb-item"><a  class="text-warning-emphasis">Loan Account</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'loan_listing' %}" class="text-warning-emphasis">Loan Account</a></li>
                  <li class="breadcrumb-item" aria-current="page">Edit Repayment Due</li>
         </nav>
         <div class="row mt-5">
@@ -32,12 +32,12 @@
                     </h5>
                     {% endfor %}
                 </div>
-                <form action="{% url 'edit_repayment' repayment.id %}" method="post" class="needs-validation" novalidate autocomplete="off">
+                <form action="{% url 'edit_repayment' repayment.id %}" method="post" class="needs-validation"  autocomplete="off">
                     {%csrf_token%}
                     <div class="row">
                       <div class="col-md-6">
                         <label for="dest" style="color: white;">Principal Amount</label>
-                        <input type="text" class="form-control text-white bg-black mt-1" id="principal_amount"  name="principal_amount" value="{{ repayment.principal_amount }}" >
+                        <input type="text" class="form-control text-white bg-black mt-1" id="principal_amount"  name="principal_amount" value="{{ repayment.principal_amount }}" required>
                       </div>
                       <div class="col-md-6">
                         <label for="date" style="color: white;">Date</label>
@@ -52,11 +52,11 @@
                       </div>
                       <div class="col-md-6">
                         <label for="amount" style="color: white;">Total Amount</label>
-                        <input type="number" class="form-control text-white bg-black mt-1" id="total_amount"  name="total_amount" value="{{ repayment.total_amount }}">
+                        <input type="number" class="form-control text-white bg-black mt-1" id="total_amount"  name="total_amount" value="{{ repayment.total_amount }}" readonly>
                       </div>
                       <div class="col-md-6">
                         <label for="origin" style="color: white;">Paid From</label>
-                        <select class="form-control text-white bg-black form-select mt-1" id="rpayment_method" name="payment_method" >
+                        <select class="form-control text-white bg-black form-select mt-1" id="rpayment_method" name="payment_method" required >
                           <option value="" selected hidden>Select</option>
                           <option value="Cash" {% if repayment.payment_method == 'Cash' %} selected {% endif %}>Cash</option>
                           <option value="UPI" {% if repayment.payment_method == 'UPI' %} selected {% endif %}>UPI</option>
