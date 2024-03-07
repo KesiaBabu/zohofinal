@@ -231,6 +231,19 @@
     padding: 6px;
     margin-top: 1%;
   }
+
+    /* Style for the date input */
+    input[type="date"] {
+        /* Change the color of the text */
+        color: white; /* Change to the desired color */
+    }
+
+    /* Style for the calendar icon */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        /* Change the color of the calendar icon */
+        filter: invert(1); /* Change to the desired color */
+    }
+
 </style>
 
 <div class="body-wrapper">
@@ -546,7 +559,7 @@
                                   <option value="UPI">UPI</option>
                                   <option value="Cheque">Cheque</option>
                                   {% for bank in banks %}
-                                    <option value="{{ bank.bnk_name }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                                    <option value="{{ bank.id }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
                                   {% endfor %}
                                  
                                 </select>
@@ -639,7 +652,7 @@
                                   <option value="UPI">UPI</option>
                                   <option value="Cheque">Cheque</option>
                                   {% for bank in banks %}
-                                        <option value="{{ bank.bnk_name }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                                        <option value="{{ bank.id }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
                                         {% endfor %}
                                   
                                 </select>
@@ -1754,12 +1767,11 @@
             $('#upidetails').hide();
             $('#accdetails').show()
             console.log('selectedOption');
+            var bankId = $(this).val();
             $.ajax({
-           url: "{% url 'full_account_number'  %}",
+              url: '{% url "full_account_number" 0 %}'.replace('0', bankId),
            type: 'GET',
-           data:{
-           bank_id:selectedOption
-           },
+           
                                             
           success: function(response) {
           console.log('Success:', response);
@@ -1797,17 +1809,16 @@
             $('#upi_details').hide();
             $('#acc_details').show()
             console.log('selectedOption');
+            var bankId = $(this).val();
             $.ajax({
-           url: "{% url 'full_account_number'  %}",
+            url: '{% url "full_account_number" 0 %}'.replace('0', bankId),
            type: 'GET',
-           data:{
-           bank_id:selectedOption
-           },
+           
                                             
           success: function(response) {
           console.log('Success:', response);
-          data=response.bank
-          $('#acc_no').val(data);
+          
+          $('#acc_no').val(response.bank);
           },
           error: function(xhr, status, error) {
           console.error(error);
@@ -2479,6 +2490,18 @@
       });
     });
   });
+</script>
+<script>
+  function printfun(){
+         var printContents = document.getElementById("whatToPrint").innerHTML;
+      var $printerDiv = $('<div class="printContainer"></div>'); // create the div that will contain the stuff to be printed
+      $printerDiv.html(printContents); // add the content to be printed
+      $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+
+      window.print(); // call print
+      $printerDiv.remove(); // remove the div
+      $('body').removeClass("printingContent");
+  }
 </script>
 
 <script>

@@ -37,7 +37,7 @@
                                     </h5>
                                     {% endfor %}
                                 </div>
-                                <form method="POST" action="{% url 'add_loan' %}" enctype="multipart/form-data">
+                                <form method="POST" action="{% url 'add_loan' %}" enctype="multipart/form-data" id="addloan">
                                     {% csrf_token %}
                                     <div class="row">
                                         <div class="data  col-lg-8 col-md-6 col-sm-16">
@@ -51,9 +51,11 @@
                                                         id="account_name" required>
                                                         <option value="" selected hidden>Select</option>
                                                         {% for acc in bank_holder %}
+                                                        {% if acc.status == 'Active' %}
 
                                                         <!-- <option value="" selected hidden>Select</option> -->
                                                         <option value="{{ acc.id }}">{{ acc.customer_name }}</option>
+                                                        {% endif %}
 
                                                         {% endfor %}
 
@@ -78,7 +80,7 @@
                                                     <label for="">Loan Amount</label>
                                                 </div>
                                                 <div class="input-container col-6">
-                                                    <input type="text" class="form-control text-dark bg-light"
+                                                    <input type="number" class="form-control text-dark bg-light"
                                                         name="loan_amount" required>
                                                 </div>
                                             </div>
@@ -113,8 +115,10 @@
                                                         <option value="UPI">UPI</option>
                                                         <option value="Cheque">Cheque</option>
                                                         {% for bank in banks %}
-                                                        <option value="{{ bank.bnk_name }}">{{ bank.bnk_name }}-(
-                                                            {{bank.bnk_acno|slice:'-4:' }})</option>
+                                                        <!-- <option value="{{ bank.bnk_name }}">{{ bank.bnk_name }}-(
+                                                            {{bank.bnk_acno|slice:'-4:' }})</option> -->
+                                                            <option value="{{ bank.id }}">{{ bank.bnk_name }}-(
+                                                                {{bank.bnk_acno|slice:'-4:' }})</option>
                                                         {% endfor %}
                                                     </select>
                                                 </div>
@@ -143,7 +147,7 @@
                                                 </div>
                                                 <div class="input-container col-6">
                                                     <input type="text" class="form-control text-dark bg-light"
-                                                        name="laccount_number" id="accountnum">
+                                                        name="laccount_number" id="accountnum" readonly>
                                                 </div>
                                             </div>
 
@@ -180,7 +184,7 @@
                                                         <option value="UPI">UPI</option>
                                                         <option value="Cheque">Cheque</option>
                                                         {% for bank in banks %}
-                                                        <option value="{{ bank.bnk_name }}">{{ bank.bnk_name }}-(
+                                                        <option value="{{ bank.id }}">{{ bank.bnk_name }}-(
                                                             {{bank.bnk_acno|slice:'-4:' }})</option>
                                                         {% endfor %}
                                                     </select>
@@ -210,7 +214,7 @@
                                                 </div>
                                                 <div class="input-container col-6">
                                                     <input type="text" class="form-control text-dark bg-light"
-                                                        name="paccount_number" id="account_number">
+                                                        name="paccount_number" id="account_number" readonly>
                                                 </div>
                                             </div>
 
@@ -271,19 +275,21 @@
                                     $('#cheque_details').hide();
                                     $('#upi_details').hide();
                                     $('#accountnumber').show()
-                                    console.log('selectedOption');
+                                   
+                                    var bankId = $(this).val();
+                                   // alert(bankId)
                                     $.ajax({
-                                        url: "{% url 'full_account_number'  %}",
+                                        url: '{% url "full_account_number" 0 %}'.replace('0', bankId),
                                         type: 'GET',
-                                        data: {
-                                            bank_id: selectedOption
-                                        },
+                                        // data: {
+                                        //     data: {'bank_id': bankId},
+                                        // },
 
                                         success: function (response) {
-                                            console.log('Success:', response);
-                                            console.log('Success:');
-                                            data = response.bank
-                                            $('#accountnum').val(data);
+                                           
+                                           
+                                            $('#accountnum').val(response.bank);
+                                            
                                         },
                                         error: function (xhr, status, error) {
                                             console.error(error);
@@ -291,7 +297,24 @@
                                     });
                                 }
                             });
-                        });       
+                            $('#addloan').submit(function (e) {
+        var selectedOption = $('#payment_method').val();
+        if (selectedOption === 'UPI') {
+            var upiId = $('#upi_id').val();
+            if (!upiId) {
+                e.preventDefault(); // Prevent form submission
+                alert('UPI ID is required.');
+            }
+        }else if(selectedOption === 'Cheque') {
+            var cheq = $('#cheque_number').val();
+            if (!cheq) {
+                e.preventDefault(); // Prevent form submission
+                alert('Cheque number is required.');
+            }}
+        
+    });
+});
+                              
                     </script>
                     <script>
                         $(document).ready(function () {
@@ -319,18 +342,17 @@
                                     $('#upi_p').hide();
                                     $('#account_number_p').show()
                                     console.log('selectedOption');
+                                    var bankId = $(this).val();
                                     $.ajax({
-                                        url: "{% url 'full_account_number'  %}",
+                                        url: '{% url "full_account_number" 0 %}'.replace('0', bankId),
                                         type: 'GET',
-                                        data: {
-                                            bank_id: selectedOption
-                                        },
+                                        
 
                                         success: function (response) {
                                             console.log('Success:', response);
                                             console.log('Success:');
-                                            data = response.bank
-                                            $('#account_number').val(data);
+                                           
+                                            $('#account_number').val(response.bank);
                                         },
                                         error: function (xhr, status, error) {
                                             console.error(error);
@@ -338,7 +360,30 @@
                                     });
                                 }
                             });
-                        });       
+                            $('#addloan').submit(function (e) {
+        var selectedOption = $('#processing_method').val();
+        if (selectedOption === 'UPI') {
+            var pupiId = $('#upi').val();
+            if (!upiId) {
+                e.preventDefault(); // Prevent form submission
+                alert('UPI ID is required.');
+            }
+        }else if(selectedOption === 'Cheque') {
+            var pcheq = $('#cheque').val();
+            if (!pcheq) {
+                e.preventDefault(); // Prevent form submission
+                alert('Cheque number is required.');
+            }
+        // }else  {
+        //     var pacco = $('#account_number').val();
+        //     if (!pacco) {
+        //         e.preventDefault(); // Prevent form submission
+        //         alert('Account number is required.');
+        //     }
+        }
+    });
+});
+                               
                     </script>
 
                     <script>
@@ -370,8 +415,8 @@
                             <div class="modal-content" style="background-color: #3b3b3b;">
                                 <div class="modal-header">
                                     <h5 class="modal-title text-light" id="accountModalLabel">Account Details</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
+                                    <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close"> -->
+                                        <!-- <span aria-hidden="true">&times;</span> -->
                                     </button>
                                 </div>
                                 <div class="modal-body">
@@ -387,7 +432,7 @@
                                                     name="customer_name" id="customer_name" required>
                                                 <h6 class="text-light mt-3"> Alias</h6>
                                                 <input type="text" class="form-control text-dark bg-light" name="alias"
-                                                    id="al" required>
+                                                    id="al" >
                                                 <h6 class="text-light mt-3">Phone Number</h6>
                                                 <input type="tel" class="form-control text-dark bg-light"
                                                     name="phone_number" id="phone" required  onkeyup="phoneValidate(document.getElementById('phone'),document.getElementById('pherror'))">
@@ -416,10 +461,12 @@
                                                     id="bank_name" required>
                                                     <option value="" selected hidden>Select</option>
                                                     {% for bank in banks %}
+                                                    {% if bank.status == 'Active' %}
                                                     <option value="{{ bank.bnk_name}} "
                                                         data-account="{{ bank.bnk_acno }}"
                                                         data-ifsc="{{ bank.bnk_ifsc }}">{{ bank.bnk_name }}-(
                                                         {{bank.bnk_acno|slice:'-4:' }})</option>
+                                                        {% endif %}
                                                     {% endfor %}
                                                 </select>
                                                 <!-- <input type="text" class="form-control text-dark bg-light"
@@ -534,7 +581,7 @@
                                                     <option value="[OT]-Other Territory">[OT]-Other Territory</option>
                                                 </select>
                                                 <h6 class="text-light mt-3">Pin</h6>
-                                                <input type="text" class="form-control text-dark bg-light" name="pin"
+                                                <input type="number" class="form-control text-dark bg-light" name="pin"
                                                     id="m_pin" required>
                                             </div>
                                         </div>
@@ -642,15 +689,20 @@
         } else {
             $('#agreeTermsContainer .error-message').remove();
         }
-        //                         var phoneInput = document.getElementById('phone').value;
-        // var phoneError = document.getElementById('phone-error');
-        // if (!/^\d{10}$/.test(phoneInput)) {
-        //     valid = false;
-        //     phoneError.textContent = "Please enter a valid 10-digit phone number";
-        //     window.alert('10 digit required');
-        // } else {
-        //     phoneError.textContent = "";
+        // if ($('#l_amount').val() === "") {
+        //    // alert('amount empty')
+        //     valid = true;
+        //    // alert(valid)
+
         // }
+
+        // // Allow form submission even if amount type field is empty
+        // if ($('#amount_type').val() === "") {
+        //    // alert('type empty')
+        //     valid = true;
+        //    // alert(valid)
+        // }
+        
 
                                 if (!valid) {
                                     alert('Please fill the required fields');
@@ -743,19 +795,7 @@
                             });
                         </script>
                         <script>
-                            // document.getElementById('phone').addEventListener('input', function () {
-                            //     var phoneInput = this.value;
-                            //     var phoneError = document.getElementById('phone-error');
-                                
-                            //     if (!/^\d{10}$/.test(phoneInput)) {
-                                    
-                            //         phoneError.textContent = "Please enter a valid 10-digit phone number";
-                            //         window.alert('10 digit required')
-                            //     } else {
-
-                            //         phoneError.textContent = "";
-                            //     }
-                            // });
+                            
                             function phoneValidate(phn, pherror) {
             if (!phn.value.match(/^[6-9]\d{9}$/)) {
                 pherror.style.display = "block"
@@ -768,16 +808,7 @@
             return true;
         }
 
-                            // document.getElementById('email_id').addEventListener('input', function () {
-                            //     var emailInput = this.value;
-                            //     var emailError = document.getElementById('email-error');
-
-                            //     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput)) {
-                            //         emailError.textContent = "Please enter a valid email address";
-                            //     } else {
-                            //         emailError.textContent = "";
-                            //     }
-                            // });
+                            
                             function emailvalidate() {
     var email = document.getElementById('email_id');
     var error = document.getElementById('error');
@@ -795,17 +826,7 @@
 }
 
 
-                            // document.getElementById('pannumber').addEventListener('input', function () {
-                            //     var panInput = this.value;
-                            //     var panError = document.getElementById('pan-error');
-                            //     var panPattern = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
 
-                            //     if (!panPattern.test(panInput)) {
-                            //         panError.textContent = "Please enter a valid PAN number (e.g., ABCDE1234F)";
-                            //     } else {
-                            //         panError.textContent = ""; // Clear error message if input is valid
-                            //     }
-                            // });
                             function panvalidate() {
     var pan = document.getElementById('pannumber');
     var error_pan = document.getElementById('error_pan');
@@ -824,17 +845,7 @@
 
 
 
-                            // document.getElementById('gst_number').addEventListener('change', function () {
-                            //     var gstInput = this.value.toUpperCase(); // Convert to uppercase to match GST format
-                            //     var gstError = document.getElementById('gst-error');
-                            //     var gstPattern = /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}\d{1}[A-Z1-9]{1}\d{1}$/;
-
-                            //     if (!gstPattern.test(gstInput)) {
-                            //         gstError.textContent = "Please enter a valid GST number (e.g., 22AAAAA0000A1Z5)";
-                            //     } else {
-                            //         gstError.textContent = "";
-                            //     }
-                            // });
+                            
                             function gstvalidate() {
                                 var gstInput = document.getElementById('gst_number');
                                 // var gstInput = this.value.toUpperCase(); // Convert to uppercase to match GST format
@@ -852,10 +863,7 @@
     return true;
 }
 
-                            // document.addEventListener('DOMContentLoaded', function () {
-                            //     var currentDate = new Date().toISOString().slice(0, 10);
-                            //     document.getElementById('l_date').value = currentDate;
-                            // });
+                            
                         </script>
                         <script>
          

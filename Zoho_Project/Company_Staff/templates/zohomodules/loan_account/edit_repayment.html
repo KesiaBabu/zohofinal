@@ -1,7 +1,17 @@
 {% extends 'base.html' %}
 {% block content %}
 {% load static %}
+<style>
+  input[type="date"] {
+        /* Change the color of the text */
+        color: white; /* Change to the desired color */
+    }
 
+    /* Style for the calendar icon */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        /* Change the color of the calendar icon */
+        filter: invert(1); /* Change to the desired color */
+    }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
@@ -62,7 +72,8 @@
                           <option value="UPI" {% if repayment.payment_method == 'UPI' %} selected {% endif %}>UPI</option>
                           <option value="Cheque" {% if repayment.payment_method == 'Cheque' %} selected {% endif %}>Cheque</option>
                           {% for bank in banks %}
-                          <option value="{{ bank.bnk_name }}" {% if repayment.payment_method == bank.bnk_name %} selected {% endif %}>{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                          <option value="{{ bank.id }}" {% if repayment.payment_method == bank.bnk_name %} selected {% endif %}>{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                          <small>{{ bank.id }}</small>
                           {% endfor %}
                         </select>
                       </div>
@@ -145,12 +156,12 @@
               $('#cheque_details').hide();
               $('#upi_details').hide();
               $('#acc_details').show();
+              var bankId = $(this).val();
+              alert(bankId)
               $.ajax({
-              url: "{% url 'full_account_number'  %}",
+                url: '{% url "full_account_number" 0 %}'.replace('0', bankId),
               type: 'GET',
-              data:{
-              bank_id:selectedOption
-                 },
+              
                         
               success: function(response) {
               console.log('Success:', response);

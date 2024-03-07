@@ -97,7 +97,7 @@
                                         <option value="UPI" {% if account.payment_method == 'UPI' %} selected {% endif %}>UPI</option>
                                         <option value="Cheque" {% if account.payment_method == 'Cheque' %} selected {% endif %}>Cheque</option>
                                         {% for bank in banks %}
-                                        <option value="{{ bank.bnk_name }}" {% if account.payment_method == bank.bnk_name %} selected {% endif %}>{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                                        <option value="{{ bank.id }}" {% if account.payment_method == bank.bnk_name %} selected {% endif %}>{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -149,7 +149,7 @@
                                         <option value="UPI" {% if account.processing_method == 'UPI' %} selected {% endif %}>UPI</option>
                                         <option value="Cheque" {% if account.processing_method == 'Cheque' %} selected {% endif %}>Cheque</option>
                                             {% for bank in banks %}
-                                        <option value="{{ bank.bnk_name }}"{% if account.processing_method == bank.bnk_name %} selected {% endif %}>{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                                        <option value="{{ bank.id }}"{% if account.processing_method == bank.bnk_name %} selected {% endif %}>{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
                                         {% endfor %}
                                         </select>
                                     </div>
@@ -205,7 +205,7 @@
                             </div>
                             </div>
                             <button type="submit"  class="btn btn-outline-warning mt-2" >Save</button>
-                            <button type="reset"  class="btn btn-outline-warning mt-2" >Reset</button>
+                            <a href="{% url 'loan_listing' %}" class="btn btn-outline-warning mt-2">Close</a>
                         </div>
                     </div>
         
@@ -213,65 +213,9 @@
                         
 
                         
-                        <script>
-                            $(document).on("click","submitFormBtn",function() {
-                                $.ajax({
-                                        url: "{% url 'save_account_details' %}",
-                                        type: "POST",
-                                        data: $("#accountForm").serialize(),
-                                        success: function(response) {
-                                        document.getElementById("accountForm").reset();
-                                        reloadVendor();
-                                        },
-                                });
-                            });
-function reloadholder() {
+                      
 
-$.ajax({
-  url: "",
-  type: "GET",
-  dataType: "json",
-  data: $(this).serialize(),
-  csrfmiddlewaretoken: '{{ csrf_token }}',
 
-  success: function(data) { debugger
-    var dropdown = $('#holder');
-    dropdown.empty();
-    dropdown.append($('<option></option>').text('Select Account name'));
-    $.each(data, function(key, value) {
-      dropdown.append($('<option></option>').attr('value', key).text(value[1] + ' ' + value[2]).val(value[3]+' '+ value[1] + ' ' + value[2]));
-    });
-  },
-  error: function(xhr, status, error) {
-  console.error(xhr.responseText);
-  }
-});
-}
-
-</script>
-
-<script>
-    $(document).ready(function(){
-        
-        $('select[name="account_name"]').change(function(){
-            var selectedAccountId = $(this).val();
-
-           
-            $.ajax({
-                url: '{% url "add_loan" %}', 
-                type: 'POST',
-                data: {account_id: selectedAccountId},
-                success: function(data) {
-                    
-                    $('input[name="account_number"]').val(data.account_number);
-                },
-                error: function(error) {
-                    console.log(error);
-                }
-            });
-        });
-    });
-</script>
 <script>
     $(document).ready(function() {
         // Function to show the appropriate payment method details based on the selected option
@@ -293,12 +237,11 @@ $.ajax({
                 $('#cheque_details').hide();
                 $('#upi_details').hide();
                 $('#accountnumber').show();
+                var bankId = $(this).val();
                 $.ajax({
-                url: "{% url 'full_account_number'  %}",
+                url: '{% url "full_account_number" 0 %}'.replace('0', bankId),
                 type: 'GET',
-                data:{
-                bank_id:selectedOption
-                   },
+                
                           
                 success: function(response) {
                 console.log('Success:', response);
@@ -364,12 +307,11 @@ $.ajax({
                 $('#cheque_p').hide();
                 $('#upi_p').hide();
                 $('#account_number_p').show();
+                var bankId = $(this).val();
                 $.ajax({
-                url: "{% url 'full_account_number'  %}",
+                url: '{% url "full_account_number" 0 %}'.replace('0', bankId),
                 type: 'GET',
-                data:{
-                bank_id:selectedOption
-                   },
+                
                           
                 success: function(response) {
                 console.log('Success:', response);

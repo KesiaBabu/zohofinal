@@ -55,6 +55,7 @@ class BankAccount(models.Model):
     date = models.DateField()
     amount_type = models.CharField(max_length=10)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status= models.TextField(default='Active')
 
 class BankAccountHistory(models.Model):
     company=models.ForeignKey(CompanyDetails, on_delete=models.CASCADE,null=True,blank=True)

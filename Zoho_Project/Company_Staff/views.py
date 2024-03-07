@@ -563,11 +563,13 @@ def get_account_number(request, account_id):
 #         return JsonResponse(data)
 #     except Banking.DoesNotExist:
 #         return JsonResponse({'error': 'Banking record not found'}, status=404)
-def full_account_number(request):
+def full_account_number(request, bank_id):
     try:
         print('bank')
-        bank_id = request.GET.get('bank_id')
-        acc = Banking.objects.get(bnk_name=bank_id)
+        # bank_id = request.GET.get('bank_id')
+        # print(bank_id)
+        # acc = Banking.objects.get(bnk_name=bank_id)
+        acc = Banking.objects.get(pk=bank_id)
         data = {'bank':acc.bnk_acno}
         print(data)
         return JsonResponse(data)
@@ -594,7 +596,7 @@ def add_loan(request):
                 dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
                 company=dash_details.company
                 allmodules = ZohoModules.objects.get(company=dash_details.company, status='New')
-            banks = Banking.objects.values('bnk_name','bnk_acno','bnk_ifsc').filter(company=company).distinct()
+            banks = Banking.objects.values('id','bnk_name','bnk_acno','bnk_ifsc','status').filter(company=company)
             today_date=date.today()
             loaned_bank_account_ids = loan_account.objects.values_list('bank_holder_id', flat=True)
             context = {
@@ -618,6 +620,12 @@ def add_loan(request):
                 lender_bank = request.POST.get('lender_bank')
                 loan_date = request.POST.get('loan_date')
                 payment_method = request.POST.get('payment_method')
+                if payment_method is not None and payment_method.isdigit():
+                    print("payment_method is a number")
+                    acc = Banking.objects.get(pk=payment_method)
+                    payment_method = acc.bnk_name
+                # else:
+                #     print("payment_method is not a number")
                 upi_id=request.POST.get('upi_id')
                 cheque=request.POST.get('cheque_number')
                 payment_accountnumber=request.POST.get('laccount_number')
@@ -715,6 +723,7 @@ def save_account_details(request):
             
             if request.method == 'POST':
                print('inside post')
+               
                customer_name = request.POST.get('customer_name')
                alias = request.POST.get('alias')
                phone_number = request.POST.get('phone_number')
@@ -738,8 +747,13 @@ def save_account_details(request):
                gst_num = request.POST.get('gst_num')
                alter_gst_details = request.POST.get('gst_alter_details')
                date = request.POST.get('date')
-               amount_type = request.POST.get('amount_type')
+               amount_type = request.POST.get('amount_type', None)
                amount = request.POST.get('amount')
+               amount = float(amount) if amount else 0 
+               alter_gst_details = alter_gst_details if  alter_gst_details else False 
+               print(amount)
+               print(alter_gst_details)
+               
 
                if BankAccount.objects.filter( Q(pan_number=pan_number),company=company).exists():
                    print("inside panbankaccount filter")
@@ -784,6 +798,8 @@ def save_account_details(request):
                 amount=amount,
                 company=company,
                 login_details=log_details,
+               
+                
                     
                     )
                 bank.save()
@@ -810,6 +826,7 @@ def save_account_details(request):
                 return JsonResponse(data)
             except Exception as e:
                 error_message = str(e)
+                print(error_message)
                 return JsonResponse({'status': 'error', 'message': error_message})
             #    context = {
             #         'details': dash_details,
@@ -885,7 +902,7 @@ def overview(request,account_id):
             repayment_history = LoanRepaymentHistory.objects.filter(repayment__in=repayment_details,company=company)
             # repayment_history = LoanRepaymentHistory.objects.filter(repayment='3')
             
-            banks = Banking.objects.values('bnk_name','bnk_acno').filter(company=company).distinct()
+            banks = Banking.objects.values('id','bnk_name','bnk_acno').filter(company=company)
 
             current_balance = loan_info.loan_amount  
             balances = [] 
@@ -967,7 +984,7 @@ def transactoverview(request,account_id):
             repayment_history = LoanRepaymentHistory.objects.filter(repayment__in=repayment_details,company=company)
             # repayment_history = LoanRepaymentHistory.objects.filter(repayment='3')
             
-            banks = Banking.objects.values('bnk_name','bnk_acno').filter(company=company).distinct()
+            banks = Banking.objects.values('id','bnk_name','bnk_acno').filter(company=company)
 
             current_balance = loan_info.loan_amount  
             balances = [] 
@@ -1073,7 +1090,7 @@ def repayment_due_form(request, account_id):
                 company=dash_details.company
                 allmodules = ZohoModules.objects.get(company=dash_details.company, status='New')
                 
-            banks = Banking.objects.values('bnk_name','bnk_acno').filter(company=company).distinct()
+            banks = Banking.objects.values('id','bnk_name','bnk_acno').filter(company=company)
 
             if request.method == 'POST':
                 principal_amount = request.POST.get('principal_amount')
@@ -1147,7 +1164,7 @@ def new_loan(request,account_id):
                 company=dash_details.company
                 allmodules = ZohoModules.objects.get(company=dash_details.company, status='New')
                 
-            banks = Banking.objects.values('bnk_name','bnk_acno').filter(company=company).distinct()
+            banks = Banking.objects.values('id','bnk_name','bnk_acno').filter(company=company)
 
             today_date = dt.today()
             if request.method == 'POST':
@@ -1227,7 +1244,7 @@ def edit_loanaccount(request, account_id):
                 company=dash_details.company
                 allmodules = ZohoModules.objects.get(company=dash_details.company, status='New')
 
-            banks = Banking.objects.values('bnk_name','bnk_acno').filter(company=company).distinct()
+            banks = Banking.objects.values('id','bnk_name','bnk_acno').filter(company=company)
             bank_holder=BankAccount.objects.filter(company=company)
 
             bank_account = get_object_or_404(BankAccount, id=account_id,company=company)
@@ -1259,7 +1276,7 @@ def edit_loantable(request, account_id):
 
             bank_account = BankAccount.objects.get(id=account_id,company=company)
             loan = loan_account.objects.get(bank_holder=bank_account,company=company)
-            banks = Banking.objects.values('bnk_name','bnk_acno').distinct()
+            banks = Banking.objects.values('id','bnk_name','bnk_acno')
 
             if request.method == 'POST':
                 
@@ -1363,7 +1380,7 @@ def edit_repayment(request, repayment_id):
                 allmodules = ZohoModules.objects.get(company=dash_details.company, status='New')
             repayment = get_object_or_404(LoanRepayemnt, id=repayment_id,company=company)
             account_id = repayment.loan.bank_holder_id 
-            banks = Banking.objects.values('bnk_name','bnk_acno').filter(company=company).distinct()
+            banks = Banking.objects.values('id','bnk_name','bnk_acno').filter(company=company)
             
            
             if request.method == 'POST':
@@ -1429,7 +1446,7 @@ def edit_additional_loan(request, repayment_id):
             repayment = get_object_or_404(LoanRepayemnt, id=repayment_id,company=company)
             account_id = repayment.loan.bank_holder_id 
             current_balance=calculate_overall_balance(request,account_id)
-            banks = Banking.objects.values('bnk_name','bnk_acno').filter(company=company).distinct()
+            banks = Banking.objects.values('id','bnk_name','bnk_acno').filter(company=company)
     
             if request.method == 'POST':
                 principal_amount = request.POST.get('principal_amount')
