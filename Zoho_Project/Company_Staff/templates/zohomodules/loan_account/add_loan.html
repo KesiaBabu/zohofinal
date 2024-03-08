@@ -17,7 +17,8 @@
                 {% if log_details.user_type == 'Company' %} <li class="breadcrumb-item"><a
                         href="{% url 'company_dashboard' %}" class="text-warning-emphasis">Dashboard</a></li>{% endif %}
                 <li class="breadcrumb-item"><a class="text-warning-emphasis">Cash & Bank</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'loan_listing' %}" class="text-warning-emphasis">Loan Account</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'loan_listing' %}" class="text-warning-emphasis">Loan
+                        Account</a></li>
                 <li class="breadcrumb-item" aria-current="page">Add Loan</li>
         </nav>
         <div class="row mt-5">
@@ -37,7 +38,8 @@
                                     </h5>
                                     {% endfor %}
                                 </div>
-                                <form method="POST" action="{% url 'add_loan' %}" enctype="multipart/form-data" id="addloan">
+                                <form method="POST" action="{% url 'add_loan' %}" enctype="multipart/form-data"
+                                    id="addloan">
                                     {% csrf_token %}
                                     <div class="row">
                                         <div class="data  col-lg-8 col-md-6 col-sm-16">
@@ -115,10 +117,12 @@
                                                         <option value="UPI">UPI</option>
                                                         <option value="Cheque">Cheque</option>
                                                         {% for bank in banks %}
+                                                        {% if bank.status == 'Active' %}
                                                         <!-- <option value="{{ bank.bnk_name }}">{{ bank.bnk_name }}-(
                                                             {{bank.bnk_acno|slice:'-4:' }})</option> -->
-                                                            <option value="{{ bank.id }}">{{ bank.bnk_name }}-(
-                                                                {{bank.bnk_acno|slice:'-4:' }})</option>
+                                                        <option value="{{ bank.id }}">{{ bank.bnk_name }}-(
+                                                            {{bank.bnk_acno|slice:'-4:' }})</option>
+                                                        {% endif %}
                                                         {% endfor %}
                                                     </select>
                                                 </div>
@@ -184,8 +188,10 @@
                                                         <option value="UPI">UPI</option>
                                                         <option value="Cheque">Cheque</option>
                                                         {% for bank in banks %}
+                                                        {% if bank.status == 'Active' %}
                                                         <option value="{{ bank.id }}">{{ bank.bnk_name }}-(
                                                             {{bank.bnk_acno|slice:'-4:' }})</option>
+                                                        {% endif %}
                                                         {% endfor %}
                                                     </select>
                                                 </div>
@@ -275,9 +281,9 @@
                                     $('#cheque_details').hide();
                                     $('#upi_details').hide();
                                     $('#accountnumber').show()
-                                   
+
                                     var bankId = $(this).val();
-                                   // alert(bankId)
+                                    // alert(bankId)
                                     $.ajax({
                                         url: '{% url "full_account_number" 0 %}'.replace('0', bankId),
                                         type: 'GET',
@@ -286,10 +292,10 @@
                                         // },
 
                                         success: function (response) {
-                                           
-                                           
+
+
                                             $('#accountnum').val(response.bank);
-                                            
+
                                         },
                                         error: function (xhr, status, error) {
                                             console.error(error);
@@ -298,23 +304,24 @@
                                 }
                             });
                             $('#addloan').submit(function (e) {
-        var selectedOption = $('#payment_method').val();
-        if (selectedOption === 'UPI') {
-            var upiId = $('#upi_id').val();
-            if (!upiId) {
-                e.preventDefault(); // Prevent form submission
-                alert('UPI ID is required.');
-            }
-        }else if(selectedOption === 'Cheque') {
-            var cheq = $('#cheque_number').val();
-            if (!cheq) {
-                e.preventDefault(); // Prevent form submission
-                alert('Cheque number is required.');
-            }}
-        
-    });
-});
-                              
+                                var selectedOption = $('#payment_method').val();
+                                if (selectedOption === 'UPI') {
+                                    var upiId = $('#upi_id').val();
+                                    if (!upiId) {
+                                        e.preventDefault(); // Prevent form submission
+                                        alert('UPI ID is required.');
+                                    }
+                                } else if (selectedOption === 'Cheque') {
+                                    var cheq = $('#cheque_number').val();
+                                    if (!cheq) {
+                                        e.preventDefault(); // Prevent form submission
+                                        alert('Cheque number is required.');
+                                    }
+                                }
+
+                            });
+                        });
+
                     </script>
                     <script>
                         $(document).ready(function () {
@@ -346,12 +353,12 @@
                                     $.ajax({
                                         url: '{% url "full_account_number" 0 %}'.replace('0', bankId),
                                         type: 'GET',
-                                        
+
 
                                         success: function (response) {
                                             console.log('Success:', response);
                                             console.log('Success:');
-                                           
+
                                             $('#account_number').val(response.bank);
                                         },
                                         error: function (xhr, status, error) {
@@ -361,29 +368,24 @@
                                 }
                             });
                             $('#addloan').submit(function (e) {
-        var selectedOption = $('#processing_method').val();
-        if (selectedOption === 'UPI') {
-            var pupiId = $('#upi').val();
-            if (!upiId) {
-                e.preventDefault(); // Prevent form submission
-                alert('UPI ID is required.');
-            }
-        }else if(selectedOption === 'Cheque') {
-            var pcheq = $('#cheque').val();
-            if (!pcheq) {
-                e.preventDefault(); // Prevent form submission
-                alert('Cheque number is required.');
-            }
-        // }else  {
-        //     var pacco = $('#account_number').val();
-        //     if (!pacco) {
-        //         e.preventDefault(); // Prevent form submission
-        //         alert('Account number is required.');
-        //     }
-        }
-    });
-});
-                               
+                                var selectedOption = $('#processing_method').val();
+                                if (selectedOption === 'UPI') {
+                                    var pupiId = $('#upi').val();
+                                    if (!pupiId) {
+                                        e.preventDefault(); // Prevent form submission
+                                        alert('UPI ID is required.');
+                                    }
+                                } else if (selectedOption === 'Cheque') {
+                                    var pcheq = $('#cheque').val();
+                                    if (!pcheq) {
+                                        e.preventDefault(); // Prevent form submission
+                                        alert('Cheque number is required.');
+                                    }
+
+                                }
+                            });
+                        });
+
                     </script>
 
                     <script>
@@ -416,7 +418,7 @@
                                 <div class="modal-header">
                                     <h5 class="modal-title text-light" id="accountModalLabel">Account Details</h5>
                                     <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close"> -->
-                                        <!-- <span aria-hidden="true">&times;</span> -->
+                                    <!-- <span aria-hidden="true">&times;</span> -->
                                     </button>
                                 </div>
                                 <div class="modal-body">
@@ -432,18 +434,19 @@
                                                     name="customer_name" id="customer_name" required>
                                                 <h6 class="text-light mt-3"> Alias</h6>
                                                 <input type="text" class="form-control text-dark bg-light" name="alias"
-                                                    id="al" >
+                                                    id="al">
                                                 <h6 class="text-light mt-3">Phone Number</h6>
                                                 <input type="tel" class="form-control text-dark bg-light"
-                                                    name="phone_number" id="phone" required  onkeyup="phoneValidate(document.getElementById('phone'),document.getElementById('pherror'))">
+                                                    name="phone_number" id="phone" required
+                                                    onkeyup="phoneValidate(document.getElementById('phone'),document.getElementById('pherror'))">
                                                 <!-- <small class="text-danger error-message" id="phone-error"></small> -->
-                                               
-                                    <div id="pherror" class="text-danger"></div>
+
+                                                <div id="pherror" class="text-danger"></div>
 
                                                 <h6 class="text-light mt-3">Email</h6>
                                                 <input type="email" class="form-control text-dark bg-light" name="email"
                                                     id="email_id" required onkeyup="emailvalidate()">
-                                                    <div id="error" class="text-danger"></div>
+                                                <div id="error" class="text-danger"></div>
                                                 <small class="text-danger error-message" id="email-error"></small>
                                                 <h6 class="text-light mt-3">Account Type</h6>
                                                 <select class="form-control text-dark bg-light" name="account_type"
@@ -466,7 +469,7 @@
                                                         data-account="{{ bank.bnk_acno }}"
                                                         data-ifsc="{{ bank.bnk_ifsc }}">{{ bank.bnk_name }}-(
                                                         {{bank.bnk_acno|slice:'-4:' }})</option>
-                                                        {% endif %}
+                                                    {% endif %}
                                                     {% endfor %}
                                                 </select>
                                                 <!-- <input type="text" class="form-control text-dark bg-light"
@@ -591,7 +594,7 @@
                                                 <h6 class="text-light mt-3">PAN number</h6>
                                                 <input type="text" class="form-control text-dark bg-light"
                                                     name="pan_number" id="pannumber" required onkeyup="panvalidate()">
-                                                    <div id="error_pan" class="text-danger"></div>
+                                                <div id="error_pan" class="text-danger"></div>
                                                 <!-- <small class="text-danger error-message" id="pan-error"></small> -->
 
                                                 <h6 class="text-light mt-3"> Registration type</h6>
@@ -607,8 +610,9 @@
                                                 <h6 class="text-light mt-3" id="gstNumberLabel" style="display: none;">
                                                     GST Number</h6>
                                                 <input type="text" class="form-control text-dark bg-light"
-                                                    name="gst_num" id="gst_number" style="display: none;"onkeyup="gstvalidate()">
-                                                    <div id="gst_error" class="text-danger"></div>
+                                                    name="gst_num" id="gst_number" style="display: none;"
+                                                    onkeyup="gstvalidate()">
+                                                <div id="gst_error" class="text-danger"></div>
 
                                                 <h6 class="text-light mt-3"> Set Alter GST Details </h6>
                                                 <select class="form-control text-dark bg-light" name="gst_alter_details"
@@ -658,7 +662,7 @@
                                                 <button type="button" class="btn btn-outline-warning"
                                                     data-dismiss="modal">Close</button>
                                                 <button type="submit" class="btn btn-outline-warning" id="submitFormBtn"
-                                                 data-dismiss="modal" >Save</button>
+                                                    data-dismiss="modal">Save</button>
                                             </div>
                                     </form>
                                 </div>
@@ -666,91 +670,165 @@
                         </div>
 
                         <script>
-                            // $(document).on("click", "#submitFormBtn", function (event) {
-                                $(document).ready(function() {
-                                document.getElementById('submitFormBtn').addEventListener('click', function(event) {
-
-                                var form = document.getElementById('modalaccount');
-                                var valid = true;
-
-                                // Reset previous validation messages
-                                $('#modalaccount .error-message').remove();
-
-                                // Check each required field individually
-                                $('#modalaccount .form-control[required]').each(function () {
-                                    if (!$(this).val()) {
-                                        valid = false;
-                                        $(this).after('<small class="text-danger error-message">This field is required.</small>');
-                                    }
-                                });
-                                if (!$('#agreeTerms').prop('checked')) {
-                valid = false;
-                $('#agreeTermsContainer').append('<small class="text-danger error-message">Please agree to the terms and conditions.</small>');
-        } else {
-            $('#agreeTermsContainer .error-message').remove();
-        }
-        // if ($('#l_amount').val() === "") {
-        //    // alert('amount empty')
-        //     valid = true;
-        //    // alert(valid)
-
-        // }
-
-        // // Allow form submission even if amount type field is empty
-        // if ($('#amount_type').val() === "") {
-        //    // alert('type empty')
-        //     valid = true;
-        //    // alert(valid)
-        // }
-        
-
-                                if (!valid) {
-                                    alert('Please fill the required fields');
-                                    event.preventDefault();
-                                    event.stopPropagation();
-                                    form.classList.add('was-validated');
+                             function phoneValidate(phn, pherror) {
+                                var phnum = phn.value;
+                                //alert(phnum);
+                                if (!phn.value.match(/^[6-9]\d{9}$/)) {
+                                    pherror.style.display = "block"
+                                    pherror.style.fontSize = ".8rem"
+                                    pherror.innerHTML = "*Please enter a valid phone number"
                                     return false;
-                                } else {
-                                    var formData = new FormData(form);
-                                    $.ajax({
-                                        url: "{% url 'save_account_details' %}",
-                                        type: "POST",
-                                        data: formData,
-                                        processData: false,
-                                        contentType: false,
-                                        headers: {
-                                            "X-CSRFToken": "{{ csrf_token }}"
-                                        },
-                                        success: function (response) {
-                                            if (response.status === 'success') {
-                                                // Do something if the submission was successful
-                                                alert('Account details saved successfully');
-                                            } else if (response.status === 'error') {
-                                                // Handle errors
-                                                if (response.message === 'phone_number') {
-                                                    alert('Phone number exists');
-                                                } else if (response.message === 'gst_num') {
-                                                    alert('GST number exists');
-                                                } else if (response.message === 'pan_number') {
-                                                    alert('PAN number exists');
-                                                } else if (response.message === 'account_number') {
-                                                    alert('Account number exists');
-                                                } else {
-                                                    alert('Error in saving form');
-                                                }
-                                                return false;
-                                            }
-                                            form.reset();
-                                            form.classList.remove('was-validated');
-                                            reloadholder();
-                                        },
-                                        error: function (xhr, status, error) {
-                                            console.error("Error occurred:", error);
+                                }
+                                pherror.style.display = "none"
+                                pherror.innerHTML = ""
+                                return true;
+                            }
+
+
+                            function emailvalidate() {
+                                var email = document.getElementById('email_id');
+                                var error = document.getElementById('error');
+
+                                // Regular expression for basic email validation
+                                if (!email.value.match(/^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/)) {
+                                    error.style.fontSize = ".8rem";
+                                    error.innerHTML = "*Please enter a valid email";
+                                    return false;
+                                }
+
+                                // Clear the error message if the email is valid
+                                error.innerHTML = "";
+                                return true;
+                            }
+
+
+
+                            function panvalidate() {
+                                var pan = document.getElementById('pannumber');
+                                var error_pan = document.getElementById('error_pan');
+
+                                // Regular expression for basic email validation
+                                if (!pan.value.match(/^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/)) {
+                                    error_pan.style.fontSize = ".8rem";
+                                    error_pan.innerHTML = "Please enter a valid PAN number (e.g., ABCDE1234F)";
+                                    return false;
+                                }
+
+                                // Clear the error message if the email is valid
+                                error_pan.innerHTML = "";
+                                return true;
+                            }
+
+
+
+
+                            function gstvalidate() {
+                                var gstInput = document.getElementById('gst_number');
+                                // var gstInput = this.value.toUpperCase(); // Convert to uppercase to match GST format
+                                var gst_error = document.getElementById('gst_error');
+
+                                // Regular expression for basic email validation
+                                if (!gstInput.value.match(/^\d{2}[A-Z]{5}\d{4}[A-Z]{1}\d{1}[A-Z1-9]{1}\d{1}$/)) {
+                                    gst_error.style.fontSize = ".8rem";
+                                    gst_error.innerHTML = "Please enter a valid GST number (e.g., 22AAAAA0000A1Z5)";
+                                    return false;
+                                }
+
+                                // Clear the error message if the email is valid
+                                gst_error.innerHTML = "";
+                                return true;
+                            }
+
+                            // $(document).on("click", "#submitFormBtn", function (event) {
+                            $(document).ready(function () {
+                                document.getElementById('submitFormBtn').addEventListener('click', function (event) {
+
+                                    var form = document.getElementById('modalaccount');
+                                    var valid = true;
+
+                                    // Reset previous validation messages
+                                    $('#modalaccount .error-message').remove();
+
+                                    // Check each required field individually
+                                    $('#modalaccount .form-control[required]').each(function () {
+                                        if (!$(this).val()) {
+                                            valid = false;
+                                            $(this).after('<small class="text-danger error-message">This field is required.</small>');
                                         }
                                     });
-                                }
+                                    if (!$('#agreeTerms').prop('checked')) {
+                                        valid = false;
+                                        $('#agreeTermsContainer').append('<small class="text-danger error-message">Please agree to the terms and conditions.</small>');
+                                    } else {
+                                        $('#agreeTermsContainer .error-message').remove();
+                                    }
+                                    
+                                    if (!phoneValidate(document.getElementById('phone'),document.getElementById('pherror'))) {
+                                        valid = false;
+                                       // alert('Phone number invalid')
+                                    }
+                                    if (!emailvalidate()) {
+                                        valid = false;
+                                       // alert('Email id invalid')
+                                    }
+                                    if (!panvalidate()) {
+                                        valid = false;
+                                        //alert('Pan number invalid')
+                                    }
+                                    if (!gstvalidate()) {
+                                        valid = false;
+                                        //alert('GST number invalid')
+                                    }
+
+
+
+                                    if (!valid) {
+                                        alert('Please fill the required fields correctly');
+                                        event.preventDefault();
+                                        event.stopPropagation();
+                                        form.classList.add('was-validated');
+                                        return false;
+                                    } else {
+                                        var formData = new FormData(form);
+                                        $.ajax({
+                                            url: "{% url 'save_account_details' %}",
+                                            type: "POST",
+                                            data: formData,
+                                            processData: false,
+                                            contentType: false,
+                                            headers: {
+                                                "X-CSRFToken": "{{ csrf_token }}"
+                                            },
+                                            success: function (response) {
+                                                if (response.status === 'success') {
+                                                    // Do something if the submission was successful
+                                                    alert('Account details saved successfully');
+                                                } else if (response.status === 'error') {
+                                                    // Handle errors
+                                                    if (response.message === 'phone_number') {
+                                                        alert('Phone number exists');
+                                                    } else if (response.message === 'gst_num') {
+                                                        alert('GST number exists');
+                                                    } else if (response.message === 'pan_number') {
+                                                        alert('PAN number exists');
+                                                    } else if (response.message === 'account_number') {
+                                                        alert('Account number exists');
+                                                    } else {
+                                                        alert('Error in saving form');
+                                                    }
+                                                    return false;
+                                                }
+                                                form.reset();
+                                                form.classList.remove('was-validated');
+                                                reloadholder();
+                                            },
+                                            error: function (xhr, status, error) {
+                                                console.error("Error occurred:", error);
+                                            }
+                                        });
+                                    }
+                                });
                             });
-                        });
                             function reloadholder() {
 
                                 $.ajax({
@@ -794,87 +872,91 @@
                                 });
                             });
                         </script>
-                        <script>
-                            
+                        <!-- <script>
+
                             function phoneValidate(phn, pherror) {
-            if (!phn.value.match(/^[6-9]\d{9}$/)) {
-                pherror.style.display = "block"
-                pherror.style.fontSize = ".8rem"
-                pherror.innerHTML = "*Please enter a valid phone number"
-                return false;
-            }
-            pherror.style.display = "none"
-            pherror.innerHTML = ""
-            return true;
-        }
+                                if (!phn.value.match(/^[6-9]\d{9}$/)) {
+                                    pherror.style.display = "block"
+                                    pherror.style.fontSize = ".8rem"
+                                    pherror.innerHTML = "*Please enter a valid phone number"
+                                    alert("Incorrent phone number");
+                                    return false;
+                                }
+                                pherror.style.display = "none"
+                                pherror.innerHTML = ""
+                                return true;
+                            }
 
-                            
+
                             function emailvalidate() {
-    var email = document.getElementById('email_id');
-    var error = document.getElementById('error');
+                                var email = document.getElementById('email_id');
+                                var error = document.getElementById('error');
 
-    // Regular expression for basic email validation
-    if (!email.value.match(/^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/)) {
-        error.style.fontSize = ".8rem";
-        error.innerHTML = "*Please enter a valid email";
-        return false;
-    }
+                                // Regular expression for basic email validation
+                                if (!email.value.match(/^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/)) {
+                                    error.style.fontSize = ".8rem";
+                                    error.innerHTML = "*Please enter a valid email";
+                                    alert("Incorrent email");
+                                    return false;
+                                }
 
-    // Clear the error message if the email is valid
-    error.innerHTML = "";
-    return true;
-}
+                                // Clear the error message if the email is valid
+                                error.innerHTML = "";
+                                return true;
+                            }
 
 
 
                             function panvalidate() {
-    var pan = document.getElementById('pannumber');
-    var error_pan = document.getElementById('error_pan');
+                                var pan = document.getElementById('pannumber');
+                                var error_pan = document.getElementById('error_pan');
 
-    // Regular expression for basic email validation
-    if (!pan.value.match(/^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/)) {
-        error_pan.style.fontSize = ".8rem";
-        error_pan.innerHTML = "Please enter a valid PAN number (e.g., ABCDE1234F)";
-        return false;
-    }
+                                // Regular expression for basic email validation
+                                if (!pan.value.match(/^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/)) {
+                                    error_pan.style.fontSize = ".8rem";
+                                    error_pan.innerHTML = "Please enter a valid PAN number (e.g., ABCDE1234F)";
+                                    alert("Incorrent pan number");
+                                    return false;
+                                }
 
-    // Clear the error message if the email is valid
-    error_pan.innerHTML = "";
-    return true;
-}
+                                // Clear the error message if the email is valid
+                                error_pan.innerHTML = "";
+                                return true;
+                            }
 
 
 
-                            
+
                             function gstvalidate() {
                                 var gstInput = document.getElementById('gst_number');
                                 // var gstInput = this.value.toUpperCase(); // Convert to uppercase to match GST format
-                             var gst_error = document.getElementById('gst_error');
+                                var gst_error = document.getElementById('gst_error');
 
-    // Regular expression for basic email validation
-    if (!gstInput.value.match(/^\d{2}[A-Z]{5}\d{4}[A-Z]{1}\d{1}[A-Z1-9]{1}\d{1}$/)) {
-        gst_error.style.fontSize = ".8rem";
-        gst_error.innerHTML = "Please enter a valid GST number (e.g., 22AAAAA0000A1Z5)";
-        return false;
-    }
+                                // Regular expression for basic email validation
+                                if (!gstInput.value.match(/^\d{2}[A-Z]{5}\d{4}[A-Z]{1}\d{1}[A-Z1-9]{1}\d{1}$/)) {
+                                    gst_error.style.fontSize = ".8rem";
+                                    gst_error.innerHTML = "Please enter a valid GST number (e.g., 22AAAAA0000A1Z5)";
+                                    alert("Incorrent gst number");
+                                    return false;
+                                }
 
-    // Clear the error message if the email is valid
-    gst_error.innerHTML = "";
-    return true;
-}
+                                // Clear the error message if the email is valid
+                                gst_error.innerHTML = "";
+                                return true;
+                            }
 
-                            
-                        </script>
+
+                        </script> -->
                         <script>
-         
+
                             var defaultDate = new Date();
-                      
-                      // Formatting the date to YYYY-MM-DD
-                      var formattedDate = defaultDate.toISOString().split('T')[0];
-                      
-                      // Setting the value of the input field
-                      document.getElementById("l_date").value = formattedDate;
-                              </script>
+
+                            // Formatting the date to YYYY-MM-DD
+                            var formattedDate = defaultDate.toISOString().split('T')[0];
+
+                            // Setting the value of the input field
+                            document.getElementById("l_date").value = formattedDate;
+                        </script>
 
                         <script>
                             document.getElementById("registrationtype").addEventListener("change", function () {
@@ -885,9 +967,11 @@
                                 if (registrationType === "Regular" || registrationType === "Composition") {
                                     gstNumberLabel.style.display = "block";
                                     gstNumberInput.style.display = "block";
+                                    gstNumberInput.required = true;
                                 } else {
                                     gstNumberLabel.style.display = "none";
                                     gstNumberInput.style.display = "none";
+                                    gstNumberInput.required = false;
                                 }
                             });
                         </script>

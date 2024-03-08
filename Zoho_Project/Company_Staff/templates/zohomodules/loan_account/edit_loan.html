@@ -31,7 +31,7 @@
                     </h5>
                     {% endfor %}
                 </div>
-                <form method="POST" action="{% url 'edit_loantable' account.bank_holder.id %}" enctype="multipart/form-data" >
+                <form method="POST" action="{% url 'edit_loantable' account.bank_holder.id %}" enctype="multipart/form-data" id="editloan">
                     {% csrf_token %}
                     <div class="row">
                         <div class="data  col-lg-8 col-md-6 col-sm-16">
@@ -97,7 +97,9 @@
                                         <option value="UPI" {% if account.payment_method == 'UPI' %} selected {% endif %}>UPI</option>
                                         <option value="Cheque" {% if account.payment_method == 'Cheque' %} selected {% endif %}>Cheque</option>
                                         {% for bank in banks %}
+                                        {% if bank.status == 'Active' %}
                                         <option value="{{ bank.id }}" {% if account.payment_method == bank.bnk_name %} selected {% endif %}>{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                                        {% endif %}
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -123,7 +125,7 @@
                                     <label for="account_number">Account Number</label>
                                 </div>
                                 <div class="input-container col-6">
-                                    <input type="text" class="form-control text-dark bg-light" name="account_number" id="accountnum"  value="{{account.payment_accountnumber}}">
+                                    <input type="text" class="form-control text-dark bg-light" name="account_number" id="accountnum"  value="{{account.payment_accountnumber}}" readonly>
                                 </div>
                             </div>
                             
@@ -149,7 +151,9 @@
                                         <option value="UPI" {% if account.processing_method == 'UPI' %} selected {% endif %}>UPI</option>
                                         <option value="Cheque" {% if account.processing_method == 'Cheque' %} selected {% endif %}>Cheque</option>
                                             {% for bank in banks %}
+                                            {% if bank.status == 'Active' %}
                                         <option value="{{ bank.id }}"{% if account.processing_method == bank.bnk_name %} selected {% endif %}>{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                                        {% endif %}
                                         {% endfor %}
                                         </select>
                                     </div>
@@ -175,7 +179,7 @@
                                         <label for="account_number">Account Number</label>
                                     </div>
                                     <div class="input-container col-6">
-                                        <input type="text" class="form-control text-dark bg-light" name="p_account_number" id="num" value="{{account.processing_acc}}">
+                                        <input type="text" class="form-control text-dark bg-light" name="p_account_number" id="num" value="{{account.processing_acc}}" readonly>
                                     </div>
                                 </div>
                                 <div class="row pb-3">
@@ -237,7 +241,7 @@
                 $('#cheque_details').hide();
                 $('#upi_details').hide();
                 $('#accountnumber').show();
-                var bankId = $(this).val();
+                var bankId = selectedOption;
                 $.ajax({
                 url: '{% url "full_account_number" 0 %}'.replace('0', bankId),
                 type: 'GET',
@@ -279,6 +283,24 @@
             $('#accountnumber').show();
         }
     });
+    $('#editloan').submit(function (e) {
+        var selectedOption = $('#lpayment_method').val();
+        if (selectedOption === 'UPI') {
+            var pupiId = $('#upi_id').val();
+            if (!pupiId) {
+                e.preventDefault(); // Prevent form submission
+                alert('UPI ID is required.');
+            }
+        }else if(selectedOption === 'Cheque') {
+            var pcheq = $('#cheque_number').val();
+            if (!pcheq) {
+                e.preventDefault(); // Prevent form submission
+                alert('Cheque number is required.');
+            }
+        
+        }
+    });
+
   </script>
 
 
@@ -307,7 +329,7 @@
                 $('#cheque_p').hide();
                 $('#upi_p').hide();
                 $('#account_number_p').show();
-                var bankId = $(this).val();
+                var bankId = selectedOption;
                 $.ajax({
                 url: '{% url "full_account_number" 0 %}'.replace('0', bankId),
                 type: 'GET',
@@ -349,6 +371,24 @@
             $('#account_number_p').show();
         }
     });
+    $('#editloan').submit(function (e) {
+        var selectedOption = $('#lprocessing_method').val();
+        if (selectedOption === 'UPI') {
+            var upiId = $('#upi').val();
+            if (!upiId) {
+                e.preventDefault(); // Prevent form submission
+                alert('UPI ID is required.');
+            }
+        }else if(selectedOption === 'Cheque') {
+            var cheq = $('#cheque').val();
+            if (!cheq) {
+                e.preventDefault(); // Prevent form submission
+                alert('Cheque number is required.');
+            }
+        
+        }
+    });
+
   </script>
 
 {% endblock %}

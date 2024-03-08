@@ -48,7 +48,7 @@
                     </h5>
                     {% endfor %}
                 </div>
-                <form action="{% url 'edit_additional_loan' repayment.id %}" method="post" class="needs-validation"  autocomplete="off">
+                <form action="{% url 'edit_additional_loan' repayment.id %}" method="post" class="needs-validation"  autocomplete="off" id="editadd">
                     {%csrf_token%}
                     <div class="row">
                       <div class="col-md-6">
@@ -86,7 +86,9 @@
                           <option value="UPI" {% if repayment.payment_method == 'UPI' %} selected {% endif %}>UPI</option>
                           <option value="Cheque" {% if repayment.payment_method == 'Cheque' %} selected {% endif %}>Cheque</option>
                           {% for bank in banks %}
+                          {% if bank.status == 'Active' %}
                           <option value="{{ bank.id }}" {% if repayment.payment_method == bank.bnk_name %} selected {% endif %}>{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                          {% endif %}
                           {% endfor %}
                         </select>
                       </div>
@@ -108,7 +110,7 @@
                   <div class="row mt-3" id="accdetails" style="display: none;">
                     <div class="col-md-6">
                         <label for="upi_id" style="color: white;">Account Number</label>
-                        <input type="text" class="form-control text-white bg-black mt-1" id="acc_num" name="acc_num"  value="{{repayment.account_number}}">
+                        <input type="text" class="form-control text-white bg-black mt-1" id="acc_num" name="acc_num"  value="{{repayment.account_number}}" readonly>
                     </div>
                     
                 </div>
@@ -171,7 +173,7 @@
                                   $('#chequedetails').hide();
                                   $('#upidetails').hide();
                                   $('#accdetails').show();
-                                  var bankId = $(this).val();
+                                  var bankId = selectedOption;
                                   $.ajax({
                                   url: '{% url "full_account_number" 0 %}'.replace('0', bankId),
                                   type: 'GET',
@@ -213,6 +215,23 @@
                               $('#accdetails').show();
                           }
                       });
+                      $('#editadd').submit(function (e) {
+        var selectedOption = $('#paymentmethod').val();
+        if (selectedOption === 'UPI') {
+            var upiId = $('#upi_id').val();
+            if (!upiId) {
+                e.preventDefault(); // Prevent form submission
+                alert('UPI ID is required.');
+            }
+        }else if(selectedOption === 'Cheque') {
+            var cheq = $('#cheque_number').val();
+            if (!cheq) {
+                e.preventDefault(); // Prevent form submission
+                alert('Cheque number is required.');
+            }
+        
+        }
+    });
                   </script>
 
                         

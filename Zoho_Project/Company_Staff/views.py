@@ -902,7 +902,7 @@ def overview(request,account_id):
             repayment_history = LoanRepaymentHistory.objects.filter(repayment__in=repayment_details,company=company)
             # repayment_history = LoanRepaymentHistory.objects.filter(repayment='3')
             
-            banks = Banking.objects.values('id','bnk_name','bnk_acno').filter(company=company)
+            banks = Banking.objects.values('id','bnk_name','bnk_acno','status').filter(company=company)
 
             current_balance = loan_info.loan_amount  
             balances = [] 
@@ -984,7 +984,7 @@ def transactoverview(request,account_id):
             repayment_history = LoanRepaymentHistory.objects.filter(repayment__in=repayment_details,company=company)
             # repayment_history = LoanRepaymentHistory.objects.filter(repayment='3')
             
-            banks = Banking.objects.values('id','bnk_name','bnk_acno').filter(company=company)
+            banks = Banking.objects.values('id','bnk_name','bnk_acno','status').filter(company=company)
 
             current_balance = loan_info.loan_amount  
             balances = [] 
@@ -1033,6 +1033,92 @@ def transactoverview(request,account_id):
                      }          
     
             return render(request,'zohomodules/loan_account/overview.html',context)
+        
+
+
+def statementoverview(request,account_id):
+    if 'login_id' in request.session:
+        log_id = request.session['login_id']
+        if 'login_id' not in request.session:
+            return redirect('/')
+        
+        log_details = LoginDetails.objects.get(id=log_id)
+        user_type = log_details.user_type
+
+        if user_type in ['Company', 'Staff']:
+            if user_type == 'Company':
+                dash_details = CompanyDetails.objects.get(login_details=log_details, superadmin_approval=1, Distributor_approval=1)
+                company=dash_details
+                allmodules = ZohoModules.objects.get(company=dash_details, status='New')
+                
+            else: 
+                dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
+                company=dash_details.company
+                allmodules = ZohoModules.objects.get(company=dash_details.company, status='New')
+            
+            today=date.today()
+            today_date = today.strftime("%Y-%m-%d")
+
+            # loan_info = get_object_or_404(loan_account, id=account_id, company=company)
+            # account = loan_info.bank_holder
+            account = get_object_or_404(BankAccount, id=account_id,company=company)
+            loan_info = loan_account.objects.filter(bank_holder=account,company=company).first()
+            repayment_details = LoanRepayemnt.objects.filter(loan=loan_info,company=company)
+            repayment_history = LoanRepaymentHistory.objects.filter(repayment__in=repayment_details,company=company)
+            # repayment_history = LoanRepaymentHistory.objects.filter(repayment='3')
+            
+            banks = Banking.objects.values('id','bnk_name','bnk_acno','status').filter(company=company)
+
+            current_balance = loan_info.loan_amount  
+            balances = [] 
+            loan_side = loan_account.objects.filter(company=company) 
+            for loan in loan_side:
+                total_emis_paid = LoanRepayemnt.objects.filter(company=company,loan=loan, type='EMI paid').aggregate(total=Sum('principal_amount'))['total'] or 0
+                total_additional_loan = LoanRepayemnt.objects.filter(company=company,loan=loan, type='Additional Loan').aggregate(total=Sum('principal_amount'))['total'] or 0
+                loan.balance = loan.loan_amount - total_emis_paid + total_additional_loan 
+
+            for repayment in repayment_details:
+                if repayment.type == 'EMI paid':
+                    current_balance -= repayment.principal_amount
+                elif repayment.type == 'Additional Loan':
+                    current_balance += repayment.principal_amount     
+                balances.append(current_balance)
+
+            overall_balance = current_balance
+            repayment_details_with_balances = zip(repayment_details, balances)
+            total_amount= loan_info.loan_amount + loan_info.interest
+
+
+            history=LoanAccountHistory.objects.filter(loan=loan_info,company=company)
+            comment=Comments.objects.filter(loan=loan_info,company=company)
+
+            context = {
+                    'details': dash_details,
+                    'allmodules': allmodules,
+                    'log_id':log_details,
+                    'account':account,
+                    'loan_info':loan_info,
+                    'repayment_details': repayment_details,
+                    'repayment_details_with_balances': repayment_details_with_balances,
+                    'overall_balance': overall_balance, 
+                    'total_amount':total_amount,
+                    'history':history,
+                    'loan_side':loan_side,
+                    'today_date':today_date,
+                    'repayment_history':repayment_history,
+                    'comment':comment,
+                    'banks':banks,
+                    
+                    'account_id':account_id,
+                    'loanpage':'2'
+                    
+                    
+                     }          
+    
+            return render(request,'zohomodules/loan_account/overview.html',context)
+        
+
+
         
 
 from django.http import JsonResponse
@@ -1090,12 +1176,16 @@ def repayment_due_form(request, account_id):
                 company=dash_details.company
                 allmodules = ZohoModules.objects.get(company=dash_details.company, status='New')
                 
-            banks = Banking.objects.values('id','bnk_name','bnk_acno').filter(company=company)
+            banks = Banking.objects.values('id','bnk_name','bnk_acno','status').filter(company=company)
 
             if request.method == 'POST':
                 principal_amount = request.POST.get('principal_amount')
                 interest_amount = request.POST.get('interest_amount')
                 payment_method=request.POST.get('payment_method')
+                if payment_method is not None and payment_method.isdigit():
+                    print("payment_method is a number")
+                    acc = Banking.objects.get(pk=payment_method)
+                    payment_method = acc.bnk_name
                 upi_id=request.POST.get('upi_id')
                 cheque=request.POST.get('cheque_number')
                 account_number=request.POST.get('acc_no')
@@ -1164,13 +1254,17 @@ def new_loan(request,account_id):
                 company=dash_details.company
                 allmodules = ZohoModules.objects.get(company=dash_details.company, status='New')
                 
-            banks = Banking.objects.values('id','bnk_name','bnk_acno').filter(company=company)
+            banks = Banking.objects.values('id','bnk_name','bnk_acno','status').filter(company=company)
 
             today_date = dt.today()
             if request.method == 'POST':
                 principal_amount = request.POST.get('principal_amount')
                 interest_amount = request.POST.get('interest_amount')
                 payment_method=request.POST.get('payment_method')
+                if payment_method is not None and payment_method.isdigit():
+                    print("payment_method is a number")
+                    acc = Banking.objects.get(pk=payment_method)
+                    payment_method = acc.bnk_name
                 upi_id=request.POST.get('upi_id')
                 cheque=request.POST.get('cheque_number')
                 account_number=request.POST.get('acc_num')
@@ -1244,7 +1338,7 @@ def edit_loanaccount(request, account_id):
                 company=dash_details.company
                 allmodules = ZohoModules.objects.get(company=dash_details.company, status='New')
 
-            banks = Banking.objects.values('id','bnk_name','bnk_acno').filter(company=company)
+            banks = Banking.objects.values('id','bnk_name','bnk_acno','status').filter(company=company)
             bank_holder=BankAccount.objects.filter(company=company)
 
             bank_account = get_object_or_404(BankAccount, id=account_id,company=company)
@@ -1276,7 +1370,7 @@ def edit_loantable(request, account_id):
 
             bank_account = BankAccount.objects.get(id=account_id,company=company)
             loan = loan_account.objects.get(bank_holder=bank_account,company=company)
-            banks = Banking.objects.values('id','bnk_name','bnk_acno')
+            banks = Banking.objects.values('id','bnk_name','bnk_acno','status').filter(company=company)
 
             if request.method == 'POST':
                 
@@ -1285,11 +1379,19 @@ def edit_loantable(request, account_id):
                 loan.lender_bank = request.POST.get('lender_bank')
                 loan.loan_date = request.POST.get('loan_date')
                 loan.payment_method = request.POST.get('payment_method')
+                if loan.payment_method is not None and loan.payment_method.isdigit():
+                    print("payment_method is a number")
+                    acc = Banking.objects.get(pk=loan.payment_method)
+                    loan.payment_method = acc.bnk_name
                 loan.upi_id = request.POST.get('upi_id')
                 loan.cheque = request.POST.get('cheque_number')
                 loan.payment_accountnumber = request.POST.get('account_number')
                 loan.term = request.POST.get('terms')
                 loan.processing_method = request.POST.get('processing_method')
+                if loan.processing_method is not None and loan.processing_method.isdigit():
+                    print("payment_method is a number")
+                    acc = Banking.objects.get(pk=loan.processing_method)
+                    loan.processing_method = acc.bnk_name
                 loan.processing_upi = request.POST.get('p_upi_id')
                 loan.processing_cheque = request.POST.get('p_cheque_number')
                 loan.processing_acc = request.POST.get('p_account_number')
@@ -1380,13 +1482,17 @@ def edit_repayment(request, repayment_id):
                 allmodules = ZohoModules.objects.get(company=dash_details.company, status='New')
             repayment = get_object_or_404(LoanRepayemnt, id=repayment_id,company=company)
             account_id = repayment.loan.bank_holder_id 
-            banks = Banking.objects.values('id','bnk_name','bnk_acno').filter(company=company)
+            banks = Banking.objects.values('id','bnk_name','bnk_acno','status').filter(company=company)
             
            
             if request.method == 'POST':
                 principal_amount = request.POST.get('principal_amount')
                 interest_amount = request.POST.get('interest_amount')
                 payment_method = request.POST.get('payment_method')
+                if payment_method is not None and payment_method.isdigit():
+                    print("payment_method is a number")
+                    acc = Banking.objects.get(pk=payment_method)
+                    payment_method = acc.bnk_name
                 upi_id = request.POST.get('upi_id')
                 cheque = request.POST.get('cheque_number')
                 account_number=request.POST.get('acc_no')
@@ -1446,12 +1552,16 @@ def edit_additional_loan(request, repayment_id):
             repayment = get_object_or_404(LoanRepayemnt, id=repayment_id,company=company)
             account_id = repayment.loan.bank_holder_id 
             current_balance=calculate_overall_balance(request,account_id)
-            banks = Banking.objects.values('id','bnk_name','bnk_acno').filter(company=company)
+            banks = Banking.objects.values('id','bnk_name','bnk_acno','status').filter(company=company)
     
             if request.method == 'POST':
                 principal_amount = request.POST.get('principal_amount')
                 interest_amount = request.POST.get('interest_amount')
                 payment_method = request.POST.get('payment_method')
+                if payment_method is not None and payment_method.isdigit():
+                    print("payment_method is a number")
+                    acc = Banking.objects.get(pk=payment_method)
+                    payment_method = acc.bnk_name
                 upi_id = request.POST.get('upi_id')
                 cheque = request.POST.get('cheque_number')
                 account_number=request.POST.get('acc_num')
@@ -1554,12 +1664,12 @@ def share_email(request, account_id):
                 email.attach(filename, pdf, "application/pdf") 
                 email.send(fail_silently=False)
 
-                messages.success(request, 'Statement has been shared via email successfully..!')
-                return redirect('overview', account_id)
+                messages.success(request, 'Loan Statement has been shared successfully..!')
+                return redirect('statementoverview', account_id)
     except Exception as e:
         print(e)
         messages.error(request, f'{e}')
-        return redirect('overview', account_id)
+        return redirect('statementoverview', account_id)
     
 
 def adding_comment(request, account_id):
@@ -1680,7 +1790,7 @@ def delete_loan(request,account_id):
             context={'details': dash_details,  'allmodules': allmodules,'loanaccount': loan_info}
             if transactions.exists():
                  messages.error(request, 'This account can be deleted as it has done some transactions !!')
-                 return redirect('overview', account_id=account_id)
+                 return redirect('transactoverview', account_id=account_id)
             else:
                 loan_info.delete()
                 return redirect('loan_listing')

@@ -198,9 +198,26 @@
   }
   
   @media print {
-    body * {
-      visibility: hidden;
+    html,body {
+        height: 100% !important;
+        /* width: 100% !important; */
+        /* display: block; */
+      
+      visibility: hidden !important;
+      /* height:100%;  */
+      overflow:scroll;
     }
+    .printContainer {
+            visibility: visible !important;/* Override the rule above to only show the printables */ 
+            position: absolute;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            font-size: large;
+        } 
 
     header {
       display: none;
@@ -388,7 +405,10 @@
                         <a class="btn btn-outline-warning small_btn mt-2 mx-2 d-none" onclick="export_as_pdf()" title="PDF" id="pdf_btn"> 
                           <i class="fa fa-file-pdf"></i>
                         </a>
-                        <a class="btn btn-outline-warning small_btn mt-2 d-none" onclick="window.print()" title="PRINT" id="print_btn">
+                        <!-- <a class="btn btn-outline-warning small_btn mt-2 d-none" onclick="window.print()" title="PRINT" id="print_btn">
+                          <i class="fa fa-print"></i> 
+                        </a> -->
+                        <a class="btn btn-outline-warning small_btn mt-2 d-none" onclick="printfun()" title="PRINT" id="print_btn">
                           <i class="fa fa-print"></i> 
                         </a>
                         <a class="btn btn-outline-warning small_btn mt-2 mx-2" href="{% url 'update_status' account.id %}" title="STATUS" >{{loan_info.status}}</a>
@@ -529,7 +549,7 @@
                               </button>
                             </div>
                           </div><br>
-                          <form action="{% url 'repayment_due_form' account.id %}" method="post" class="needs-validation"  autocomplete="off">
+                          <form action="{% url 'repayment_due_form' account.id %}" method="post" class="needs-validation"  autocomplete="off" id="dueemi">
                             {%csrf_token%}
                             <div class="row">
                               <div class="col-md-6">
@@ -559,7 +579,9 @@
                                   <option value="UPI">UPI</option>
                                   <option value="Cheque">Cheque</option>
                                   {% for bank in banks %}
+                                  {% if bank.status == 'Active' %}
                                     <option value="{{ bank.id }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                                    {% endif %}
                                   {% endfor %}
                                  
                                 </select>
@@ -574,7 +596,7 @@
                             </div>
                             <div class="col-md-6" id="acc_details" style="display: none;">
                               <label for="upi_id" style="color: white;">Account Number</label>
-                              <input type="text" class="form-control text-white bg-black mt-1" id="acc_no" name="acc_no">
+                              <input type="text" class="form-control text-white bg-black mt-1" id="acc_no" name="acc_no" readonly>
                           </div>
                               
                             </div>
@@ -612,7 +634,7 @@
                               </button>
                             </div>
                           </div><br>
-                          <form action="{% url 'new_loan' account.id %}" method="post" class="needs-validation"  autocomplete="off">
+                          <form action="{% url 'new_loan' account.id %}" method="post" class="needs-validation"  autocomplete="off" id="newloan">
                             {%csrf_token%}
                             <div class="row">
                               <div class="col-md-6">
@@ -652,7 +674,9 @@
                                   <option value="UPI">UPI</option>
                                   <option value="Cheque">Cheque</option>
                                   {% for bank in banks %}
+                                  {% if bank.status == 'Active' %}
                                         <option value="{{ bank.id }}">{{ bank.bnk_name }}-( {{ bank.bnk_acno|slice:'-4:' }})</option>
+                                        {% endif %}
                                         {% endfor %}
                                   
                                 </select>
@@ -661,7 +685,7 @@
                             <div class="row mt-3" id="chequedetails" style="display: none;">
                               <div class="col-md-6">
                                   <label for="cheque_number" style="color: white;">Cheque Number</label>
-                                  <input type="text" class="form-control text-white bg-black mt-1" id="cheque_number" name="cheque_number" >
+                                  <input type="text" class="form-control text-white bg-black mt-1" id="chequenumber" name="cheque_number" >
                               </div>
                           </div>
       
@@ -669,14 +693,14 @@
                           <div class="row mt-3" id="upidetails" style="display: none;">
                               <div class="col-md-6">
                                   <label for="upi_id" style="color: white;">UPI ID</label>
-                                  <input type="text" class="form-control text-white bg-black mt-1" id="upi_id" name="upi_id">
+                                  <input type="text" class="form-control text-white bg-black mt-1" id="upiid" name="upi_id">
                               </div>
                               
                           </div>
                           <div class="row mt-3" id="accdetails" style="display: none;">
                             <div class="col-md-6">
                                 <label for="upi_id" style="color: white;">Account Number</label>
-                                <input type="text" class="form-control text-white bg-black mt-1" id="acc_num" name="acc_num" >
+                                <input type="text" class="form-control text-white bg-black mt-1" id="acc_num" name="acc_num" readonly>
                             </div>
                             
                         </div>
@@ -1188,13 +1212,13 @@
                       </div>
                       <div class="bank-row d-md-flex mt-5">
                         <div class="col-md-5">
-                            <span class="bank-label text-black">Received Bank</span>
+                            <span class="bank-label text-black">Lender Bank</span>
                         </div>
                         <div class="col-md-2 text-center">
                             <span class="bnk-colon text-black">:</span>
                         </div>
                         <div class="col-md-5 text-right">
-                            <span class="bank-value text-black">{{ loan_info.bank_holder.bankname }}</span>
+                            <span class="bank-value text-black">{{ loan_info.lender_bank }}</span>
                         </div>
                       </div>
                       <div class="bank-row d-md-flex mt-5">
@@ -1490,9 +1514,9 @@
                                 <div style="margin-left: 20%;">
                                   <h3>{{ loan_info.bank_holder.customer_name }}</h3>
                                   <p class="text-black"> 
-                                    {{ loan_info.bank_holder.account_number}} <br>
-                                    {{ bnk.bnk_ifsc }} <br>
-                                    {{ bnk.bnk_branch }}
+                                    
+                                    {{ loan_info.bank_holder.email }} <br>
+                                    {{loan_info.bank_holder.phone_number }}
                                   </p>
                                 </div>
                               </div>
@@ -1784,7 +1808,25 @@
           });
           }
           });
-          });                                          
+          });
+          $('#newloan').submit(function (e) {
+        var selectedOption = $('#paymentmethod').val();
+        if (selectedOption === 'UPI') {
+            var upiId = $('#upiid').val();
+           
+            if (!upiId) {
+                e.preventDefault(); // Prevent form submission
+                alert('UPI ID is required.');
+            }
+        }else if(selectedOption === 'Cheque') {
+            var cheq = $('#chequenumber').val();
+            if (!cheq) {
+                e.preventDefault(); // Prevent form submission
+                alert('Cheque number is required.');
+            }
+        
+        }
+    });                                          
 </script>
 
 <script>
@@ -1826,7 +1868,25 @@
           });
           }
           });
-          });  
+          }); 
+          $('#dueemi').submit(function (e) {
+        var selectedOption = $('#payment_method').val();
+        if (selectedOption === 'UPI') {
+            var pupiId = $('#upi_id').val();
+            if (!pupiId) {
+                e.preventDefault(); // Prevent form submission
+                alert('UPI ID is required.');
+            }
+        }else if(selectedOption === 'Cheque') {
+            var pcheq = $('#cheque_number').val();
+            if (!pcheq) {
+                e.preventDefault(); // Prevent form submission
+                alert('Cheque number is required.');
+            }
+        
+        }
+    });
+ 
 </script>
 <script>
 
@@ -2492,22 +2552,59 @@
   });
 </script>
 <script>
+
+  // function printfun() {
+  //   var printContents = $("#Statement").clone(); // Clone the content-div to avoid modifying the original content
+  //   printContents.find('.hideon-print').remove(); // Remove columns by class name
+
+  //   var $printerDiv = $('<div class="printContainer" id=printContainer></div>');
+  //   $printerDiv.html(printContents.html());
+  //   $('body').append($printerDiv).addClass("printingContent");
+  //   var h1Element = document.createElement("h1");
+  //   var head = document.getElementById("printContainer");
+  //   head.insertBefore(h1Element, head.firstChild);
+  //   window.print();
+  //   $printerDiv.remove();
+  //   $('body').removeClass("printingContent");
+
+
+  //}
   function printfun(){
-         var printContents = document.getElementById("whatToPrint").innerHTML;
+         var printContents = document.getElementById("Statement").innerHTML;
       var $printerDiv = $('<div class="printContainer"></div>'); // create the div that will contain the stuff to be printed
       $printerDiv.html(printContents); // add the content to be printed
-      $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
+      //alert(printContents);
+      // $('body').append($printerDiv).addClass("printingContent"); // add the div to body, and make the body aware of printing (we apply a set of css styles to the body to hide its contents)
 
       window.print(); // call print
       $printerDiv.remove(); // remove the div
       $('body').removeClass("printingContent");
-  }
+   }
+//   function printfun() {
+//     // Open a new window for printing
+//     var printWindow = window.open('', '_self');
+    
+//     // Get the content you want to print
+//     var contentToPrint = document.getElementById("Statement").innerHTML;
+    
+//     // Write the content into the new window
+//     printWindow.document.write('<html><head><title>Print</title></head><body>' + contentToPrint + '</body></html>');
+    
+//     // Print the content
+//     printWindow.print();
+    
+//     // Close the new window
+//     printWindow.close();
+// }
 </script>
+
 
 <script>
   loanpage = '{{loanpage}}'
   if(loanpage == '1'){
     changetab('Transaction')
+  }else  if (loanpage == '2'){
+    changetab('Statement')
   }else{
     changetab('Overview')
   }
