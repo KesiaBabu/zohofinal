@@ -467,7 +467,8 @@
                                                     {% if bank.status == 'Active' %}
                                                     <option value="{{ bank.bnk_name}} "
                                                         data-account="{{ bank.bnk_acno }}"
-                                                        data-ifsc="{{ bank.bnk_ifsc }}">{{ bank.bnk_name }}-(
+                                                        data-ifsc="{{ bank.bnk_ifsc }}"
+                                                        data-branch="{{ bank.bnk_branch }}">{{ bank.bnk_name }}-(
                                                         {{bank.bnk_acno|slice:'-4:' }})</option>
                                                     {% endif %}
                                                     {% endfor %}
@@ -728,11 +729,13 @@
                                 var gst_error = document.getElementById('gst_error');
 
                                 // Regular expression for basic email validation
+                                if (gstInput && gstInput.style.display !== 'none') {
                                 if (!gstInput.value.match(/^\d{2}[A-Z]{5}\d{4}[A-Z]{1}\d{1}[A-Z1-9]{1}\d{1}$/)) {
                                     gst_error.style.fontSize = ".8rem";
                                     gst_error.innerHTML = "Please enter a valid GST number (e.g., 22AAAAA0000A1Z5)";
                                     return false;
                                 }
+                            }
 
                                 // Clear the error message if the email is valid
                                 gst_error.innerHTML = "";
@@ -859,16 +862,19 @@
                                 const bankNameSelect = document.getElementById('bank_name');
                                 const accountNumberInput = document.getElementById('baccount_num');
                                 const ifscCodeInput = document.getElementById('bifsc');
+                                const branchInput = document.getElementById('branchname');
 
                                 bankNameSelect.addEventListener('change', function () {
                                     const selectedOption = bankNameSelect.options[bankNameSelect.selectedIndex];
                                     const accountNumber = selectedOption.getAttribute('data-account');
                                     //window.alert(accountNumber)
                                     const ifscCode = selectedOption.getAttribute('data-ifsc');
+                                    const branch = selectedOption.getAttribute('data-branch');
                                     // window.alert(ifscCode)
 
                                     accountNumberInput.value = accountNumber;
                                     ifscCodeInput.value = ifscCode;
+                                    branchInput.value = branch;
                                 });
                             });
                         </script>

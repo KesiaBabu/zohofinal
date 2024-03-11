@@ -596,7 +596,7 @@ def add_loan(request):
                 dash_details = StaffDetails.objects.get(login_details=log_details, company_approval=1)
                 company=dash_details.company
                 allmodules = ZohoModules.objects.get(company=dash_details.company, status='New')
-            banks = Banking.objects.values('id','bnk_name','bnk_acno','bnk_ifsc','status').filter(company=company)
+            banks = Banking.objects.values('id','bnk_name','bnk_acno','bnk_ifsc','status','bnk_branch').filter(company=company)
             today_date=date.today()
             loaned_bank_account_ids = loan_account.objects.values_list('bank_holder_id', flat=True)
             context = {
@@ -630,6 +630,10 @@ def add_loan(request):
                 cheque=request.POST.get('cheque_number')
                 payment_accountnumber=request.POST.get('laccount_number')
                 processing_method = request.POST.get('processing_method')
+                if processing_method is not None and processing_method.isdigit():
+                    print("payment_method is a number")
+                    acc = Banking.objects.get(pk=processing_method)
+                    processing_method = acc.bnk_name
                 processing_upi=request.POST.get('pupi_id')
                 processing_cheque=request.POST.get('pcheque_number')
                 processing_acc=request.POST.get('paccount_number')
@@ -919,9 +923,16 @@ def overview(request,account_id):
                     current_balance += repayment.principal_amount     
                 balances.append(current_balance)
 
+            
             overall_balance = current_balance
             repayment_details_with_balances = zip(repayment_details, balances)
             total_amount= loan_info.loan_amount + loan_info.interest
+
+            new_amount = loan_info.loan_amount
+            for repayment in repayment_details:
+                if repayment.type == 'Additional Loan':
+                    new_amount += repayment.principal_amount
+            transact_amount=new_amount
 
 
             history=LoanAccountHistory.objects.filter(loan=loan_info,company=company)
@@ -943,6 +954,7 @@ def overview(request,account_id):
                     'repayment_history':repayment_history,
                     'comment':comment,
                     'banks':banks,
+                    'transact_amount':transact_amount,
                     
                     'account_id':account_id,
                     'loanpage':'0'
@@ -1005,6 +1017,12 @@ def transactoverview(request,account_id):
             repayment_details_with_balances = zip(repayment_details, balances)
             total_amount= loan_info.loan_amount + loan_info.interest
 
+            new_amount = loan_info.loan_amount
+            for repayment in repayment_details:
+                if repayment.type == 'Additional Loan':
+                    new_amount += repayment.principal_amount
+            transact_amount=new_amount
+
 
             history=LoanAccountHistory.objects.filter(loan=loan_info,company=company)
             comment=Comments.objects.filter(loan=loan_info,company=company)
@@ -1025,6 +1043,7 @@ def transactoverview(request,account_id):
                     'repayment_history':repayment_history,
                     'comment':comment,
                     'banks':banks,
+                    'transact_amount':transact_amount,
                     
                     'account_id':account_id,
                     'loanpage':'1'
@@ -1088,6 +1107,12 @@ def statementoverview(request,account_id):
             repayment_details_with_balances = zip(repayment_details, balances)
             total_amount= loan_info.loan_amount + loan_info.interest
 
+            new_amount = loan_info.loan_amount
+            for repayment in repayment_details:
+                if repayment.type == 'Additional Loan':
+                    new_amount += repayment.principal_amount
+            transact_amount=new_amount
+
 
             history=LoanAccountHistory.objects.filter(loan=loan_info,company=company)
             comment=Comments.objects.filter(loan=loan_info,company=company)
@@ -1108,6 +1133,7 @@ def statementoverview(request,account_id):
                     'repayment_history':repayment_history,
                     'comment':comment,
                     'banks':banks,
+                    'transact_amount':transact_amount,
                     
                     'account_id':account_id,
                     'loanpage':'2'

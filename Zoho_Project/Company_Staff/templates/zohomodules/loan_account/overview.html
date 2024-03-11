@@ -1185,7 +1185,7 @@
                             <span class="bnk-colon text-black">:</span>
                         </div>
                         <div class="col-md-5 text-right">
-                            <span class="bank-value text-black">{{ loan_info.loan_amount }}</span>
+                            <span class="bank-value text-black">{{ transact_amount }}</span>
                         </div>
                       </div>
                       <div class="bank-row d-md-flex mt-5">
@@ -1374,7 +1374,7 @@
                       <div class="info-container"  style="padding-left: 5%;">
                         <div class="info-row d-md-flex">
                             <span class="info-label text-white">Loan Amount :</span>
-                            <span class="info-value text-white">{{ loan_info.loan_amount }}</span>
+                            <span class="info-value text-white">{{ transact_amount }}</span>
                         </div>
                         <div class="info-row d-md-flex mt-3">
                             <span class="info-label text-white">Account Holder :</span>
@@ -1524,6 +1524,8 @@
 
                             <div class="row">
                               <h2 class="text-black">Balance : {{ overall_balance }}</h2>
+                              <h2 class="text-black" id="balanceAtEndDate"></h2>
+                              <!-- <div id="balanceAtEndDate"></div> -->
                             </div>
                           </div>
                         </section>
@@ -1967,7 +1969,7 @@
 
 
 </script>
-<script>
+<!-- <script>
   var table = document.getElementById("statementtable");
   //window.alert("script start stat")
   var fromDate;
@@ -2042,6 +2044,65 @@
   })
 
 
+</script> -->
+<script>
+  var table = document.getElementById("statementtable");
+  var fromDate;
+  var toDate;
+
+  $('#start-date').on('change', function () {
+      fromDate = $(this).val();
+      filterTable();
+  });
+
+  $('#end-date').on('change', function () {
+      toDate = $(this).val();
+      filterTable();
+  });
+
+  function filterTable() {
+      var startDate = new Date(document.getElementById("start-date").value);
+      var endDate = new Date(document.getElementById("end-date").value);
+      var sDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+      var eDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+      var rows = table.getElementsByTagName("tr");
+
+      for (var i = 1; i < rows.length; i++) {
+          var row = rows[i];
+          var dateCell = row.cells[1];
+          var rowDate = new Date(dateCell.textContent);
+          var rDate = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+
+          if (rDate >= sDate && rDate <= eDate) {
+              row.style.display = "";
+          } else {
+              row.style.display = "none";
+          }
+      }
+
+      // Calculate and display the balance amount at the end date
+      var balanceAtEndDate = calculateBalanceAtEndDate(eDate);
+      document.getElementById("balanceAtEndDate").innerHTML = balanceAtEndDate.toFixed(2);
+  }
+
+  function calculateBalanceAtEndDate(endDate) {
+      var rows = table.getElementsByTagName("tr");
+      var balance = 0;
+
+      for (var i = 1; i < rows.length; i++) {
+          var row = rows[i];
+          var dateCell = row.cells[1];
+          var balanceCell = row.cells[7]; // Assuming balance cell is at index 7
+          var rowDate = new Date(dateCell.textContent);
+          var rDate = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+
+          if (rDate <= endDate) {
+              balance = parseFloat(balanceCell.textContent);
+          }
+      }
+
+      return balance;
+  }
 </script>
 <script>
   function ExportToExcel() {
